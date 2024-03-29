@@ -1,0 +1,32 @@
+version: "3.10"
+
+services:
+
+  db:
+    image: postgres:latest
+    restart: always
+    ports:  
+      - "5432:5432"
+    environment:      
+      POSTGRES_DB: ${PG_NAME}
+      POSTGRES_USER: ${PG_USER}      
+      POSTGRES_PASSWORD: ${PG_PASS}
+      
+    volumes:
+      - "./postgres:/var/lib/postgresql/data"
+
+  app:
+    build: .
+    volumes:
+      - .:/config
+      - ./static:/app/static
+    ports:
+    - "8011:8011"
+    command: bash -c "python manage.py collectstatic --no-input && python manage.py migrate && gunicorn config.wsgi:application -w 4 -b 0.0.0.0:8011"
+    environment:      
+      POSTGRES_DB: ${PG_NAME}
+      POSTGRES_USER: ${PG_USER}      
+      POSTGRES_PASSWORD: ${PG_PASS}
+    depends_on:
+      - db
+      
