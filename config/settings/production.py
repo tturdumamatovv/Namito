@@ -95,14 +95,7 @@ STORAGES = {
             "location": "media",
             "file_overwrite": False,
         },
-    },
-    "static": {
-        "BACKEND": "storages.backends.s3.S3Storage",
-        "OPTIONS": {
-            "location": "static",
-            "default_acl": "public-read",
-        },
-    },
+    }
 }
 # MEDIA_URL = f"https://{aws_s3_domain}/media/"
 COLLECTFAST_STRATEGY = "collectfast.strategies.boto3.Boto3Strategy"
