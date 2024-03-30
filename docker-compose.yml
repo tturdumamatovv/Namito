@@ -14,7 +14,7 @@ services:
     build: .
     volumes:
       - .:/config
-      - ./static:/app/static
+      - ./namito/static:/app/namito/static
     ports:
     - "8011:8011"
     command: bash -c "python manage.py collectstatic --no-input && python manage.py migrate && gunicorn config.wsgi:application -b 0.0.0.0:8011"
