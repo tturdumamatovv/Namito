@@ -12,7 +12,7 @@ urlpatterns = [
 
     path(settings.ADMIN_URL, admin.site.urls),
     path("users/", include("namito.users.urls")),
-    # path("accounts/", include("allauth.urls")),
+    path("accounts/", include("allauth.urls")),
     path('carts/', include('namito.orders.urls')),
 
     path("api/", include("namito.catalog.urls")),
