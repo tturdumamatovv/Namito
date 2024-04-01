@@ -149,6 +149,9 @@ class Product(models.Model):
             self.meta_title = self.generate_meta_title()
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return self.name
+
 
 class Color(models.Model):
     name = models.CharField(max_length=50)
