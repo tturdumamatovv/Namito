@@ -76,7 +76,7 @@ class ProductAdmin(admin.ModelAdmin):
     form = ProductForm
     list_display = ['name', 'category']
     search_fields = ['name', 'category__name']
-    inlines = [VariantInline, ImageInline, ReviewInline]
+    inlines = [VariantInline, ReviewInline]
 
 
 @admin.register(Brand)
@@ -122,8 +122,7 @@ class VariantAdmin(admin.ModelAdmin):
 
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
-    list_display = ['product', 'variant', 'image_preview']
-    search_fields = ['product__name']
+    list_display = ['variant', 'image_preview']
 
     def image_preview(self, obj):
         if obj.image:

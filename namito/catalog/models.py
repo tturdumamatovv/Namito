@@ -195,13 +195,9 @@ class Variant(models.Model):
 
 
 class Image(ProcessedImageModel):
-    product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='product_images/')
     main_image = models.BooleanField(default=False)
     variant = models.ForeignKey(Variant, related_name='images', on_delete=models.CASCADE, null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.product.name} Image"
 
 
 class Review(models.Model):
