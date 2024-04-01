@@ -176,6 +176,7 @@ class Variant(models.Model):
     size = models.ForeignKey(Size, on_delete=models.CASCADE, related_name='variants')
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField(blank=True, null=True)
+    main = models.BooleanField(default=False)
     DISCOUNT_TYPE_CHOICES = [
         ('percent', _("Percent")),
         ('unit', _("Unit")),

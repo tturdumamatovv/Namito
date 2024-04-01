@@ -79,17 +79,25 @@ class VariantSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    variants = serializers.SerializerMethodField()
+    price = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
+    category = serializers.CharField(source='category.name')
     tags = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags']
+        fields = ['id', 'name', 'description', 'category', 'price', 'average_rating', 'tags']
 
-    def get_variants(self, product):
-        variants_qs = Variant.objects.filter(product=product)
-        return VariantSerializer(variants_qs, many=True).data
+    def get_price(self, product):
+        main_variant = Variant.objects.filter(product=product, main=True).first()
+
+        if not main_variant:
+            main_variant = Variant.objects.filter(product=product).first()
+
+        if main_variant:
+            return VariantSerializer(main_variant).data['price']
+        else:
+            return None
 
     def get_average_rating(self, product):
         average = Rating.objects.filter(product=product).aggregate(Avg('score'))['score__avg']
@@ -98,7 +106,7 @@ class ProductSerializer(serializers.ModelSerializer):
         return round(average, 2)
 
     def get_tags(self, product):
-        tags_qs = product.tags.all()  # Предполагаем, что связь с тегами называется 'tags'
+        tags_qs = product.tags.all()
         return TagSerializer(tags_qs, many=True).data
 
 

@@ -54,13 +54,13 @@ class CategoryAdmin(DraggableMPTTAdmin):
 
 class VariantInline(admin.TabularInline):
     model = Variant
-    extra = 1
+    extra = 0
     show_change_link = True
 
 
 class ImageInline(admin.TabularInline):
     model = Image
-    extra = 1
+    extra = 0
 
 
 class ReviewInline(admin.TabularInline):
