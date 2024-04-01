@@ -34,7 +34,7 @@ schema_view = get_schema_view(
 # API URLS
 urlpatterns += [
     # API base url
-    path("/", TemplateView.as_view(template_name='home.html')),
+    path("/", TemplateView.as_view(template_name='home.html'), name='home'),
     path("api/", include("config.api_router")),
     # DRF auth token
     # path("auth-token/", obtain_auth_token),
