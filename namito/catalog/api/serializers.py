@@ -78,7 +78,7 @@ class VariantSerializer(serializers.ModelSerializer):
         return price
 
 
-class ProductSerializer(serializers.ModelSerializer):
+class ProductListSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
     category = serializers.CharField(source='category.name')
@@ -89,6 +89,44 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description', 'category', 'price', 'average_rating', 'tags']
 
     def get_price(self, product):
+        # Fetch the main variant; if it's not there, fetch any variant
+        main_variant = Variant.objects.filter(product=product, main=True).first()
+        if not main_variant:
+            main_variant = Variant.objects.filter(product=product).first()
+
+        if main_variant:
+            price = main_variant.price
+
+            discount = main_variant.get_price()
+
+            return {
+                'price': price,
+                'reduced_price': discount
+            }
+
+        return {'price': 0, 'discount': 0}
+
+    def get_average_rating(self, product):
+        average = Rating.objects.filter(product=product).aggregate(Avg('score'))['score__avg']
+        if average is None:
+            return 0
+        return round(average, 2)
+
+    def get_tags(self, product):
+        tags_qs = product.tags.all()
+        return TagSerializer(tags_qs, many=True).data
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    variants = serializers.SerializerMethodField()
+    average_rating = serializers.SerializerMethodField()
+    tags = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags']
+
+    def get_variants(self, product):
         main_variant = Variant.objects.filter(product=product, main=True).first()
 
         if not main_variant:

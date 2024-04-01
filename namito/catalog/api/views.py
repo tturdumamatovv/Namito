@@ -6,7 +6,8 @@ from rest_framework import status
 from namito.catalog.models import Category, Product, Color, Size, Variant, Image, Review, Rating, Favorite, SizeChart
 from .filters import ProductFilter
 from .serializers import CategorySerializer, ProductSerializer, ColorSerializer, SizeSerializer, VariantSerializer, \
-    ImageSerializer, RatingSerializer, ReviewSerializer, FavoriteSerializer, BrandSerializer, SizeChartSerializer
+    ImageSerializer, RatingSerializer, ReviewSerializer, FavoriteSerializer, BrandSerializer, SizeChartSerializer, \
+    ProductListSerializer
 
 
 class CategoryListView(generics.ListCreateAPIView):
@@ -40,7 +41,7 @@ class BrandDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class ProductListView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+    serializer_class = ProductListSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilter
 
