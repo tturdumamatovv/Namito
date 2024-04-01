@@ -2,10 +2,28 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from mptt.admin import DraggableMPTTAdmin
-from django import forms
 
 from .forms import CategoryAdminForm, ColorAdminForm, SizeChartForm, TagAdminForm, ProductForm
-from .models import Category, Product, Color, Size, Variant, Image, Review, Brand, SizeChart, SizeChartItem, Tag
+from .models import Category, Product, Color, Size, Variant, Image, Review, Brand, SizeChart, SizeChartItem, Tag, \
+    StaticPage
+
+
+@admin.register(StaticPage)
+class StaticPageAdmin(admin.ModelAdmin):
+    list_display = ('title', 'slug', 'created_at', 'updated_at')
+    search_fields = ['title', 'content']
+    prepopulated_fields = {'slug': ('title',)}
+    list_filter = ('created_at', 'updated_at')
+    ordering = ('title',)
+    fieldsets = (
+        (None, {
+            'fields': ('title', 'content', 'meta_title', 'meta_description', 'image')
+        }),
+        ('Advanced options', {
+            'classes': ('collapse',),
+            'fields': ('slug',),
+        }),
+    )
 
 
 @admin.register(Category)

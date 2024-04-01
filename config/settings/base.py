@@ -433,5 +433,10 @@ SIMPLEUI_CONFIG = {
             'icon': 'fas fa-star',
             'url': '/admin/orders/order/'
         },
+        {
+            'name': 'Static Pages',
+            'icon': 'fas fa-page',
+            'url': '/admin/catalog/staticpage/'
+        },
     ]
 }
