@@ -125,7 +125,7 @@ class Product(models.Model):
     meta_image = models.ImageField(blank=True, null=True)
     keywords = models.JSONField(null=True, blank=True)
     min_price = models.PositiveIntegerField(default=0)
-    tags = models.ManyToManyField(Tag,)
+    tags = models.ManyToManyField(Tag, blank=True)
 
     def generate_meta_description(self):
         if self.description:
