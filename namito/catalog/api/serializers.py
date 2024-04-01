@@ -127,15 +127,8 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags']
 
     def get_variants(self, product):
-        main_variant = Variant.objects.filter(product=product, main=True).first()
-
-        if not main_variant:
-            main_variant = Variant.objects.filter(product=product).first()
-
-        if main_variant:
-            return VariantSerializer(main_variant).data['price']
-        else:
-            return None
+        variants_qs = Variant.objects.filter(product=product)
+        return VariantSerializer(variants_qs, many=True).data
 
     def get_average_rating(self, product):
         average = Rating.objects.filter(product=product).aggregate(Avg('score'))['score__avg']
