@@ -3,11 +3,18 @@ from rest_framework import generics, permissions, mixins
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from namito.catalog.models import Category, Product, Color, Size, Variant, Image, Review, Rating, Favorite, SizeChart
+from namito.catalog.models import Category, Product, Color, Size, Variant, Image, Review, Rating, Favorite, SizeChart, \
+    StaticPage
 from .filters import ProductFilter
 from .serializers import CategorySerializer, ProductSerializer, ColorSerializer, SizeSerializer, VariantSerializer, \
     ImageSerializer, RatingSerializer, ReviewSerializer, FavoriteSerializer, BrandSerializer, SizeChartSerializer, \
-    ProductListSerializer
+    ProductListSerializer, StaticPageSerializer
+
+
+class StaticPageDetailView(generics.RetrieveAPIView):
+    queryset = StaticPage.objects.all()
+    serializer_class = StaticPageSerializer
+    lookup_field = 'slug'
 
 
 class CategoryListView(generics.ListCreateAPIView):

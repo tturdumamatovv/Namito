@@ -2,11 +2,14 @@ from django.urls import path
 
 from namito.catalog.api.views import CategoryListView, CategoryDetailView, ProductListView, ProductDetailView, \
     ColorCreateView, \
-    ColorDetailView, SizeCreateView, SizeDetailView, VariantListView, VariantDetailView, ImageCreateView, ImageDetailView, \
+    ColorDetailView, SizeCreateView, SizeDetailView, VariantListView, VariantDetailView, ImageCreateView, \
+    ImageDetailView, \
     ReviewCreate, RatingCreate, FavoriteToggleAPIView, FavoriteListView, BrandListView, \
-    BrandDetailView, CategoryPromotionListView, SizeChartListView, UserReviewListView
+    BrandDetailView, CategoryPromotionListView, SizeChartListView, UserReviewListView, StaticPageDetailView
 
 urlpatterns = [
+    path('static-pages/<slug:slug>/', StaticPageDetailView.as_view(), name='static-page-detail'),
+
     path('categories/', CategoryListView.as_view()),
     path('categories/promotion/', CategoryPromotionListView.as_view()),
     path('categories/<int:pk>/', CategoryDetailView.as_view()),
