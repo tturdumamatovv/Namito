@@ -8,7 +8,7 @@ from datetime import timedelta
 import os
 import environ
 
-BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
+BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent.parent
 # namito/
 APPS_DIR = BASE_DIR / "namito"
 env = environ.Env()
