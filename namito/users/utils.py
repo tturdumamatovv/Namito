@@ -1,4 +1,4 @@
-import os
+from decouple import config
 import requests
 import uuid
 
@@ -15,10 +15,10 @@ def generate_confirmation_code():
 
 
 def send_sms(phone_number, confirmation_code):
-    login = 'nurmuhammed'
-    password = 'oRXcgAEn'
+    login = config('login_nikita')'jazeeratravelkg'
+    password = config('password_nikita')'PQUegP__'
     transaction_id = str(uuid.uuid4())
-    sender = 'SMSPRO.KG'
+    sender = config('sender_nikita')'Jazeera.kg'
     text = f'Your confirmation code id: {confirmation_code}'
 
     request_body = ET.Element("message")
