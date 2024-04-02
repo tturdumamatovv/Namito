@@ -15,10 +15,10 @@ def generate_confirmation_code():
 
 
 def send_sms(phone_number, confirmation_code):
-    login = config('login_nikita')'jazeeratravelkg'
-    password = config('password_nikita')'PQUegP__'
+    login = config('login_nikita')
+    password = config('password_nikita')
     transaction_id = str(uuid.uuid4())
-    sender = config('sender_nikita')'Jazeera.kg'
+    sender = config('sender_nikita')
     text = f'Your confirmation code id: {confirmation_code}'
 
     request_body = ET.Element("message")
