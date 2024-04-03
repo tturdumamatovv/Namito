@@ -94,11 +94,12 @@ class ProductListSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField()
     is_favorite = serializers.SerializerMethodField()
     cart_quantity = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'category', 'price', 'average_rating', 'tags', 'is_favorite',
-                  'cart_quantity']
+                  'cart_quantity', 'image']
 
     def get_price(self, product):
         # Fetch the main variant; if it's not there, fetch any variant
@@ -128,25 +129,43 @@ class ProductListSerializer(serializers.ModelSerializer):
         tags_qs = product.tags.all()
         return TagSerializer(tags_qs, many=True).data
 
-    def get_is_favorite(self, obj):
+    def get_is_favorite(self, product):
         user = self.context.get('request').user if 'request' in self.context else None
 
         if user and user.is_authenticated:
-            return Favorite.objects.filter(user=user, product=obj).exists()
+            return Favorite.objects.filter(user=user, product=product).exists()
         return False
 
-    def get_cart_quantity(self, obj):
+    def get_cart_quantity(self, product):
         user = self.context.get('request').user if 'request' in self.context else None
 
         if user and user.is_authenticated:
             quantity = CartItem.objects.filter(
                 cart__user=user,
-                product_variant__product=obj,
+                product_variant__product=product,
                 to_purchase=True
             ).aggregate(total_quantity=models.Sum('quantity'))['total_quantity']
 
             return quantity if quantity else 0
         return 0
+
+    def get_image(self, product):
+        variant = Variant.objects.filter(product=product, main=True).first()
+        if variant:
+            images_qs = Image.objects.filter(variant=variant, main_image=True).first()
+            if images_qs:
+                return ImageSerializer(images_qs, many=False).data
+
+        variant = Variant.objects.filter(product=product).first()
+        if variant:
+            images_qs = Image.objects.filter(variant=variant, main_image=True).first()
+            if images_qs:
+                return ImageSerializer(images_qs, many=False).data
+            images_qs = Image.objects.filter(variant=variant).first()
+            return ImageSerializer(images_qs, many=False).data
+
+        return ''
+
 
 
 class ProductSerializer(serializers.ModelSerializer):
