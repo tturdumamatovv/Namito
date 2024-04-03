@@ -10,7 +10,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-
+        migrations.AddField(
+            model_name='static_page',
+            name='image',
+            field=models.ImageField(blank=True, null=True, upload_to='static_page_image'),
+        ),
         migrations.AlterField(
             model_name='product',
             name='meta_image',
