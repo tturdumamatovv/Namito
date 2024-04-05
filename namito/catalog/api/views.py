@@ -4,11 +4,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from namito.catalog.models import Category, Product, Color, Size, Variant, Image, Review, Rating, Favorite, SizeChart, \
-    StaticPage
+    StaticPage, MainPage, Advertisement
 from .filters import ProductFilter
 from .serializers import CategorySerializer, ProductSerializer, ColorSerializer, SizeSerializer, VariantSerializer, \
     ImageSerializer, RatingSerializer, ReviewSerializer, FavoriteSerializer, BrandSerializer, SizeChartSerializer, \
-    ProductListSerializer, StaticPageSerializer
+    ProductListSerializer, StaticPageSerializer, MainPageSerializer, AdvertisementSerializer
 
 
 class StaticPageDetailView(generics.RetrieveAPIView):
@@ -169,3 +169,13 @@ class SizeChartListView(generics.ListAPIView):
         if category_id:
             queryset = queryset.filter(categories__id=category_id)
         return queryset
+
+
+class MainPageView(generics.ListAPIView):
+    queryset = MainPage.objects.all()
+    serializer_class = MainPageSerializer
+
+
+class AdvertisementView(generics.ListAPIView):
+    queryset = MainPage.objects.all()
+    serializer_class = AdvertisementSerializer

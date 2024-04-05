@@ -292,31 +292,32 @@ class SingletonModel(models.Model):
 
 
 class MainPage(SingletonModel):
-    banner1 = models.ImageField(upload_to='banners/')
-    banner2 = models.ImageField(upload_to='banners/')
-    banner3 = models.ImageField(upload_to='banners/')
-    title = models.CharField(verbose_name=_('Заголовок'), max_length=100)
-    descrition = models.TextField(verbose_name=_('Описание'))
-    counter1_title = models.CharField(max_length=30)
-    counter2_title = models.CharField(max_length=30)
-    counter3_title = models.CharField(max_length=30)
-    counter1_value = models.CharField(max_length=30)
-    counter2_value = models.CharField(max_length=30)
-    counter3_value = models.CharField(max_length=30)
-    button_link = models.URLField()
-    button = models.CharField(max_length=50)
+    banner1 = models.ImageField(upload_to='banners/', blank=True, null=True)
+    banner2 = models.ImageField(upload_to='banners/', blank=True, null=True)
+    banner3 = models.ImageField(upload_to='banners/', blank=True, null=True)
+    title = models.CharField(verbose_name=_('Заголовок'), max_length=100, blank=True, null=True)
+    description = models.TextField(verbose_name=_('Описание'), blank=True, null=True)
+    counter1_title = models.CharField(max_length=30, verbose_name=_('Значение показателя 1'), blank=True, null=True)
+    counter1_value = models.CharField(max_length=30, verbose_name=_('Название показателя 1'), blank=True, null=True)
+    counter2_title = models.CharField(max_length=30, verbose_name=_('Значение показателя 2'), blank=True, null=True)
+    counter2_value = models.CharField(max_length=30, verbose_name=_('Название показателя 2'), blank=True, null=True)
+    counter3_value = models.CharField(max_length=30, verbose_name=_('Значение показателя 3'), blank=True, null=True)
+    counter3_title = models.CharField(max_length=30, verbose_name=_('Название показателя 3'), blank=True, null=True)
+
+    button_link = models.URLField(verbose_name=_('Ссылка'), blank=True, null=True)
+    button = models.CharField(max_length=50, verbose_name=_('Кнопка'), blank=True, null=True)
 
     class Meta:
         verbose_name = _('Главная страница')
 
 
 class Advertisement(models.Model):
-    adv_image = models.ImageField(upload_to='banners/')
-    adv_title = models.CharField(max_length=30)
-    adv_description = models.CharField(max_length=100)
-    adv_button_link = models.URLField()
-    adv_button = models.CharField(max_length=30)
-    page = models.ForeignKey(MainPage, on_delete=models.PROTECT)
+    image = models.ImageField(upload_to='banners/', verbose_name='Картинка', blank=True, null=True)
+    title = models.CharField(max_length=30, verbose_name='Заголовок', blank=True, null=True)
+    description = models.CharField(max_length=100, verbose_name='Описание', blank=True, null=True)
+    button_link = models.URLField(verbose_name='Сылка', blank=True, null=True)
+    button = models.CharField(max_length=30, verbose_name='Кнопка', blank=True, null=True)
+    page = models.ForeignKey(MainPage, on_delete=models.PROTECT, blank=True, null=True)
 
     class Meta:
         verbose_name = _('Реклама')

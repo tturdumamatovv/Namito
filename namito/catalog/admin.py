@@ -5,7 +5,7 @@ from mptt.admin import DraggableMPTTAdmin
 
 from .forms import CategoryAdminForm, ColorAdminForm, SizeChartForm, TagAdminForm, ProductForm
 from .models import Category, Product, Color, Size, Variant, Image, Review, Brand, SizeChart, SizeChartItem, Tag, \
-    StaticPage
+    StaticPage, MainPage, Advertisement
 
 
 @admin.register(StaticPage)
@@ -143,3 +143,30 @@ class SizeChartAdmin(admin.ModelAdmin):
     form = SizeChartForm
     list_display = ('name',)
     inlines = [SizeChartItemInline]
+
+
+class AdvertisementInline(admin.TabularInline):
+    model = Advertisement
+    extra = 0
+
+
+@admin.register(MainPage)
+class MainPageAdmin(admin.ModelAdmin):
+    list_display = ('title', 'description', 'button', 'button_link',)
+    inlines = [AdvertisementInline,]
+    fieldsets = (
+        (None, {
+            'fields': ('title', 'description',)
+        }),
+        ("Банера", {
+            'fields': ('banner1', 'banner2', 'banner3',)
+        }),
+        ("Сетчики", {
+            'fields': (('counter1_title', 'counter1_value'),
+                       ('counter2_title', 'counter2_value'),
+                       ('counter3_title', 'counter3_value'),)
+        }),
+        ("Кнопка", {
+            'fields': ('button', 'button_link',)
+        }),
+    )

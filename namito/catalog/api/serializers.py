@@ -1,7 +1,7 @@
 from django.db import models
 from rest_framework import serializers
 from namito.catalog.models import Category, Product, Color, Size, Variant, Image, Rating, Review, Favorite, Brand, \
-    SizeChartItem, SizeChart, Tag, StaticPage
+    SizeChartItem, SizeChart, Tag, StaticPage, MainPage, Advertisement
 from django.db.models import Avg
 
 from namito.orders.models import CartItem
@@ -160,9 +160,9 @@ class ProductListSerializer(serializers.ModelSerializer):
         if variant:
             images_qs = Image.objects.filter(variant=variant, main_image=True).first()
             if images_qs:
-                return ImageSerializer(images_qs, many=False).data
+                return ImageSerializer(images_qs, many=True).data
             images_qs = Image.objects.filter(variant=variant).first()
-            return ImageSerializer(images_qs, many=False).data
+            return ImageSerializer(images_qs, many=True).data
 
         return ''
 
@@ -216,6 +216,7 @@ class ProductSerializer(serializers.ModelSerializer):
             return quantity if quantity else 0
         return 0
 
+
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
@@ -259,3 +260,17 @@ class SizeChartSerializer(serializers.ModelSerializer):
     class Meta:
         model = SizeChart
         fields = ['id', 'name', 'items']
+
+
+class AdvertisementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Advertisement
+        fields = ["image", 'title', 'description', 'button_link', 'button', 'page']
+
+
+class MainPageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = MainPage
+        fields = ['banner1', 'banner2', 'banner3', 'title', 'description', 'counter1_title', 'counter1_value', 'counter2_title', 'counter2_value', 'counter3_title', 'counter3_value', 'button_link', 'button']
+

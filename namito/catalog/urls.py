@@ -5,9 +5,8 @@ from namito.catalog.api.views import CategoryListView, CategoryDetailView, Produ
     ColorDetailView, SizeCreateView, SizeDetailView, VariantListView, VariantDetailView, ImageCreateView, \
     ImageDetailView, \
     ReviewCreate, RatingCreate, FavoriteToggleAPIView, FavoriteListView, BrandListView, \
-
-    BrandDetailView, CategoryPromotionListView, SizeChartListView, UserReviewListView, TopProductListView, NewProductListView
-
+    BrandDetailView, CategoryPromotionListView, SizeChartListView, UserReviewListView, TopProductListView, \
+    NewProductListView, StaticPageDetailView, MainPageView, AdvertisementView
 
 urlpatterns = [
     path('static-pages/<slug:slug>/', StaticPageDetailView.as_view(), name='static-page-detail'),
@@ -37,5 +36,6 @@ urlpatterns = [
     path('favorites/', FavoriteListView.as_view(), name='favorite-list'),
     path('size-charts/', SizeChartListView.as_view(), name='size-chart-list'),
     path('size-charts/<int:category_id>/', SizeChartListView.as_view(), name='size-chart-list-by-category'),
-
+    path('main-page/', MainPageView.as_view(), name='main-page'),
+    path('advertisement/', AdvertisementView.as_view(), name='advertisement'),
 ]

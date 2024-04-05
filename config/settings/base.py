@@ -430,12 +430,17 @@ SIMPLEUI_CONFIG = {
         },
         {
             'name': 'Orders',
-            'icon': 'fas fa-star',
+            'icon': 'fa fa-star',
             'url': '/admin/orders/order/'
         },
         {
+            'name': 'Главная страница',
+            'icon': 'fa fa-window-maximize',
+            'url': '/admin/catalog/mainpage/'
+        },
+        {
             'name': 'Static Pages',
-            'icon': 'fas fa-page',
+            'icon': 'fa fa-file-text',
             'url': '/admin/catalog/staticpage/'
         },
     ]
