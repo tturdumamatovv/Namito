@@ -293,8 +293,11 @@ class SingletonModel(models.Model):
 
 class MainPage(SingletonModel):
     banner1 = models.ImageField(upload_to='banners/', blank=True, null=True)
+    banner1_link = models.URLField(blank=True, null=True)
     banner2 = models.ImageField(upload_to='banners/', blank=True, null=True)
+    banner2_link = models.URLField(blank=True, null=True)
     banner3 = models.ImageField(upload_to='banners/', blank=True, null=True)
+    banner3_link = models.URLField(blank=True, null=True)
     title = models.CharField(verbose_name=_('Заголовок'), max_length=100, blank=True, null=True)
     description = models.TextField(verbose_name=_('Описание'), blank=True, null=True)
     counter1_title = models.CharField(max_length=30, verbose_name=_('Значение показателя 1'), blank=True, null=True)
@@ -311,14 +314,23 @@ class MainPage(SingletonModel):
         verbose_name = _('Главная страница')
 
 
+class MainPageSlider(models.Model):
+    image = models.ImageField(upload_to='banners/slider/')
+    link = models.URLField(blank=True, null=True)
+    page = models.ForeignKey(MainPage, on_delete=models.PROTECT, blank=True, null=True)
+
+    class Meta:
+        verbose_name = _('Слайдер')
+
+
 class Advertisement(models.Model):
     image = models.ImageField(upload_to='banners/', verbose_name='Картинка', blank=True, null=True)
     title = models.CharField(max_length=30, verbose_name='Заголовок', blank=True, null=True)
     description = models.CharField(max_length=100, verbose_name='Описание', blank=True, null=True)
-    button_link = models.URLField(verbose_name='Сылка', blank=True, null=True)
+    button_link = models.URLField(verbose_name='Ссылка', blank=True, null=True)
     button = models.CharField(max_length=30, verbose_name='Кнопка', blank=True, null=True)
     page = models.ForeignKey(MainPage, on_delete=models.PROTECT, blank=True, null=True)
 
     class Meta:
-        verbose_name = _('Реклама')
+        verbose_name = _('Рекламу')
         verbose_name_plural = _('Рекламы')
