@@ -268,3 +268,56 @@ class SizeChartItem(models.Model):
 
     def __str__(self):
         return self.size
+
+
+class SingletonModel(models.Model):
+    """
+    Модель, которая всегда имеет только один экземпляр.
+    """
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        # Если модель уже существует, удалите ее
+        self.__class__.objects.exclude(id=self.id).delete()
+        super(SingletonModel, self).save(*args, **kwargs)
+
+    @classmethod
+    def load(cls):
+        # Если модель еще не существует, создайте ее
+        if not cls.objects.exists():
+            cls.objects.create()
+        return cls.objects.get()
+
+
+class MainPage(SingletonModel):
+    banner1 = models.ImageField(upload_to='banners/')
+    banner2 = models.ImageField(upload_to='banners/')
+    banner3 = models.ImageField(upload_to='banners/')
+    title = models.CharField(verbose_name=_('Заголовок'), max_length=100)
+    descrition = models.TextField(verbose_name=_('Описание'))
+    counter1_title = models.CharField(max_length=30)
+    counter2_title = models.CharField(max_length=30)
+    counter3_title = models.CharField(max_length=30)
+    counter1_value = models.CharField(max_length=30)
+    counter2_value = models.CharField(max_length=30)
+    counter3_value = models.CharField(max_length=30)
+    button_link = models.URLField()
+    button = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name = _('Главная страница')
+
+
+class Advertisement(models.Model):
+    adv_image = models.ImageField(upload_to='banners/')
+    adv_title = models.CharField(max_length=30)
+    adv_description = models.CharField(max_length=100)
+    adv_button_link = models.URLField()
+    adv_button = models.CharField(max_length=30)
+    page = models.ForeignKey(MainPage, on_delete=models.PROTECT)
+
+    class Meta:
+        verbose_name = _('Реклама')
+        verbose_name_plural = _('Рекламы')
