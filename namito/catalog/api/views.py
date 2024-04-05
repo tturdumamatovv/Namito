@@ -53,12 +53,12 @@ class ProductListView(generics.ListCreateAPIView):
     filterset_class = ProductFilter
 
 
-class TopProductListView(generics.ListCreateAPIView):
-    queryset = Product.objects.filter(is_top=True)[:15]
+class TopProductListView(generics.ListAPIView):
+    queryset = Product.objects.filter(is_top=True).order_by('?')[:15]
     serializer_class = ProductSerializer
 
 
-class NewProductListView(generics.ListCreateAPIView):
+class NewProductListView(generics.ListAPIView):
     queryset = Product.objects.all().order_by('-id')[:15]
     serializer_class = ProductSerializer
 
