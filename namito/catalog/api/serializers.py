@@ -1,7 +1,16 @@
+from django.db import models
 from rest_framework import serializers
 from namito.catalog.models import Category, Product, Color, Size, Variant, Image, Rating, Review, Favorite, Brand, \
-    SizeChartItem, SizeChart, Tag
+    SizeChartItem, SizeChart, Tag, StaticPage
 from django.db.models import Avg
+
+from namito.orders.models import CartItem
+
+
+class StaticPageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StaticPage
+        fields = ['title', 'slug', 'content', 'image', 'meta_title', 'meta_description', 'created_at', 'updated_at']
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -78,14 +87,98 @@ class VariantSerializer(serializers.ModelSerializer):
         return price
 
 
+class ProductListSerializer(serializers.ModelSerializer):
+    price = serializers.SerializerMethodField()
+    average_rating = serializers.SerializerMethodField()
+    category = serializers.CharField(source='category.name')
+    tags = serializers.SerializerMethodField()
+    is_favorite = serializers.SerializerMethodField()
+    cart_quantity = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'description', 'category', 'price', 'average_rating', 'tags', 'is_favorite',
+                  'cart_quantity', 'image']
+
+    def get_price(self, product):
+        # Fetch the main variant; if it's not there, fetch any variant
+        main_variant = Variant.objects.filter(product=product, main=True).first()
+        if not main_variant:
+            main_variant = Variant.objects.filter(product=product).first()
+
+        if main_variant:
+            price = main_variant.price
+
+            discount = main_variant.get_price()
+
+            return {
+                'price': price,
+                'reduced_price': discount
+            }
+
+        return {'price': 0, 'discount': 0}
+
+    def get_average_rating(self, product):
+        average = Rating.objects.filter(product=product).aggregate(Avg('score'))['score__avg']
+        if average is None:
+            return 0
+        return round(average, 2)
+
+    def get_tags(self, product):
+        tags_qs = product.tags.all()
+        return TagSerializer(tags_qs, many=True).data
+
+    def get_is_favorite(self, product):
+        user = self.context.get('request').user if 'request' in self.context else None
+
+        if user and user.is_authenticated:
+            return Favorite.objects.filter(user=user, product=product).exists()
+        return False
+
+    def get_cart_quantity(self, product):
+        user = self.context.get('request').user if 'request' in self.context else None
+
+        if user and user.is_authenticated:
+            quantity = CartItem.objects.filter(
+                cart__user=user,
+                product_variant__product=product,
+                to_purchase=True
+            ).aggregate(total_quantity=models.Sum('quantity'))['total_quantity']
+
+            return quantity if quantity else 0
+        return 0
+
+    def get_image(self, product):
+        variant = Variant.objects.filter(product=product, main=True).first()
+        if variant:
+            images_qs = Image.objects.filter(variant=variant, main_image=True).first()
+            if images_qs:
+                return ImageSerializer(images_qs, many=False).data
+
+        variant = Variant.objects.filter(product=product).first()
+        if variant:
+            images_qs = Image.objects.filter(variant=variant, main_image=True).first()
+            if images_qs:
+                return ImageSerializer(images_qs, many=False).data
+            images_qs = Image.objects.filter(variant=variant).first()
+            return ImageSerializer(images_qs, many=False).data
+
+        return ''
+
+
+
 class ProductSerializer(serializers.ModelSerializer):
     variants = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
     tags = serializers.SerializerMethodField()
+    is_favorite = serializers.SerializerMethodField()
+    cart_quantity = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags']
+        fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags', 'is_favorite',
+                  'cart_quantity']
 
     def get_variants(self, product):
         variants_qs = Variant.objects.filter(product=product)
@@ -98,9 +191,30 @@ class ProductSerializer(serializers.ModelSerializer):
         return round(average, 2)
 
     def get_tags(self, product):
-        tags_qs = product.tags.all()  # Предполагаем, что связь с тегами называется 'tags'
+        tags_qs = product.tags.all()
         return TagSerializer(tags_qs, many=True).data
 
+    def get_is_favorite(self, obj):
+        user = self.context.get('request').user if 'request' in self.context else None
+
+        if user and user.is_authenticated:
+            return Favorite.objects.filter(user=user, product=obj).exists()
+        return False
+
+    def get_cart_quantity(self, obj):
+        # Check if 'request' is in the context and thus the user
+        user = self.context.get('request').user if 'request' in self.context else None
+
+        if user and user.is_authenticated:
+            # Aggregate the quantities of this product in the user's cart(s)
+            quantity = CartItem.objects.filter(
+                cart__user=user,
+                product_variant__product=obj,
+                to_purchase=True  # Assuming you want to count only items marked for purchase
+            ).aggregate(total_quantity=models.Sum('quantity'))['total_quantity']
+
+            return quantity if quantity else 0
+        return 0
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:

@@ -33,6 +33,7 @@ class StaticPage(ProcessedImageModel):
     title = models.CharField(max_length=200, unique=True)
     slug = models.SlugField(max_length=200, unique=True, blank=True)
     content = models.TextField()
+    image = models.ImageField(upload_to='static_pages', blank=True, null=True)
     meta_title = models.CharField(max_length=60, blank=True, null=True)
     meta_description = models.CharField(max_length=160, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -122,7 +123,7 @@ class Product(models.Model):
     brand = models.ForeignKey(Brand, related_name='products', on_delete=models.PROTECT, blank=True, null=True)
     meta_title = models.CharField(max_length=59, blank=True, null=True)
     meta_description = models.TextField(blank=True, null=True)
-    meta_image = models.ImageField(blank=True, null=True)
+    meta_image = models.ImageField(upload_to='product_meta_images', blank=True, null=True)
     keywords = models.JSONField(null=True, blank=True)
     min_price = models.PositiveIntegerField(default=0)
     tags = models.ManyToManyField(Tag, blank=True)
@@ -176,6 +177,7 @@ class Variant(models.Model):
     size = models.ForeignKey(Size, on_delete=models.CASCADE, related_name='variants')
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField(blank=True, null=True)
+    main = models.BooleanField(default=False)
     DISCOUNT_TYPE_CHOICES = [
         ('percent', _("Percent")),
         ('unit', _("Unit")),
@@ -199,13 +201,9 @@ class Variant(models.Model):
 
 
 class Image(ProcessedImageModel):
-    product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='product_images/')
     main_image = models.BooleanField(default=False)
     variant = models.ForeignKey(Variant, related_name='images', on_delete=models.CASCADE, null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.product.name} Image"
 
 
 class Review(models.Model):
