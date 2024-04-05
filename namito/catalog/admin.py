@@ -139,7 +139,6 @@ class SizeChartItemInline(admin.TabularInline):
 
 @admin.register(SizeChart)
 class SizeChartAdmin(admin.ModelAdmin):
-
     form = SizeChartForm
     list_display = ('name',)
     inlines = [SizeChartItemInline]
@@ -158,13 +157,17 @@ class MainPageSliderInline(admin.TabularInline):
 @admin.register(MainPage)
 class MainPageAdmin(admin.ModelAdmin):
     list_display = ('title', 'description', 'button', 'button_link',)
-    inlines = [AdvertisementInline,MainPageSliderInline]
+    inlines = [AdvertisementInline, MainPageSliderInline]
     fieldsets = (
         (None, {
             'fields': ('title', 'description',)
         }),
         ("Банера", {
-            'fields': ('banner1', 'banner2', 'banner3',)
+            'fields': (
+                ('banner1', 'banner1_link'),
+                ('banner2', 'banner2_link'),
+                ('banner3', 'banner3_link')
+            )
         }),
         ("Сетчики", {
             'fields': (('counter1_title', 'counter1_value'),
