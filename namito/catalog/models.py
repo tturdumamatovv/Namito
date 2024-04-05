@@ -126,6 +126,7 @@ class Product(models.Model):
     keywords = models.JSONField(null=True, blank=True)
     min_price = models.PositiveIntegerField(default=0)
     tags = models.ManyToManyField(Tag, blank=True)
+    is_top = models.BooleanField(default=False)
 
     def generate_meta_description(self):
         if self.description:
