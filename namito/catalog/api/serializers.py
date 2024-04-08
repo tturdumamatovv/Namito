@@ -277,8 +277,12 @@ class MainPageSliderSerializer(serializers.ModelSerializer):
 
     def get_image(self, slider):
         request = self.context.get('request')
-        image_url = slider.image.url
-        return request.build_absolute_uri(image_url)
+        if request is not None:
+            image_url = slider.image.url
+            return request.build_absolute_uri(image_url)
+        else:
+            # Обработка ситуации, когда объект запроса отсутствует в контексте
+            return slider.image.url 
 
 
 class MainPageSerializer(serializers.ModelSerializer):
