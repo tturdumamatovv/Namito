@@ -33,7 +33,7 @@ class StaticPage(ProcessedImageModel):
     title = models.CharField(max_length=200, unique=True)
     slug = models.SlugField(max_length=200, unique=True, blank=True)
     content = models.TextField()
-    image = models.ImageField(upload_to='static_pages', blank=True, null=True)
+    image = models.ImageField(upload_to='static_pages/', blank=True, null=True)
     meta_title = models.CharField(max_length=60, blank=True, null=True)
     meta_description = models.CharField(max_length=160, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -123,7 +123,7 @@ class Product(models.Model):
     brand = models.ForeignKey(Brand, related_name='products', on_delete=models.PROTECT, blank=True, null=True)
     meta_title = models.CharField(max_length=59, blank=True, null=True)
     meta_description = models.TextField(blank=True, null=True)
-    meta_image = models.ImageField(upload_to='product_meta_images', blank=True, null=True)
+    meta_image = models.ImageField(upload_to='product_meta_images/', blank=True, null=True)
     keywords = models.JSONField(null=True, blank=True)
     min_price = models.PositiveIntegerField(default=0)
     tags = models.ManyToManyField(Tag, blank=True)
@@ -317,7 +317,7 @@ class MainPage(SingletonModel):
 class MainPageSlider(models.Model):
     title = models.CharField(max_length=100, verbose_name=_('Загловок'), blank=True, null=True)
     description = models.CharField(max_length=100, verbose_name=_('Описание'), blank=True, null=True)
-    image = models.ImageField(upload_to='banners/slider/', blank=True, null=True)
+    image = models.ImageField(upload_to='slider/', blank=True, null=True)
     link = models.URLField(blank=True, null=True)
     page = models.ForeignKey(MainPage, on_delete=models.PROTECT, blank=True, null=True)
 
