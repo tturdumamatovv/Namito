@@ -269,24 +269,25 @@ class AdvertisementSerializer(serializers.ModelSerializer):
 
 
 class MainPageSliderSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = MainPageSlider
         fields = ['title', 'description', 'image', 'link']
 
+    def get_image(self, slider):
+        request = self.context.get('request')
+        image_url = slider.image.url
+        return request.build_absolute_uri(image_url)
+
 
 class MainPageSerializer(serializers.ModelSerializer):
     slider = serializers.SerializerMethodField()
-    photo_url = serializers.SerializerMethodField()
 
     class Meta:
         model = MainPage
-        fields = ['banner1', 'banner2', 'banner3', 'title', 'description', 'counter1_title', 'counter1_value', 'counter2_title', 'counter2_value', 'counter3_title', 'counter3_value', 'button_link', 'button', 'slider', 'photo_url']
+        fields = ['banner1', 'banner2', 'banner3', 'title', 'description', 'counter1_title', 'counter1_value', 'counter2_title', 'counter2_value', 'counter3_title', 'counter3_value', 'button_link', 'button', 'slider']
 
     def get_slider(self, page):
         slider_qs = MainPageSlider.objects.filter(page=page)
         return MainPageSliderSerializer(slider_qs, many=True).data
-
-    def get_photo_url(self, slide):
-        request = self.context.get('request')
-        photo_url = slide.image.url
-        return request.build_absolute_uri(photo_url)
