@@ -1,13 +1,16 @@
 import html
 import re
+import io
+
 from django.db import models
 from django.utils.text import slugify
-from mptt.models import MPTTModel, TreeForeignKey
 from django.utils.translation import gettext_lazy as _
-from PIL import Image as PILImage
-import io
 from django.core.files.base import ContentFile
+
+from mptt.models import MPTTModel, TreeForeignKey
 from colorfield.fields import ColorField
+from PIL import Image as PILImage
+
 from namito.users.models import User
 
 

@@ -1,5 +1,11 @@
 from django.contrib import admin
-from .models import Cart, CartItem, Order, OrderHistory
+
+from .models import (
+    Cart, 
+    CartItem, 
+    Order, 
+    OrderHistory
+    )
 
 
 class CartItemInline(admin.TabularInline):

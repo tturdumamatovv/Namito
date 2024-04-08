@@ -1,11 +1,33 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+
 from mptt.admin import DraggableMPTTAdmin
 
-from .forms import CategoryAdminForm, ColorAdminForm, SizeChartForm, TagAdminForm, ProductForm
-from .models import Category, Product, Color, Size, Variant, Image, Review, Brand, SizeChart, SizeChartItem, Tag, \
-    StaticPage, MainPage, Advertisement, MainPageSlider
+from .forms import (
+    CategoryAdminForm, 
+    ColorAdminForm, 
+    SizeChartForm, 
+    TagAdminForm, 
+    ProductForm
+    )
+from .models import (
+    Category, 
+    Product, 
+    Color, 
+    Size, 
+    Variant, 
+    Image, 
+    Review, 
+    Brand, 
+    SizeChart, 
+    SizeChartItem, 
+    Tag,
+    StaticPage, 
+    MainPage, 
+    Advertisement, 
+    MainPageSlider
+    )
 
 
 @admin.register(StaticPage)

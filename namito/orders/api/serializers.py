@@ -1,8 +1,16 @@
 from namito.catalog.api.serializers import VariantSerializer
 from namito.users.api.serializers import CustomUserSerializer 
-from namito.orders.models import Cart, CartItem, Order, OrderHistory, OrderedItem
+from namito.orders.models import (
+    Cart, 
+    CartItem, 
+    Order, 
+    OrderHistory, 
+    OrderedItem
+    )
+
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
+
 from django.db import transaction
 
 

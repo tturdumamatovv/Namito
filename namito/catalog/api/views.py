@@ -1,14 +1,42 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics, permissions, mixins
+
+from rest_framework import generics, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from namito.catalog.models import Category, Product, Color, Size, Variant, Image, Review, Rating, Favorite, SizeChart, \
-    StaticPage, MainPage, Advertisement
+
+from namito.catalog.models import (
+    Category, 
+    Product, 
+    Color, 
+    Size, 
+    Variant, 
+    Image, 
+    Review, 
+    Rating, 
+    Favorite, 
+    SizeChart,
+    StaticPage, 
+    MainPage
+    )
+from .serializers import (
+    CategorySerializer, 
+    ProductSerializer, 
+    ColorSerializer, 
+    SizeSerializer, 
+    VariantSerializer,
+    ImageSerializer, 
+    RatingSerializer, 
+    ReviewSerializer, 
+    FavoriteSerializer, 
+    BrandSerializer, 
+    SizeChartSerializer,
+    ProductListSerializer, 
+    StaticPageSerializer, 
+    MainPageSerializer, 
+    AdvertisementSerializer
+    )
 from .filters import ProductFilter
-from .serializers import CategorySerializer, ProductSerializer, ColorSerializer, SizeSerializer, VariantSerializer, \
-    ImageSerializer, RatingSerializer, ReviewSerializer, FavoriteSerializer, BrandSerializer, SizeChartSerializer, \
-    ProductListSerializer, StaticPageSerializer, MainPageSerializer, AdvertisementSerializer
 
 
 class StaticPageDetailView(generics.RetrieveAPIView):

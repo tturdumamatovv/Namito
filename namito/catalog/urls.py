@@ -1,25 +1,54 @@
 from django.urls import path
 
-from namito.catalog.api.views import CategoryListView, CategoryDetailView, ProductListView, ProductDetailView, \
-    ColorCreateView, \
-    ColorDetailView, SizeCreateView, SizeDetailView, VariantListView, VariantDetailView, ImageCreateView, \
-    ImageDetailView, \
-    ReviewCreate, RatingCreate, FavoriteToggleAPIView, FavoriteListView, BrandListView, \
-    BrandDetailView, CategoryPromotionListView, SizeChartListView, UserReviewListView, TopProductListView, \
-    NewProductListView, StaticPageDetailView, MainPageView, AdvertisementView
+from namito.catalog.api.views import (
+    CategoryListView, 
+    CategoryDetailView, 
+    ProductListView, 
+    ProductDetailView,
+    ColorCreateView,
+    ColorDetailView, 
+    SizeCreateView, 
+    SizeDetailView, 
+    VariantListView, 
+    VariantDetailView, 
+    ImageCreateView, 
+    ImageDetailView, 
+    ReviewCreate, 
+    RatingCreate, 
+    FavoriteToggleAPIView, 
+    FavoriteListView, 
+    BrandListView, 
+    BrandDetailView, 
+    CategoryPromotionListView, 
+    SizeChartListView, 
+    UserReviewListView, 
+    TopProductListView, 
+    NewProductListView, 
+    StaticPageDetailView, 
+    MainPageView, 
+    AdvertisementView
+    )
 
-urlpatterns = [
+static_page_patterns = [
     path('static-pages/<slug:slug>/', StaticPageDetailView.as_view(), name='static-page-detail'),
+]
 
+category_patterns = [
     path('categories/', CategoryListView.as_view()),
     path('categories/promotion/', CategoryPromotionListView.as_view()),
     path('categories/<int:pk>/', CategoryDetailView.as_view()),
     path('brands/', BrandListView.as_view()),
     path('brands/<int:pk>/', BrandDetailView.as_view()),
+]
+
+product_patterns = [
     path('products/', ProductListView.as_view()),
     path('top-products/', TopProductListView.as_view()),
     path('new-products/', NewProductListView.as_view()),
     path('products/<int:pk>/', ProductDetailView.as_view()),
+]
+
+entity_patterns = [
     path('colors/', ColorCreateView.as_view()),
     path('colors/<int:pk>/', ColorDetailView.as_view()),
     path('sizes/', SizeCreateView.as_view()),
@@ -30,8 +59,10 @@ urlpatterns = [
     path('images/<int:pk>/', ImageDetailView.as_view()),
     path('reviews/', ReviewCreate.as_view()),
     path('reviews/', UserReviewListView.as_view(), name='user_reviews'),
-
     path('ratings/', RatingCreate.as_view()),
+]
+
+utility_patterns = [
     path('favorite/toggle/', FavoriteToggleAPIView.as_view(), name='favorite-toggle'),
     path('favorites/', FavoriteListView.as_view(), name='favorite-list'),
     path('size-charts/', SizeChartListView.as_view(), name='size-chart-list'),
@@ -39,3 +70,12 @@ urlpatterns = [
     path('main-page/', MainPageView.as_view(), name='main-page'),
     path('advertisement/', AdvertisementView.as_view(), name='advertisement'),
 ]
+
+urlpatterns = [
+    *static_page_patterns,
+    *category_patterns,
+    *product_patterns,
+    *entity_patterns,
+    *utility_patterns,
+]
+

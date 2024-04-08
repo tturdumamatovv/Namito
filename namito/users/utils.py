@@ -1,11 +1,11 @@
-from decouple import config
 import requests
 import uuid
+import random
 
 from django.conf import settings
-from xml.etree import ElementTree as ET
 
-import random
+from xml.etree import ElementTree as ET
+from decouple import config
 
 
 def generate_confirmation_code():

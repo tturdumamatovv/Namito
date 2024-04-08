@@ -1,10 +1,10 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 # Register your models here.
 from namito.catalog.admin import ReviewInline
 from namito.orders.admin import OrderHistoryInline
 from namito.users.models import User
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 
 class UserAdmin(BaseUserAdmin):

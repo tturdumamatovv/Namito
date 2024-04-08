@@ -1,8 +1,20 @@
 from rest_framework import status, permissions, generics
 from rest_framework.response import Response
 
-from namito.orders.api.serializers import CartItemSerializer, CartSerializer, OrderSerializer, OrderHistorySerializer, CartItemSerializer, CartItemCreateUpdateSerializer
-from namito.orders.models import Cart, CartItem, Order, OrderHistory
+from namito.orders.api.serializers import (
+    CartItemSerializer, 
+    CartSerializer, 
+    OrderSerializer, 
+    OrderHistorySerializer, 
+    CartItemSerializer, 
+    CartItemCreateUpdateSerializer
+    )
+from namito.orders.models import (
+    Cart, 
+    CartItem, 
+    Order, 
+    OrderHistory
+    )
 
 
 class CartItemCreateAPIView(generics.CreateAPIView):

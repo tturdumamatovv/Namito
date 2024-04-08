@@ -1,7 +1,14 @@
 from django.urls import path
 
-from namito.orders.api.views import CartDetailAPIView, CartItemCreateAPIView, CartItemUpdateDeleteAPIView, OrderCreateAPIView, OrderDetailAPIView, OrderHistoryListAPIView, UserOrderListAPIView
-
+from namito.orders.api.views import (
+    CartDetailAPIView, 
+    CartItemCreateAPIView, 
+    CartItemUpdateDeleteAPIView, 
+    OrderCreateAPIView, 
+    OrderDetailAPIView, 
+    OrderHistoryListAPIView, 
+    UserOrderListAPIView
+    )
 
 urlpatterns = [
     path('add/', CartItemCreateAPIView.as_view(), name='cart-add'),

@@ -1,16 +1,35 @@
 from django.db import models
-from rest_framework import serializers
-from namito.catalog.models import Category, Product, Color, Size, Variant, Image, Rating, Review, Favorite, Brand, \
-    SizeChartItem, SizeChart, Tag, StaticPage, MainPage, Advertisement, MainPageSlider
 from django.db.models import Avg
 
+from rest_framework import serializers
+
+from namito.catalog.models import (
+    Category, 
+    Product, 
+    Color, 
+    Size, 
+    Variant, 
+    Image, 
+    Rating, 
+    Review, 
+    Favorite, 
+    Brand,
+    SizeChartItem, 
+    SizeChart, 
+    Tag, 
+    StaticPage, 
+    MainPage, 
+    Advertisement, 
+    MainPageSlider
+    )
 from namito.orders.models import CartItem
 
 
 class StaticPageSerializer(serializers.ModelSerializer):
     class Meta:
         model = StaticPage
-        fields = ['title', 'slug', 'content', 'image', 'meta_title', 'meta_description', 'created_at', 'updated_at']
+        fields = ['title', 'slug', 'content', 'image', 
+                  'meta_title', 'meta_description', 'created_at', 'updated_at']
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -18,8 +37,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ['id', 'name', 'type', 'slug', 'image', 'parent', 'order', 'meta_title', 'meta_description',
-                  'promotion', 'children']
+        fields = ['id', 'name', 'type', 'slug', 'image', 'parent',
+                   'order', 'meta_title', 'meta_description','promotion', 'children']
 
     def get_fields(self):
         fields = super().get_fields()
@@ -74,7 +93,8 @@ class VariantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Variant
-        fields = ['color', 'size', 'price', 'discounted_price', 'images', 'stock', 'discount_value', 'discount_type']
+        fields = ['color', 'size', 'price', 'discounted_price', 
+                  'images', 'stock', 'discount_value', 'discount_type']
 
     @staticmethod
     def get_images(variant):
@@ -98,8 +118,8 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'price', 'average_rating', 'tags', 'is_favorite',
-                  'cart_quantity', 'image']
+        fields = ['id', 'name', 'description', 'category', 'price', 
+                  'average_rating', 'tags', 'is_favorite','cart_quantity', 'image']
 
     def get_price(self, product):
         # Fetch the main variant; if it's not there, fetch any variant
@@ -167,7 +187,6 @@ class ProductListSerializer(serializers.ModelSerializer):
         return ''
 
 
-
 class ProductSerializer(serializers.ModelSerializer):
     variants = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
@@ -177,8 +196,8 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags', 'is_favorite',
-                  'cart_quantity']
+        fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating',
+                   'tags', 'is_favorite','cart_quantity']
 
     def get_variants(self, product):
         variants_qs = Variant.objects.filter(product=product)
@@ -288,7 +307,9 @@ class MainPageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MainPage
-        fields = ['banner1', 'banner2', 'banner3', 'title', 'description', 'counter1_title', 'counter1_value', 'counter2_title', 'counter2_value', 'counter3_title', 'counter3_value', 'button_link', 'button', 'slider']
+        fields = ['banner1', 'banner2', 'banner3', 'title', 'description', 'counter1_title',
+                   'counter1_value', 'counter2_title', 'counter2_value', 'counter3_title',
+                     'counter3_value', 'button_link', 'button', 'slider']
 
     def get_slider(self, page):
         slider_qs = MainPageSlider.objects.filter(page=page)

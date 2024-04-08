@@ -1,7 +1,11 @@
 from django.urls import path
 
 
-from namito.users.api.views import UserLoginView, VerifyCodeView, UserProfileUpdateView
+from namito.users.api.views import (
+    UserLoginView, 
+    VerifyCodeView, 
+    UserProfileUpdateView
+    )
 
 urlpatterns = [
     path('login/', UserLoginView.as_view(), name='user_registration'),
