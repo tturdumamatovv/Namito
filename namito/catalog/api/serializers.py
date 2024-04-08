@@ -278,11 +278,9 @@ class MainPageSliderSerializer(serializers.ModelSerializer):
     def get_image(self, slider):
         request = self.context.get('request')
         if request is not None:
-            image_url = slider.image.url
-            return request.build_absolute_uri(image_url)
+            return request.build_absolute_uri(slider.image.url)
         else:
-            # Обработка ситуации, когда объект запроса отсутствует в контексте
-            return slider.image.url 
+            return slider.image.url
 
 
 class MainPageSerializer(serializers.ModelSerializer):
@@ -294,4 +292,4 @@ class MainPageSerializer(serializers.ModelSerializer):
 
     def get_slider(self, page):
         slider_qs = MainPageSlider.objects.filter(page=page)
-        return MainPageSliderSerializer(slider_qs, many=True).data
+        return MainPageSliderSerializer(slider_qs, many=True, context=self.context).data
