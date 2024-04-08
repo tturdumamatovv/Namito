@@ -1,7 +1,7 @@
 from django.db import models
 from rest_framework import serializers
 from namito.catalog.models import Category, Product, Color, Size, Variant, Image, Rating, Review, Favorite, Brand, \
-    SizeChartItem, SizeChart, Tag, StaticPage, MainPage, Advertisement
+    SizeChartItem, SizeChart, Tag, StaticPage, MainPage, Advertisement, MainPageSlider
 from django.db.models import Avg
 
 from namito.orders.models import CartItem
@@ -268,9 +268,19 @@ class AdvertisementSerializer(serializers.ModelSerializer):
         fields = ["image", 'title', 'description', 'button_link', 'button', 'page']
 
 
+class MainPageSliderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MainPageSlider
+        fields = ['title', 'description', 'image', 'link']
+
+
 class MainPageSerializer(serializers.ModelSerializer):
+    slider = serializers.SerializerMethodField()
 
     class Meta:
         model = MainPage
-        fields = ['banner1', 'banner2', 'banner3', 'title', 'description', 'counter1_title', 'counter1_value', 'counter2_title', 'counter2_value', 'counter3_title', 'counter3_value', 'button_link', 'button']
+        fields = ['banner1', 'banner2', 'banner3', 'title', 'description', 'counter1_title', 'counter1_value', 'counter2_title', 'counter2_value', 'counter3_title', 'counter3_value', 'button_link', 'button', 'slider']
 
+    def get_slider(self, page):
+        slider_qs = MainPageSlider.objects.filter(page=page)
+        return MainPageSliderSerializer(slider_qs, many=True).data
