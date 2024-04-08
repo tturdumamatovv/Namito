@@ -342,7 +342,7 @@ SPECTACULAR_SETTINGS = {
     "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
 }
 # Your stuff...
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------
 SIMPLEUI_ICON = {
     "Catalog": "fa fa-shopping-bag",
     "Categories": "fa fa-book",
