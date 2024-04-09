@@ -10,6 +10,7 @@ from django.core.files.base import ContentFile
 from mptt.models import MPTTModel, TreeForeignKey
 from colorfield.fields import ColorField
 from PIL import Image as PILImage
+from unidecode import unidecode
 
 from namito.users.models import User
 
@@ -83,15 +84,9 @@ class Category(MPTTModel, models.Model):
         order_insertion_by = ["name"]
 
     def save(self, *args, **kwargs):
-        print("Вызов метода save для объекта категории")
         if not self.slug:
-            print("Слаг не установлен")
             if self.name:
-                print(f"Имя категории: {self.name}")
-                base_slug = slugify(self.name)
-                print(f"Базовый слаг (после slugify): {base_slug}")
-                if not base_slug:
-                    print("Ошибка: базовый слаг пустой")
+                base_slug = slugify(unidecode(self.name))
                 counter = 1  # Начинаем счетчик с 1, а не с 0
 
                 unique_slug = base_slug
@@ -100,11 +95,8 @@ class Category(MPTTModel, models.Model):
                     counter += 1
 
                 self.slug = unique_slug
-                print(f"Установлен слаг для категории {self.name}: {self.slug}")
             else:
                 print("Ошибка: поле 'name' не заполнено, невозможно создать слаг.")
-        else:
-            print("Слаг уже установлен")
 
         super().save(*args, **kwargs)
 
