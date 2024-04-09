@@ -89,7 +89,9 @@ class Category(MPTTModel, models.Model):
             if self.name:
                 print(f"Имя категории: {self.name}")
                 base_slug = slugify(self.name)
-                print(f"Базовый слаг: {base_slug}")
+                print(f"Базовый слаг (после slugify): {base_slug}")
+                if not base_slug:
+                    print("Ошибка: базовый слаг пустой")
                 counter = 1  # Начинаем счетчик с 1, а не с 0
 
                 unique_slug = base_slug
@@ -105,6 +107,7 @@ class Category(MPTTModel, models.Model):
             print("Слаг уже установлен")
 
         super().save(*args, **kwargs)
+
 
     def __str__(self):
         return self.name
