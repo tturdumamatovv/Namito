@@ -9,7 +9,8 @@ class ProductFilter(django_filters.FilterSet):
     color = django_filters.CharFilter(field_name="variants__color__name", lookup_expr='iexact')
     size = django_filters.CharFilter(field_name="variants__size__name", lookup_expr='iexact')
     brand = django_filters.CharFilter(field_name="brand__name", lookup_expr='iexact')
+    category = django_filters.CharFilter(field_name="category__name", lookup_expr='iexact')
 
     class Meta:
         model = Product
-        fields = ['min_price', 'max_price', 'color', 'size']
+        fields = ['min_price', 'max_price', 'color', 'size', 'category']
