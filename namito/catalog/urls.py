@@ -40,7 +40,7 @@ category_patterns = [
     path('categories/<int:pk>/', CategoryDetailView.as_view()),
     path('brands/', BrandListView.as_view()),
     path('brands/<int:pk>/', BrandDetailView.as_view()),
-    path('categories/<slug:slug>/', CategoryBySlugAPIView.as_view(), name='category-detail'),
+    path('category/<slug:slug>/', CategoryBySlugAPIView.as_view(), name='category-detail'),
 ]
 
 product_patterns = [
