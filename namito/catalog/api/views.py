@@ -35,7 +35,6 @@ from .serializers import (
     StaticPageSerializer, 
     MainPageSerializer, 
     AdvertisementSerializer, 
-    ParentCategorySerializer
     )
 from .filters import ProductFilter
 
@@ -212,6 +211,6 @@ class AdvertisementView(generics.ListAPIView):
 
 class CategoryBySlugAPIView(generics.ListAPIView):
     queryset = Category.objects.all()
-    serializer_class = ParentCategorySerializer
+    serializer_class = CategorySerializer
     lookup_field = 'slug'
 
