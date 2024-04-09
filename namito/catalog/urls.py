@@ -26,7 +26,8 @@ from namito.catalog.api.views import (
     NewProductListView, 
     StaticPageDetailView, 
     MainPageView, 
-    AdvertisementView
+    AdvertisementView,
+    CategoryBySlugAPIView
     )
 
 static_page_patterns = [
@@ -39,6 +40,7 @@ category_patterns = [
     path('categories/<int:pk>/', CategoryDetailView.as_view()),
     path('brands/', BrandListView.as_view()),
     path('brands/<int:pk>/', BrandDetailView.as_view()),
+    path('categories/<slug:slug>/', CategoryBySlugAPIView.as_view(), name='category-detail'),
 ]
 
 product_patterns = [
