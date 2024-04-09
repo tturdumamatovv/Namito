@@ -85,12 +85,11 @@ class Category(MPTTModel, models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             base_slug = slugify(self.name)
-            counter = 0
+            counter = 1
 
             unique_slug = base_slug
             while Category.objects.filter(slug=unique_slug).exists():
                 counter += 1
-                unique_slug = f"{base_slug}-{counter}"
 
             self.slug = unique_slug
             print(f'Установлен слаг для категории {self.name} - {self.slug}')
