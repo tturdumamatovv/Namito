@@ -83,21 +83,28 @@ class Category(MPTTModel, models.Model):
         order_insertion_by = ["name"]
 
     def save(self, *args, **kwargs):
-            if not self.slug:
-                if self.name:
-                    base_slug = slugify(self.name)
-                    counter = 1  # Начинаем счетчик с 1, а не с 0
+        print("Вызов метода save для объекта категории")
+        if not self.slug:
+            print("Слаг не установлен")
+            if self.name:
+                print(f"Имя категории: {self.name}")
+                base_slug = slugify(self.name)
+                print(f"Базовый слаг: {base_slug}")
+                counter = 1  # Начинаем счетчик с 1, а не с 0
 
-                    unique_slug = base_slug
-                    while Category.objects.filter(slug=unique_slug).exists():
-                        unique_slug = f"{base_slug}-{counter}"
-                        counter += 1
+                unique_slug = base_slug
+                while Category.objects.filter(slug=unique_slug).exists():
+                    unique_slug = f"{base_slug}-{counter}"
+                    counter += 1
 
-                    self.slug = unique_slug
-                    print(f"Установлен слаг для категории {self.name}: {self.slug}")
-                else:
-                    print("Ошибка: поле 'name' не заполнено, невозможно создать слаг.")
-            super().save(*args, **kwargs)
+                self.slug = unique_slug
+                print(f"Установлен слаг для категории {self.name}: {self.slug}")
+            else:
+                print("Ошибка: поле 'name' не заполнено, невозможно создать слаг.")
+        else:
+            print("Слаг уже установлен")
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
