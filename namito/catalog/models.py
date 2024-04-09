@@ -93,6 +93,7 @@ class Category(MPTTModel, models.Model):
                 unique_slug = f"{base_slug}-{counter}"
 
             self.slug = unique_slug
+            print(f'Установлен слаг для категории {self.name} - {self.slug}')
         super().save(*args, **kwargs)
 
     def __str__(self):
