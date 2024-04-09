@@ -83,15 +83,16 @@ class Category(MPTTModel, models.Model):
         order_insertion_by = ["name"]
 
     def save(self, *args, **kwargs):
-        base_slug = slugify(self.name)
-        counter = 0
+        if not self.slug:
+            base_slug = slugify(self.name)
+            counter = 0
 
-        unique_slug = base_slug
-        while Category.objects.filter(slug=unique_slug).exists():
-            counter += 1
-            unique_slug = f"{base_slug}-{counter}"
+            unique_slug = base_slug
+            while Category.objects.filter(slug=unique_slug).exists():
+                counter += 1
+                unique_slug = f"{base_slug}-{counter}"
 
-        self.slug = unique_slug
+            self.slug = unique_slug
         super().save(*args, **kwargs)
 
     def __str__(self):
