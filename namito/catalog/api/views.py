@@ -214,3 +214,9 @@ class CategoryBySlugAPIView(generics.ListAPIView):
     serializer_class = CategorySerializer
     lookup_field = 'slug'
 
+    def get_queryset(self):
+        # Получаем значение slug из URL
+        slug = self.kwargs.get('slug')
+        # Фильтруем категории по заданному slug
+        queryset = Category.objects.filter(slug=slug)
+        return queryset
