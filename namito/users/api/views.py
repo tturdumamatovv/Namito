@@ -71,7 +71,17 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
     def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        # Check if all required fields are filled
+        if all(serializer.validated_data.get(field) for field in ['full_name', 'date_of_birth', 'email']):
+            instance.first_visit = False
+            instance.save()
+
+        return Response(serializer.data)
     
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
