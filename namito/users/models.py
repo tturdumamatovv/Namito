@@ -30,6 +30,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     full_name = models.CharField(max_length=255, blank=True)
     date_of_birth = models.DateField(blank=True, null=True)
     email = models.EmailField(blank=True)
+    first_visit = models.BooleanField(default=True)
 
     objects = CustomUserManager()
 
