@@ -22,6 +22,12 @@ class UserLoginView(generics.CreateAPIView):
         phone_number = request.data.get('phone_number')
         if not phone_number:
             return Response({'error': 'Phone number is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not phone_number.startswith("+996"):
+            return Response({'error': 'Phone number must start with "+996".'}, status=status.HTTP_400_BAD_REQUEST)
+        elif len(phone_number) != 13:
+            return Response({'error': 'Phone number must be 13 digits long including the country code.'}, status=status.HTTP_400_BAD_REQUEST)
+        elif not phone_number[4:].isdigit():
+            return Response({'error': 'Invalid characters in phone number. Only digits are allowed after the country code.'}, status=status.HTTP_400_BAD_REQUEST)
 
         confirmation_code = generate_confirmation_code()
         send_sms(phone_number, confirmation_code)
@@ -75,7 +81,7 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
             instance.save()
 
         return Response(serializer.data)
-    
+
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
