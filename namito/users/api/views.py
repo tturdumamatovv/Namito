@@ -60,7 +60,11 @@ class VerifyCodeView(generics.CreateAPIView):
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
 
-        return Response({'access_token': access_token, 'refresh_token': str(refresh)}, status=status.HTTP_200_OK)
+        return Response({
+            'access_token': access_token,
+            'refresh_token': str(refresh),
+            'first_visit': user.first_visit},
+            status=status.HTTP_200_OK)
 
 
 class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
