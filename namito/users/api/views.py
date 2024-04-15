@@ -31,7 +31,7 @@ class UserLoginView(generics.CreateAPIView):
             return Response({'error': 'Invalid characters in phone number. Only digits are allowed after the country code.'}, status=status.HTTP_400_BAD_REQUEST)
 
         confirmation_code = generate_confirmation_code()
-        send_sms(phone_number, confirmation_code)
+        # send_sms(phone_number, confirmation_code)
 
         User.objects.update_or_create(
             phone_number=phone_number,
