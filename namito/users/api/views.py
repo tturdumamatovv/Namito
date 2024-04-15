@@ -38,7 +38,11 @@ class UserLoginView(generics.CreateAPIView):
             defaults={'code': confirmation_code}
         )
 
-        return Response({'message': 'Confirmation code sent successfully.'}, status=status.HTTP_200_OK)
+        response_data = {
+            'message': 'Confirmation code sent successfully.',
+            'code': confirmation_code
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
 
 
 class VerifyCodeView(generics.CreateAPIView):
