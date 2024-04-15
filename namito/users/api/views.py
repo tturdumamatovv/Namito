@@ -1,5 +1,5 @@
 from rest_framework import generics, status, permissions
-from rest_framework.parsers import FormParser, MultiPartParser
+# from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -75,7 +75,7 @@ class VerifyCodeView(generics.CreateAPIView):
 class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
+    # parser_classes = [MultiPartParser, FormParser]
 
     def get_object(self):
         return self.request.user
