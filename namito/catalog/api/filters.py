@@ -1,4 +1,3 @@
-# In filters.py or within your views.py file
 import django_filters
 from namito.catalog.models import Product
 

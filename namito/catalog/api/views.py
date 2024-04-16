@@ -1,4 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models.functions import Lower
 
 from rest_framework import generics, permissions
 from rest_framework.views import APIView
@@ -6,35 +7,35 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from namito.catalog.models import (
-    Category, 
-    Product, 
-    Color, 
-    Size, 
-    Variant, 
-    Image, 
-    Review, 
-    Rating, 
-    Favorite, 
+    Category,
+    Product,
+    Color,
+    Size,
+    Variant,
+    Image,
+    Review,
+    Rating,
+    Favorite,
     SizeChart,
-    StaticPage, 
+    StaticPage,
     MainPage
     )
 from .serializers import (
-    CategorySerializer, 
-    ProductSerializer, 
-    ColorSerializer, 
-    SizeSerializer, 
+    CategorySerializer,
+    ProductSerializer,
+    ColorSerializer,
+    SizeSerializer,
     VariantSerializer,
-    ImageSerializer, 
-    RatingSerializer, 
-    ReviewSerializer, 
-    FavoriteSerializer, 
-    BrandSerializer, 
+    ImageSerializer,
+    RatingSerializer,
+    ReviewSerializer,
+    FavoriteSerializer,
+    BrandSerializer,
     SizeChartSerializer,
-    ProductListSerializer, 
-    StaticPageSerializer, 
-    MainPageSerializer, 
-    AdvertisementSerializer, 
+    ProductListSerializer,
+    StaticPageSerializer,
+    MainPageSerializer,
+    AdvertisementSerializer,
     )
 from .filters import ProductFilter
 
@@ -219,4 +220,34 @@ class CategoryBySlugAPIView(generics.ListAPIView):
         slug = self.kwargs.get('slug')
         # Фильтруем категории по заданному slug
         queryset = Category.objects.filter(slug=slug)
+        return queryset
+
+
+class CategoryByNameStartsWithAPIView(generics.ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    lookup_field = 'name'
+
+    def get_queryset(self):
+        name_query = self.request.query_params.get('name', None)
+        if name_query:
+            name_query = name_query.lower()
+            queryset = Category.objects.annotate(lower_name=Lower('name')).filter(lower_name__startswith=name_query)
+        else:
+            queryset = Category.objects.none()
+        return queryset
+
+
+class ProductByNameStartsWithAPIView(generics.ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_field = 'name'
+
+    def get_queryset(self):
+        name_query = self.request.query_params.get('name', None)
+        if name_query:
+            name_query = name_query.lower()
+            queryset = Product.objects.annotate(lower_name=Lower('name')).filter(lower_name__startswith=name_query)
+        else:
+            queryset = Product.objects.none()
         return queryset
