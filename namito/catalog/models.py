@@ -85,18 +85,15 @@ class Category(MPTTModel, models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            if self.name:
-                base_slug = slugify(unidecode(self.name))
-                counter = 1  # Начинаем счетчик с 1, а не с 0
+            base_slug = slugify(unidecode(self.name))
+            unique_slug = base_slug
+            counter = 1
 
-                unique_slug = base_slug
-                while Category.objects.filter(slug=unique_slug).exists():
-                    unique_slug = f"{base_slug}-{counter}"
-                    counter += 1
+            while Category.objects.filter(slug=unique_slug).exists():
+                unique_slug = f"{base_slug}-{counter}"
+                counter += 1
 
-                self.slug = unique_slug
-            else:
-                print("Ошибка: поле 'name' не заполнено, невозможно создать слаг.")
+            self.slug = unique_slug
 
         super().save(*args, **kwargs)
 
@@ -139,10 +136,17 @@ class Product(models.Model):
     tags = models.ManyToManyField(Tag, blank=True)
     is_top = models.BooleanField(default=False)
 
+    def save(self, *args, **kwargs):
+        if not self.meta_description:
+            self.meta_description = self.generate_meta_description()
+
+        if not self.meta_title:
+            self.meta_title = self.generate_meta_title()
+        super().save(*args, **kwargs)
+
     def generate_meta_description(self):
         if self.description:
             decoded_description = html.unescape(self.description)
-            self.description = decoded_description
             first_sentence_match = re.match(r"^(.*?[.!?])", decoded_description)
             first_sentence = first_sentence_match.group(1) if first_sentence_match else decoded_description
 
@@ -152,14 +156,6 @@ class Product(models.Model):
 
     def generate_meta_title(self):
         return self.name
-
-    def save(self, *args, **kwargs):
-        if not self.meta_description:
-            self.meta_description = self.generate_meta_description()
-
-        if not self.meta_title:
-            self.meta_title = self.generate_meta_title()
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
