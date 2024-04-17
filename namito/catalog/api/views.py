@@ -251,3 +251,14 @@ class ProductByNameStartsWithAPIView(generics.ListAPIView):
         else:
             queryset = Product.objects.none()
         return queryset
+
+
+class ColorListView(generics.ListAPIView):
+    queryset = Color.objects.all()
+    serializer_class = ColorSerializer
+
+
+class SizeListView(generics.ListAPIView):
+    queryset = Size.objects.all()
+    serializer_class = SizeSerializer
+
