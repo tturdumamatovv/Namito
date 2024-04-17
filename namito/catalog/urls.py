@@ -29,7 +29,10 @@ from namito.catalog.api.views import (
     AdvertisementView,
     CategoryBySlugAPIView,
     CategoryByNameStartsWithAPIView,
-    ProductByNameStartsWithAPIView
+    ProductByNameStartsWithAPIView,
+    ColorListView,
+    SizeListView,
+
     )
 
 static_page_patterns = [
@@ -55,10 +58,12 @@ product_patterns = [
 ]
 
 entity_patterns = [
-    path('colors/', ColorCreateView.as_view()),
-    path('colors/<int:pk>/', ColorDetailView.as_view()),
-    path('sizes/', SizeCreateView.as_view()),
-    path('sizes/<int:pk>/', SizeDetailView.as_view()),
+    path('color/', ColorCreateView.as_view()),
+    path('colors/', ColorListView.as_view(), name='color-list'),
+    path('color/<int:pk>/', ColorDetailView.as_view()),
+    path('size/', SizeCreateView.as_view()),
+    path('sizes/', SizeListView.as_view(), name='size-list'),
+    path('size/<int:pk>/', SizeDetailView.as_view()),
     path('variants/', VariantListView.as_view()),
     path('variants/<int:pk>/', VariantDetailView.as_view()),
     path('images/', ImageCreateView.as_view()),

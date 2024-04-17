@@ -4,22 +4,22 @@ from django.db.models import Avg
 from rest_framework import serializers
 
 from namito.catalog.models import (
-    Category, 
-    Product, 
-    Color, 
-    Size, 
-    Variant, 
-    Image, 
-    Rating, 
-    Review, 
-    Favorite, 
+    Category,
+    Product,
+    Color,
+    Size,
+    Variant,
+    Image,
+    Rating,
+    Review,
+    Favorite,
     Brand,
-    SizeChartItem, 
-    SizeChart, 
-    Tag, 
-    StaticPage, 
-    MainPage, 
-    Advertisement, 
+    SizeChartItem,
+    SizeChart,
+    Tag,
+    StaticPage,
+    MainPage,
+    Advertisement,
     MainPageSlider
     )
 from namito.orders.models import CartItem
@@ -28,7 +28,7 @@ from namito.orders.models import CartItem
 class StaticPageSerializer(serializers.ModelSerializer):
     class Meta:
         model = StaticPage
-        fields = ['title', 'slug', 'content', 'image', 
+        fields = ['title', 'slug', 'content', 'image',
                   'meta_title', 'meta_description', 'created_at', 'updated_at']
 
 
@@ -93,7 +93,7 @@ class VariantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Variant
-        fields = ['color', 'size', 'price', 'discounted_price', 
+        fields = ['color', 'size', 'price', 'discounted_price',
                   'images', 'stock', 'discount_value', 'discount_type']
 
     @staticmethod
@@ -118,7 +118,7 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'price', 
+        fields = ['id', 'name', 'description', 'category', 'price',
                   'average_rating', 'tags', 'is_favorite','cart_quantity', 'image']
 
     def get_price(self, product):
