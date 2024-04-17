@@ -314,3 +314,21 @@ class MainPageSerializer(serializers.ModelSerializer):
     def get_slider(self, page):
         slider_qs = MainPageSlider.objects.filter(page=page)
         return MainPageSliderSerializer(slider_qs, many=True, context=self.context).data
+
+
+class ColorSizeBrandSerializer(serializers.Serializer):
+    colors = serializers.SerializerMethodField()
+    sizes = serializers.SerializerMethodField()
+    brands = serializers.SerializerMethodField()
+
+    def get_colors(self, instance):
+        colors = Color.objects.all()
+        return ColorSerializer(colors, many=True).data
+
+    def get_sizes(self, instance):
+        sizes = Size.objects.all()
+        return SizeSerializer(sizes, many=True).data
+
+    def get_brands(self, instance):
+        brands = Brand.objects.all()
+        return BrandSerializer(brands, many=True).data

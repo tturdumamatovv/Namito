@@ -18,7 +18,8 @@ from namito.catalog.models import (
     Favorite,
     SizeChart,
     StaticPage,
-    MainPage
+    MainPage,
+    Brand
     )
 from .serializers import (
     CategorySerializer,
@@ -36,6 +37,7 @@ from .serializers import (
     StaticPageSerializer,
     MainPageSerializer,
     AdvertisementSerializer,
+    ColorSizeBrandSerializer
     )
 from .filters import ProductFilter
 
@@ -253,12 +255,12 @@ class ProductByNameStartsWithAPIView(generics.ListAPIView):
         return queryset
 
 
-class ColorListView(generics.ListAPIView):
-    queryset = Color.objects.all()
-    serializer_class = ColorSerializer
+class ColorSizeBrandAPIView(generics.ListAPIView):
+    serializer_class = ColorSizeBrandSerializer
 
-
-class SizeListView(generics.ListAPIView):
-    queryset = Size.objects.all()
-    serializer_class = SizeSerializer
-
+    def list(self, request, *args, **kwargs):
+        colors = Color.objects.all()
+        sizes = Size.objects.all()
+        brands = Brand.objects.all()
+        serializer = self.get_serializer({'colors': colors, 'sizes': sizes, 'brands': brands})
+        return Response(serializer.data)
