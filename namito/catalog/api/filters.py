@@ -18,4 +18,22 @@ class ProductFilter(django_filters.FilterSet):
         fields = ['min_price', 'max_price', 'color', 'size', 'brand', 'min_rating']
 
     def filter_by_min_rating(self, queryset, name, value):
-        return queryset.annotate(avg_rating=Avg('ratings__score')).filter(avg_rating__gte=value)
+        queryset = queryset.annotate(avg_rating=Avg('ratings__score')).filter(avg_rating__gte=value)
+        return queryset.distinct()
+
+    @property
+    def qs(self):
+        queryset = super().qs
+        if self.request:
+            if 'min_price' in self.request.GET:
+                queryset = queryset.filter(variants__price__gte=self.request.GET['min_price'])
+            if 'max_price' in self.request.GET:
+                queryset = queryset.filter(variants__price__lte=self.request.GET['max_price'])
+            if 'color' in self.request.GET:
+                queryset = queryset.filter(variants__color__name__iexact=self.request.GET['color'])
+            if 'size' in self.request.GET:
+                queryset = queryset.filter(variants__size__name__iexact=self.request.GET['size'])
+            if 'brand' in self.request.GET:
+                queryset = queryset.filter(brand__name__iexact=self.request.GET['brand'])
+        return queryset.distinct()
+
