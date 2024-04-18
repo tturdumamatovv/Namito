@@ -1,33 +1,36 @@
 from django.urls import path
 
 from namito.catalog.api.views import (
-    CategoryListView, 
-    CategoryDetailView, 
-    ProductListView, 
+    CategoryListView,
+    CategoryDetailView,
+    ProductListView,
     ProductDetailView,
     ColorCreateView,
-    ColorDetailView, 
-    SizeCreateView, 
-    SizeDetailView, 
-    VariantListView, 
-    VariantDetailView, 
-    ImageCreateView, 
-    ImageDetailView, 
-    ReviewCreate, 
-    RatingCreate, 
-    FavoriteToggleAPIView, 
-    FavoriteListView, 
-    BrandListView, 
-    BrandDetailView, 
-    CategoryPromotionListView, 
-    SizeChartListView, 
-    UserReviewListView, 
-    TopProductListView, 
-    NewProductListView, 
-    StaticPageDetailView, 
-    MainPageView, 
+    ColorDetailView,
+    SizeCreateView,
+    SizeDetailView,
+    VariantListView,
+    VariantDetailView,
+    ImageCreateView,
+    ImageDetailView,
+    ReviewCreate,
+    RatingCreate,
+    FavoriteToggleAPIView,
+    FavoriteListView,
+    BrandListView,
+    BrandDetailView,
+    CategoryPromotionListView,
+    SizeChartListView,
+    UserReviewListView,
+    TopProductListView,
+    NewProductListView,
+    StaticPageDetailView,
+    MainPageView,
     AdvertisementView,
-    CategoryBySlugAPIView
+    CategoryBySlugAPIView,
+    CategoryByNameStartsWithAPIView,
+    ProductByNameStartsWithAPIView,
+    ColorSizeBrandAPIView
     )
 
 static_page_patterns = [
@@ -41,6 +44,7 @@ category_patterns = [
     path('brands/', BrandListView.as_view()),
     path('brands/<int:pk>/', BrandDetailView.as_view()),
     path('category/<slug:slug>/', CategoryBySlugAPIView.as_view(), name='category-detail'),
+    path('categories/startswith/', CategoryByNameStartsWithAPIView.as_view(), name='category_startswith'),
 ]
 
 product_patterns = [
@@ -48,13 +52,15 @@ product_patterns = [
     path('top-products/', TopProductListView.as_view()),
     path('new-products/', NewProductListView.as_view()),
     path('products/<int:pk>/', ProductDetailView.as_view()),
+    path('products/startswith/', ProductByNameStartsWithAPIView.as_view(), name='product_startswith'),
 ]
 
 entity_patterns = [
-    path('colors/', ColorCreateView.as_view()),
-    path('colors/<int:pk>/', ColorDetailView.as_view()),
-    path('sizes/', SizeCreateView.as_view()),
-    path('sizes/<int:pk>/', SizeDetailView.as_view()),
+    path('colors-sizes-brands/', ColorSizeBrandAPIView.as_view(), name='colors-sizes-brands'),
+    path('color/', ColorCreateView.as_view()),
+    path('color/<int:pk>/', ColorDetailView.as_view()),
+    path('size/', SizeCreateView.as_view()),
+    path('size/<int:pk>/', SizeDetailView.as_view()),
     path('variants/', VariantListView.as_view()),
     path('variants/<int:pk>/', VariantDetailView.as_view()),
     path('images/', ImageCreateView.as_view()),
