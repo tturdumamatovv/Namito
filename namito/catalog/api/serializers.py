@@ -182,8 +182,7 @@ class ProductListSerializer(serializers.ModelSerializer):
             if images_qs:
                 return ImageSerializer(images_qs, many=True).data
             images_qs = Image.objects.filter(variant=variant).first()
-            return ImageSerializer(images_qs, many=True).data
-
+            return ImageSerializer(images_qs, many=False).data
         return ''
 
 
