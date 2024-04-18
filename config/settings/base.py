@@ -296,6 +296,11 @@ LOGGING = {
     "root": {"level": "INFO", "handlers": ["console"]},
 }
 
+CSRF_TRUSTED_ORIGINS = ['https://namito.tatadev.pro/', 'https://www.namito.tatadev.pro/']
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+
 # django-allauth
 # ------------------------------------------------------------------------------
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
