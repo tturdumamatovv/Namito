@@ -6,35 +6,35 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from namito.catalog.models import (
-    Category, 
-    Product, 
-    Color, 
-    Size, 
-    Variant, 
-    Image, 
-    Review, 
-    Rating, 
-    Favorite, 
+    Category,
+    Product,
+    Color,
+    Size,
+    Variant,
+    Image,
+    Review,
+    Rating,
+    Favorite,
     SizeChart,
-    StaticPage, 
+    StaticPage,
     MainPage
     )
 from .serializers import (
-    CategorySerializer, 
-    ProductSerializer, 
-    ColorSerializer, 
-    SizeSerializer, 
+    CategorySerializer,
+    ProductSerializer,
+    ColorSerializer,
+    SizeSerializer,
     VariantSerializer,
-    ImageSerializer, 
-    RatingSerializer, 
-    ReviewSerializer, 
-    FavoriteSerializer, 
-    BrandSerializer, 
+    ImageSerializer,
+    RatingSerializer,
+    ReviewSerializer,
+    FavoriteSerializer,
+    BrandSerializer,
     SizeChartSerializer,
-    ProductListSerializer, 
-    StaticPageSerializer, 
-    MainPageSerializer, 
-    AdvertisementSerializer, 
+    ProductListSerializer,
+    StaticPageSerializer,
+    MainPageSerializer,
+    AdvertisementSerializer,
     )
 from .filters import ProductFilter
 
@@ -83,7 +83,7 @@ class ProductListView(generics.ListCreateAPIView):
 
 class TopProductListView(generics.ListAPIView):
     queryset = Product.objects.filter(is_top=True).order_by('?')[:15]
-    serializer_class = ProductSerializer
+    serializer_class = ProductListSerializer
 
 
 class NewProductListView(generics.ListAPIView):
