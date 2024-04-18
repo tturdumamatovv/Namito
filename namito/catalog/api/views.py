@@ -38,6 +38,7 @@ from .serializers import (
     MainPageSerializer,
     AdvertisementSerializer,
     ColorSizeBrandSerializer
+
     )
 from .filters import ProductFilter
 
@@ -86,12 +87,12 @@ class ProductListView(generics.ListCreateAPIView):
 
 class TopProductListView(generics.ListAPIView):
     queryset = Product.objects.filter(is_top=True).order_by('?')[:15]
-    serializer_class = ProductSerializer
+    serializer_class = ProductListSerializer
 
 
 class NewProductListView(generics.ListAPIView):
     queryset = Product.objects.all().order_by('-id')[:15]
-    serializer_class = ProductSerializer
+    serializer_class = ProductListSerializer
 
 
 class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
