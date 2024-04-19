@@ -176,32 +176,29 @@ class ProductListSerializer(serializers.ModelSerializer):
             return quantity if quantity else 0
         return 0
 
-    def get_image(self, product, request):
-        # Получаем все варианты продукта с главным вариантом на первом месте
-        variants = Variant.objects.filter(product=product).order_by('-main', 'id')
+    def get_image(self, product):
+        base_url = self.context.get('request').build_absolute_uri('/')
         images_data = []
 
-        # Получаем базовый URL для построения абсолютного пути
-        base_url = request.build_absolute_uri('/')
+        # Сортируем варианты по признаку главного, затем по ID
+        variants = Variant.objects.filter(product=product).order_by('-main', 'id')
 
-        # Перебираем все варианты и получаем их главные изображения
         for variant in variants:
-            # Пытаемся получить главное изображение для варианта
+            # Пытаемся найти главное изображение варианта
             image = Image.objects.filter(variant=variant, main_image=True).first()
-
-            # Если главное изображение отсутствует, берем любое доступное
-            if image is None:
+            # Если главного изображения нет, берем первое попавшееся
+            if not image:
                 image = Image.objects.filter(variant=variant).first()
-
-            # Если нашли изображение, добавляем в список результатов
+            # Если изображение есть, добавляем его в результат
             if image:
-                image_data = ImageSerializer(image).data
-                if image_data.get('image'):
-                    image_data['image'] = base_url + image_data['image']
-                images_data.append(image_data)
+                image_url = base_url + image.image.url if image.image else None
+                images_data.append({
+                    'variant_id': variant.id,
+                    'image_url': image_url
+                })
 
+        # Возвращаем список изображений, по одному на каждый вариант
         return images_data
-
 
 class CharacteristicsSerializer(serializers.ModelSerializer):
     class Meta:
