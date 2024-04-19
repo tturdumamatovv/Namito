@@ -178,18 +178,28 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     def get_image(self, product):
         variant = Variant.objects.filter(product=product, main=True).first()
+        base_url = self.context.get('request').build_absolute_uri('/')
+
         if variant:
             images_qs = Image.objects.filter(variant=variant, main_image=True).first()
             if images_qs:
-                return ImageSerializer(images_qs, many=False).data
+                image_data = ImageSerializer(images_qs, many=False).data
+                image_data['image'] = base_url + image_data['image']
+                return image_data
 
         variant = Variant.objects.filter(product=product).first()
         if variant:
             images_qs = Image.objects.filter(variant=variant, main_image=True).first()
             if images_qs:
-                return ImageSerializer(images_qs, many=True).data
+                image_data = ImageSerializer(images_qs, many=False).data
+                image_data['image'] = base_url + image_data['image']
+                return image_data
+
             images_qs = Image.objects.filter(variant=variant).first()
-            return ImageSerializer(images_qs, many=False).data
+            image_data = ImageSerializer(images_qs, many=False).data
+            image_data['image'] = base_url + image_data['image']
+            return image_data
+
         return ''
 
 
@@ -211,7 +221,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating',
-                  'tags', 'is_favorite', 'cart_quantity', 'rating_count', 'characteristics']
+                  'tags', 'is_favorite', 'cart_quantity', 'rating_count', 'characteristics', 'sku']
 
     def get_variants(self, product):
         variants_qs = Variant.objects.filter(product=product)
