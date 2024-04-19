@@ -177,20 +177,24 @@ class ProductListSerializer(serializers.ModelSerializer):
         return 0
 
     def get_image(self, product):
-        variant = Variant.objects.filter(product=product, main=True).first()
-        if variant:
-            images_qs = Image.objects.filter(variant=variant, main_image=True).first()
-            if images_qs:
-                return ImageSerializer(images_qs, many=False).data
+        # Получить все варианты продукта с главным вариантом на первом месте
+        variants = Variant.objects.filter(product=product).order_by('-main', 'id')
+        images_data = []
 
-        variant = Variant.objects.filter(product=product).first()
-        if variant:
-            images_qs = Image.objects.filter(variant=variant, main_image=True).first()
-            if images_qs:
-                return ImageSerializer(images_qs, many=True).data
-            images_qs = Image.objects.filter(variant=variant).first()
-            return ImageSerializer(images_qs, many=False).data
-        return ''
+        # Перебираем все варианты и получаем их главные изображения
+        for variant in variants:
+            # Пытаемся получить главное изображение для варианта
+            image = Image.objects.filter(variant=variant, main_image=True).first()
+
+            # Если главное изображение отсутствует, берем любое доступное
+            if image is None:
+                image = Image.objects.filter(variant=variant).first()
+
+            # Если нашли изображение, добавляем в список результатов
+            if image:
+                images_data.append(ImageSerializer(image).data)
+
+        return images_data
 
 
 class CharacteristicsSerializer(serializers.ModelSerializer):
