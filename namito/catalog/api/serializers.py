@@ -178,13 +178,14 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     def get_image(self, product):
         variant = Variant.objects.filter(product=product, main=True).first()
-        base_url = self.context.get('request').build_absolute_uri('/')
+        base_url = self.context.get('request').build_absolute_uri('/')  # Получите базовый URL
 
         if variant:
             images_qs = Image.objects.filter(variant=variant, main_image=True).first()
             if images_qs:
                 image_data = ImageSerializer(images_qs, many=False).data
-                image_data['image'] = base_url + image_data['image']
+                if image_data.get('image'):
+                    image_data['image'] = base_url + image_data['image']
                 return image_data
 
         variant = Variant.objects.filter(product=product).first()
@@ -192,12 +193,14 @@ class ProductListSerializer(serializers.ModelSerializer):
             images_qs = Image.objects.filter(variant=variant, main_image=True).first()
             if images_qs:
                 image_data = ImageSerializer(images_qs, many=False).data
-                image_data['image'] = base_url + image_data['image']
+                if image_data.get('image'):
+                    image_data['image'] = base_url + image_data['image']
                 return image_data
 
             images_qs = Image.objects.filter(variant=variant).first()
             image_data = ImageSerializer(images_qs, many=False).data
-            image_data['image'] = base_url + image_data['image']
+            if image_data.get('image'):
+                image_data['image'] = base_url + image_data['image']
             return image_data
 
         return ''
