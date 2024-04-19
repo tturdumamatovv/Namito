@@ -99,6 +99,7 @@ THIRD_PARTY_APPS = [
     "allauth",
     "allauth.account",
     # "allauth.mfa",
+    'nested_admin',
     "allauth.socialaccount",
     "rest_framework",
     "rest_framework.authtoken",
@@ -180,15 +181,13 @@ MIDDLEWARE = [
 # # https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 # STATIC_URL = "/static/"
 # # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
-# STATICFILES_DIRS = [
-#     str(APPS_DIR / "static")
-# ]
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
-
-
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'assets'),
+]
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",

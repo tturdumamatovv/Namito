@@ -3,31 +3,32 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from mptt.admin import DraggableMPTTAdmin
+import nested_admin
 
 from .forms import (
-    CategoryAdminForm, 
-    ColorAdminForm, 
-    SizeChartForm, 
-    TagAdminForm, 
+    CategoryAdminForm,
+    ColorAdminForm,
+    SizeChartForm,
+    TagAdminForm,
     ProductForm
-    )
+)
 from .models import (
-    Category, 
-    Product, 
-    Color, 
-    Size, 
-    Variant, 
-    Image, 
-    Review, 
-    Brand, 
-    SizeChart, 
-    SizeChartItem, 
+    Category,
+    Product,
+    Color,
+    Size,
+    Variant,
+    Image,
+    Review,
+    Brand,
+    SizeChart,
+    SizeChartItem,
     Tag,
-    StaticPage, 
-    MainPage, 
-    Advertisement, 
+    StaticPage,
+    MainPage,
+    Advertisement,
     MainPageSlider
-    )
+)
 
 
 @admin.register(StaticPage)
@@ -74,18 +75,25 @@ class CategoryAdmin(DraggableMPTTAdmin):
         return f'{instance.name}'
 
 
-class VariantInline(admin.TabularInline):
+class ImageInline(nested_admin.NestedTabularInline):
+    model = Image
+    extra = 0
+    readonly_fields = ("get_image",)
+
+    def get_image(self, obj):
+        return mark_safe(f'<img src = {obj.image.url} width = "300"')
+
+    get_image.short_description = "Изображение"
+
+
+class VariantInline(nested_admin.NestedTabularInline):
     model = Variant
     extra = 0
     show_change_link = True
+    inlines = [ImageInline]
 
 
-class ImageInline(admin.TabularInline):
-    model = Image
-    extra = 0
-
-
-class ReviewInline(admin.TabularInline):
+class ReviewInline(nested_admin.NestedTabularInline):
     model = Review
     extra = 0
     show_change_link = False
@@ -94,12 +102,16 @@ class ReviewInline(admin.TabularInline):
 
 
 @admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(nested_admin.NestedModelAdmin):
     form = ProductForm
     list_display = ['name', 'category']
     search_fields = ['name', 'category__name']
     inlines = [VariantInline, ReviewInline]
 
+    class Media:
+        css = {
+            "all": ("css/admin.css",)
+        }
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
