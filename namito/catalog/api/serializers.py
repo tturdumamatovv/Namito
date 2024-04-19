@@ -176,10 +176,13 @@ class ProductListSerializer(serializers.ModelSerializer):
             return quantity if quantity else 0
         return 0
 
-    def get_image(self, product):
-        # Получить все варианты продукта с главным вариантом на первом месте
+    def get_image(self, product, request):
+        # Получаем все варианты продукта с главным вариантом на первом месте
         variants = Variant.objects.filter(product=product).order_by('-main', 'id')
         images_data = []
+
+        # Получаем базовый URL для построения абсолютного пути
+        base_url = request.build_absolute_uri('/')
 
         # Перебираем все варианты и получаем их главные изображения
         for variant in variants:
@@ -192,7 +195,10 @@ class ProductListSerializer(serializers.ModelSerializer):
 
             # Если нашли изображение, добавляем в список результатов
             if image:
-                images_data.append(ImageSerializer(image).data)
+                image_data = ImageSerializer(image).data
+                if image_data.get('image'):
+                    image_data['image'] = base_url + image_data['image']
+                images_data.append(image_data)
 
         return images_data
 

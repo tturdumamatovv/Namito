@@ -1,5 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models.functions import Lower
+from django.shortcuts import get_object_or_404
 
 from rest_framework import generics, permissions
 from rest_framework.views import APIView
@@ -93,6 +94,16 @@ class TopProductListView(generics.ListAPIView):
 class NewProductListView(generics.ListAPIView):
     queryset = Product.objects.all().order_by('-id')[:15]
     serializer_class = ProductListSerializer
+
+
+class SimilarProductsView(generics.ListAPIView):
+    serializer_class = ProductListSerializer
+
+    def get_queryset(self):
+        product_id = self.kwargs.get('product_id')
+        product = get_object_or_404(Product, pk=product_id)
+        queryset = Product.objects.filter(category=product.category).exclude(pk=product_id)[:10]
+        return queryset
 
 
 class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):

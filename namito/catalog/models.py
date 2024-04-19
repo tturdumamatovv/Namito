@@ -1,6 +1,7 @@
 import html
 import re
 import io
+import uuid
 
 from django.db import models
 from django.utils.text import slugify
@@ -135,14 +136,24 @@ class Product(models.Model):
     min_price = models.PositiveIntegerField(default=0)
     tags = models.ManyToManyField(Tag, blank=True)
     is_top = models.BooleanField(default=False)
+    sku = models.CharField(max_length=50, unique=True, blank=True, null=True)
 
     def save(self, *args, **kwargs):
+
+        if not self.sku:
+            self.sku = self.generate_sku()
+
         if not self.meta_description:
             self.meta_description = self.generate_meta_description()
 
         if not self.meta_title:
             self.meta_title = self.generate_meta_title()
+
+
         super().save(*args, **kwargs)
+
+    def generate_sku(self):
+        return str(uuid.uuid4()).split('-')[0]
 
     def generate_meta_description(self):
         if self.description:
