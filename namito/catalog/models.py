@@ -135,6 +135,7 @@ class Product(models.Model):
     min_price = models.PositiveIntegerField(default=0)
     tags = models.ManyToManyField(Tag, blank=True)
     is_top = models.BooleanField(default=False)
+    characteristics = models.TextField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.meta_description:

@@ -151,6 +151,16 @@ class UserReviewListView(generics.ListAPIView):
         return queryset
 
 
+class ProductReviewListView(generics.ListAPIView):
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        product_id = self.kwargs.get('pk')
+
+        queryset = Review.objects.filter(product_id=product_id)
+        return queryset
+
+
 class ReviewCreate(generics.CreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer

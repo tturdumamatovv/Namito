@@ -198,11 +198,12 @@ class ProductSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField()
     is_favorite = serializers.SerializerMethodField()
     cart_quantity = serializers.SerializerMethodField()
+    rating_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating',
-                  'tags', 'is_favorite', 'cart_quantity']
+                  'tags', 'is_favorite', 'cart_quantity', 'rating_count', 'characteristics']
 
     def get_variants(self, product):
         variants_qs = Variant.objects.filter(product=product)
@@ -239,6 +240,10 @@ class ProductSerializer(serializers.ModelSerializer):
 
             return quantity if quantity else 0
         return 0
+
+    def get_rating_count(self, product):
+        count = Rating.objects.filter(product=product).count()
+        return count
 
 
 class ReviewSerializer(serializers.ModelSerializer):

@@ -30,7 +30,8 @@ from namito.catalog.api.views import (
     CategoryBySlugAPIView,
     CategoryByNameStartsWithAPIView,
     ProductByNameStartsWithAPIView,
-    ColorSizeBrandAPIView
+    ColorSizeBrandAPIView,
+    ProductReviewListView
     )
 
 static_page_patterns = [
@@ -53,6 +54,7 @@ product_patterns = [
     path('new-products/', NewProductListView.as_view()),
     path('products/<int:pk>/', ProductDetailView.as_view()),
     path('products/startswith/', ProductByNameStartsWithAPIView.as_view(), name='product_startswith'),
+    path('products/<int:pk>/reviews/', ProductReviewListView.as_view(), name='product-reviews'),
 ]
 
 entity_patterns = [
@@ -66,7 +68,7 @@ entity_patterns = [
     path('images/', ImageCreateView.as_view()),
     path('images/<int:pk>/', ImageDetailView.as_view()),
     path('reviews/', ReviewCreate.as_view()),
-    path('reviews/', UserReviewListView.as_view(), name='user_reviews'),
+    path('reviews-list/', UserReviewListView.as_view(), name='user_reviews'),
     path('ratings/', RatingCreate.as_view()),
 ]
 
