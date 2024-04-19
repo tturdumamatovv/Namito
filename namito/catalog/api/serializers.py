@@ -21,7 +21,7 @@ from namito.catalog.models import (
     MainPage,
     Advertisement,
     MainPageSlider,
-    Characteristics
+    Characteristic
     )
 from namito.orders.models import CartItem
 
@@ -195,7 +195,7 @@ class ProductListSerializer(serializers.ModelSerializer):
 
 class CharacteristicsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Characteristics
+        model = Characteristic
         fields = ('key', 'value')
 
 

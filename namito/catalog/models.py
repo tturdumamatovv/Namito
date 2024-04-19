@@ -161,10 +161,10 @@ class Product(models.Model):
         return self.name
 
 
-class Characteristics(models.Model):
+class Characteristic(models.Model):
     key = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Key'))
     value = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Value'))
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='characteristics')
 
     def __str__(self):
         return self.key

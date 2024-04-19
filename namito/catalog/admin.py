@@ -28,7 +28,7 @@ from .models import (
     MainPage,
     Advertisement,
     MainPageSlider,
-    Characteristics
+    Characteristic
 )
 
 
@@ -98,15 +98,15 @@ class ReviewInline(nested_admin.NestedTabularInline):
     model = Review
     extra = 0
     show_change_link = False
-    readonly_fields = ['user', 'text']
+    fields = ['user', 'text']
     can_delete = False
 
 
 class CharacteristicsInline(nested_admin.NestedTabularInline):
-    model = Characteristics
+    model = Characteristic
     extra = 0
     show_change_link = True
-    readonly_fields = ['key', 'value']
+    fields = ['key', 'value']
 
 
 @admin.register(Product)
