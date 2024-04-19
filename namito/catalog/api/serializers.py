@@ -89,6 +89,7 @@ class VariantSerializer(serializers.ModelSerializer):
     color = ColorSerializer(read_only=True)
     size = SizeSerializer(read_only=True)
     images = serializers.SerializerMethodField()
+    price = serializers.SerializerMethodField()
     discounted_price = serializers.SerializerMethodField()
 
     class Meta:
@@ -103,6 +104,11 @@ class VariantSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_discounted_price(variant):
+        discounted_price = variant.get_price()
+        return discounted_price
+
+    @staticmethod
+    def get_price(variant):
         price = variant.get_price()
         return price
 
@@ -119,7 +125,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'category', 'price',
-                  'average_rating', 'tags', 'is_favorite','cart_quantity', 'image']
+                  'average_rating', 'tags', 'is_favorite', 'cart_quantity', 'image']
 
     def get_price(self, product):
         # Fetch the main variant; if it's not there, fetch any variant
@@ -196,7 +202,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating',
-                   'tags', 'is_favorite','cart_quantity']
+                  'tags', 'is_favorite', 'cart_quantity']
 
     def get_variants(self, product):
         variants_qs = Variant.objects.filter(product=product)
