@@ -135,7 +135,6 @@ class Product(models.Model):
     min_price = models.PositiveIntegerField(default=0)
     tags = models.ManyToManyField(Tag, blank=True)
     is_top = models.BooleanField(default=False)
-    characteristics = models.TextField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.meta_description:
@@ -160,6 +159,15 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Characteristics(models.Model):
+    key = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Key'))
+    value = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Value'))
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.key
 
 
 class Color(models.Model):

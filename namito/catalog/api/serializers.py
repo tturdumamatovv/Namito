@@ -20,7 +20,8 @@ from namito.catalog.models import (
     StaticPage,
     MainPage,
     Advertisement,
-    MainPageSlider
+    MainPageSlider,
+    Characteristics
     )
 from namito.orders.models import CartItem
 
@@ -192,6 +193,12 @@ class ProductListSerializer(serializers.ModelSerializer):
         return ''
 
 
+class CharacteristicsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Characteristics
+        fields = ('key', 'value')
+
+
 class ProductSerializer(serializers.ModelSerializer):
     variants = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
@@ -199,6 +206,7 @@ class ProductSerializer(serializers.ModelSerializer):
     is_favorite = serializers.SerializerMethodField()
     cart_quantity = serializers.SerializerMethodField()
     rating_count = serializers.SerializerMethodField()
+    characteristics = CharacteristicsSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product

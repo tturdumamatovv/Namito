@@ -27,7 +27,8 @@ from .models import (
     StaticPage,
     MainPage,
     Advertisement,
-    MainPageSlider
+    MainPageSlider,
+    Characteristics
 )
 
 
@@ -101,17 +102,25 @@ class ReviewInline(nested_admin.NestedTabularInline):
     can_delete = False
 
 
+class CharacteristicsInline(nested_admin.NestedTabularInline):
+    model = Characteristics
+    extra = 0
+    show_change_link = True
+    readonly_fields = ['key', 'value']
+
+
 @admin.register(Product)
 class ProductAdmin(nested_admin.NestedModelAdmin):
     form = ProductForm
     list_display = ['name', 'category']
     search_fields = ['name', 'category__name']
-    inlines = [VariantInline, ReviewInline]
+    inlines = [CharacteristicsInline, VariantInline, ReviewInline]
 
     class Media:
         css = {
             "all": ("css/admin.css",)
         }
+
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
