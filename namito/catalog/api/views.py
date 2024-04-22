@@ -7,6 +7,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from drf_yasg.utils import swagger_auto_schema
+
 from namito.catalog.models import (
     Category,
     Product,
@@ -38,9 +40,9 @@ from .serializers import (
     StaticPageSerializer,
     MainPageSerializer,
     AdvertisementSerializer,
-    ColorSizeBrandSerializer
+    ColorSizeBrandSerializer, FavoriteToggleSerializer
 
-    )
+)
 from .filters import ProductFilter
 
 
@@ -110,6 +112,10 @@ class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
 
 class ColorCreateView(generics.CreateAPIView):
     queryset = Color.objects.all()
@@ -185,6 +191,8 @@ class RatingCreate(generics.CreateAPIView):
 class FavoriteToggleAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
+    @swagger_auto_schema(request_body=FavoriteToggleSerializer,
+                         responses={200: 'Successfully toggled favorite'})
     def post(self, request, *args, **kwargs):
         user = request.user
         product_id = request.data.get('product_id')
