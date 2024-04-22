@@ -95,12 +95,12 @@ class VariantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Variant
-        fields = ['color', 'size', 'price', 'discounted_price',
-                  'images', 'stock', 'discount_value', 'discount_type']
+        fields = ['id', 'color', 'size', 'price', 'discounted_price',
+                  'images', 'stock', 'discount_value', 'discount_type', 'main']
 
     @staticmethod
     def get_images(variant):
-        images_qs = Image.objects.filter(variant=variant)
+        images_qs = Image.objects.filter(variant=variant).order_by('-main')
         return ImageSerializer(images_qs, many=True).data
 
     @staticmethod
@@ -221,7 +221,7 @@ class ProductSerializer(serializers.ModelSerializer):
                   'tags', 'is_favorite', 'cart_quantity', 'rating_count', 'characteristics']
 
     def get_variants(self, product):
-        variants_qs = Variant.objects.filter(product=product)
+        variants_qs = Variant.objects.filter(product=product).order_by('-main')
         return VariantSerializer(variants_qs, many=True).data
 
     def get_average_rating(self, product):
