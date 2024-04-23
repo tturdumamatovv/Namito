@@ -73,6 +73,10 @@ class SizeSerializer(serializers.ModelSerializer):
         model = Size
         fields = '__all__'
 
+    def to_representation(self, instance):
+        sizes = list(instance.all()) 
+        return [size.name for size in sizes]
+
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
