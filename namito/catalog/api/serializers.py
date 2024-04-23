@@ -81,9 +81,20 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class ImageSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = Image
         fields = '__all__'
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image and hasattr(obj.image, 'url'):
+            if request is not None:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return None
+
 
 
 class VariantSerializer(serializers.ModelSerializer):
@@ -95,13 +106,12 @@ class VariantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Variant
-        fields = ['color', 'size', 'price', 'discounted_price',
-                  'images', 'stock', 'discount_value', 'discount_type']
+        fields = ['id', 'color', 'size', 'price', 'discounted_price',
+                  'images', 'stock', 'discount_value', 'discount_type', 'main']
 
-    @staticmethod
-    def get_images(variant):
-        images_qs = Image.objects.filter(variant=variant)
-        return ImageSerializer(images_qs, many=True).data
+    def get_images(self, variant):
+        images_qs = Image.objects.filter(variant=variant).order_by('-main_image')
+        return ImageSerializer(images_qs, many=True, context=self.context).data
 
     @staticmethod
     def get_discounted_price(variant):
@@ -221,8 +231,8 @@ class ProductSerializer(serializers.ModelSerializer):
                   'tags', 'is_favorite', 'cart_quantity', 'rating_count', 'characteristics']
 
     def get_variants(self, product):
-        variants_qs = Variant.objects.filter(product=product)
-        return VariantSerializer(variants_qs, many=True).data
+        variants_qs = Variant.objects.filter(product=product).order_by('-main')
+        return VariantSerializer(variants_qs, many=True, context=self.context).data
 
     def get_average_rating(self, product):
         average = Rating.objects.filter(product=product).aggregate(Avg('score'))['score__avg']
@@ -357,3 +367,6 @@ class ColorSizeBrandSerializer(serializers.Serializer):
     def get_brands(self, instance):
         brands = Brand.objects.all()
         return BrandSerializer(brands, many=True).data
+
+class FavoriteToggleSerializer(serializers.Serializer):
+    product_id = serializers.IntegerField(help_text="The unique identifier of the product to be favorited or unfavored.")

@@ -11,7 +11,9 @@ class ProductFilter(django_filters.FilterSet):
     color = django_filters.CharFilter(field_name="variants__color__name", lookup_expr='iexact')
     size = django_filters.CharFilter(field_name="variants__size__name", lookup_expr='iexact')
     brand = django_filters.CharFilter(field_name="brand__name", lookup_expr='iexact')
+    category = django_filters.CharFilter(field_name="category__name", lookup_expr='iexact')
     min_rating = django_filters.NumberFilter(method='filter_by_min_rating')
+    has_discount = django_filters.BooleanFilter(method='filter_by_discount_presence')
 
     class Meta:
         model = Product
@@ -20,6 +22,22 @@ class ProductFilter(django_filters.FilterSet):
     def filter_by_min_rating(self, queryset, name, value):
         queryset = queryset.annotate(avg_rating=Avg('ratings__score')).filter(avg_rating__gte=value)
         return queryset.distinct()
+
+    def filter_by_discount_presence(self, queryset, name, value):
+        if value:
+            return queryset.filter(
+                variants__discount_value__isnull=False,
+                variants__discount_value__gt=0,
+                variants__discount_type__isnull=False
+            ).distinct()
+
+        else:
+            return queryset.exclude(
+                variants__discount_value__isnull=False,
+                variants__discount_value__gt=0,
+                variants__discount_type__isnull=False
+            ).distinct()
+
 
     @property
     def qs(self):
