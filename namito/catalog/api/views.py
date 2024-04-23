@@ -2,7 +2,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models.functions import Lower
 from django.shortcuts import get_object_or_404
 
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -286,3 +286,9 @@ class ColorSizeBrandAPIView(generics.ListAPIView):
         brands = Brand.objects.all()
         serializer = self.get_serializer({'colors': colors, 'sizes': sizes, 'brands': brands})
         return Response(serializer.data)
+
+
+class DiscountAPIView(generics.ListAPIView):
+    queryset = Product.objects.filter(variants__discount_value__isnull=False, variants__discount_type__isnull=False).distinct()
+    serializer_class = ProductListSerializer
+    
