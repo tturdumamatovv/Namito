@@ -158,14 +158,9 @@ class SizeAdmin(admin.ModelAdmin):
 
 @admin.register(Variant)
 class VariantAdmin(admin.ModelAdmin):
-    list_display = ['product', 'color', 'get_sizes', 'price']
+    list_display = ['product', 'color', 'size', 'price']
     search_fields = ['product__name', 'color__name', 'size__name']
     inlines = [ImageInline]
-
-
-    def get_sizes(self, obj):
-        return ", ".join([str(size) for size in obj.sizes.all()])
-    get_sizes.short_description = 'Sizes'
 
 
 @admin.register(Image)

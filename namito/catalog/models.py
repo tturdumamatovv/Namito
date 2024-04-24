@@ -199,8 +199,8 @@ class Size(models.Model):
 
 class Variant(models.Model):
     product = models.ForeignKey(Product, related_name='variants', on_delete=models.CASCADE)
-    color = models.ForeignKey(Color, on_delete=models.CASCADE, related_name='variants')
-    size = models.ManyToManyField(Size, related_name='variants')
+    color = models.ForeignKey(Color, on_delete=models.PROTECT, related_name='variants')
+    size = models.ForeignKey(Size, on_delete=models.PROTECT, related_name='variants')
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField(blank=True, null=True)
     main = models.BooleanField(default=False)
