@@ -87,11 +87,11 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order {self.id} by {self.user}"
-    
+
     def clean(self):
         if self.delivery_method == 'courier' and not self.delivery_address:
             raise ValidationError(_('Delivery address is required for courier delivery.'))
-    
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if self.status == 2 and not OrderHistory.objects.filter(order=self).exists():
