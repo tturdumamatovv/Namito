@@ -2,10 +2,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models.functions import Lower
 from django.shortcuts import get_object_or_404
 
-from rest_framework import generics, permissions, viewsets
+from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
 
 from drf_yasg.utils import swagger_auto_schema
 
@@ -40,7 +39,8 @@ from .serializers import (
     StaticPageSerializer,
     MainPageSerializer,
     AdvertisementSerializer,
-    ColorSizeBrandSerializer, FavoriteToggleSerializer
+    ColorSizeBrandSerializer,
+    FavoriteToggleSerializer
 
 )
 from .filters import ProductFilter
@@ -117,6 +117,7 @@ class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
         context['request'] = self.request
         return context
 
+
 class ColorCreateView(generics.CreateAPIView):
     queryset = Color.objects.all()
     serializer_class = ColorSerializer
@@ -173,7 +174,6 @@ class ProductReviewListView(generics.ListAPIView):
 
     def get_queryset(self):
         product_id = self.kwargs.get('pk')
-
         queryset = Review.objects.filter(product_id=product_id)
         return queryset
 
@@ -191,24 +191,19 @@ class RatingCreate(generics.CreateAPIView):
 class FavoriteToggleAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    @swagger_auto_schema(request_body=FavoriteToggleSerializer,
-                         responses={200: 'Successfully toggled favorite'})
+    @swagger_auto_schema(request_body=FavoriteToggleSerializer, responses={200: 'Successfully toggled favorite'})
     def post(self, request, *args, **kwargs):
         user = request.user
         product_id = request.data.get('product_id')
-
         if not product_id:
             return Response({"error": "Product ID is required."}, status=status.HTTP_400_BAD_REQUEST)
-
         product = Product.objects.get(id=product_id)
         favorite, created = Favorite.objects.get_or_create(user=user, product=product)
-
         if created:
             message = "Added to favorites."
         else:
             favorite.delete()
             message = "Removed from favorites."
-
         return Response({"message": message}, status=status.HTTP_200_OK)
 
 
@@ -248,9 +243,7 @@ class CategoryBySlugAPIView(generics.ListAPIView):
     lookup_field = 'slug'
 
     def get_queryset(self):
-        # Получаем значение slug из URL
         slug = self.kwargs.get('slug')
-        # Фильтруем категории по заданному slug
         queryset = Category.objects.filter(slug=slug)
         return queryset
 
@@ -299,4 +292,3 @@ class ColorSizeBrandAPIView(generics.ListAPIView):
 class DiscountAPIView(generics.ListAPIView):
     queryset = Product.objects.filter(variants__discount_value__isnull=False, variants__discount_type__isnull=False).distinct()
     serializer_class = ProductListSerializer
-    

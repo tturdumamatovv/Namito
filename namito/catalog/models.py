@@ -31,7 +31,8 @@ class ProcessedImageModel(models.Model):
                 output_io_stream = io.BytesIO()
                 pil_image.convert('RGB').save(output_io_stream, format='WEBP', quality=70)
                 output_io_stream.seek(0)
-                self.image = ContentFile(output_io_stream.read(), name=self.image.name.split('.')[0] + '.webp')
+                self.image = ContentFile(output_io_stream.read(),
+                                         name=self.image.name.split('.')[0] + '.webp')
 
 
 class StaticPage(ProcessedImageModel):
@@ -70,8 +71,8 @@ class Category(MPTTModel, models.Model):
     slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
     image = models.ImageField(null=True, blank=True)
     background_color = ColorField(default='#FF0000', null=True)
-    parent = TreeForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True, related_name="children",
-                            verbose_name=_("Parent category"))
+    parent = TreeForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True,
+                            related_name="children", verbose_name=_("Parent category"))
     order = models.PositiveIntegerField(default=0, editable=False, db_index=True)
     meta_title = models.CharField(max_length=59, blank=True)
     meta_description = models.CharField(max_length=160, blank=True)
@@ -89,15 +90,11 @@ class Category(MPTTModel, models.Model):
             base_slug = slugify(unidecode(self.name))
             unique_slug = base_slug
             counter = 1
-
             while Category.objects.filter(slug=unique_slug).exists():
                 unique_slug = f"{base_slug}-{counter}"
                 counter += 1
-
             self.slug = unique_slug
-
         super().save(*args, **kwargs)
-
 
     def __str__(self):
         return self.name
@@ -105,7 +102,8 @@ class Category(MPTTModel, models.Model):
 
 class Brand(models.Model):
     name = models.CharField(max_length=255, unique=True, help_text="The name of the brand")
-    logo = models.ImageField(upload_to='brand_logos/', blank=True, null=True, help_text="The logo of the brand")
+    logo = models.ImageField(upload_to='brand_logos/', blank=True, null=True,
+                             help_text="The logo of the brand")
 
     def __str__(self):
         return self.name
@@ -128,7 +126,8 @@ class Product(models.Model):
     description = models.TextField()
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE,
                                  verbose_name=_("Category"))
-    brand = models.ForeignKey(Brand, related_name='products', on_delete=models.PROTECT, blank=True, null=True)
+    brand = models.ForeignKey(Brand, related_name='products', on_delete=models.PROTECT,
+                              blank=True, null=True)
     meta_title = models.CharField(max_length=59, blank=True, null=True)
     meta_description = models.TextField(blank=True, null=True)
     meta_image = models.ImageField(upload_to='product_meta_images/', blank=True, null=True)
@@ -139,17 +138,12 @@ class Product(models.Model):
     sku = models.CharField(max_length=50, unique=True, blank=True, null=True)
 
     def save(self, *args, **kwargs):
-
         if not self.sku:
             self.sku = self.generate_sku()
-
         if not self.meta_description:
             self.meta_description = self.generate_meta_description()
-
         if not self.meta_title:
             self.meta_title = self.generate_meta_title()
-
-
         super().save(*args, **kwargs)
 
     def generate_sku(self):
@@ -297,21 +291,16 @@ class SizeChartItem(models.Model):
 
 
 class SingletonModel(models.Model):
-    """
-    Модель, которая всегда имеет только один экземпляр.
-    """
 
     class Meta:
         abstract = True
 
     def save(self, *args, **kwargs):
-        # Если модель уже существует, удалите ее
         self.__class__.objects.exclude(id=self.id).delete()
         super(SingletonModel, self).save(*args, **kwargs)
 
     @classmethod
     def load(cls):
-        # Если модель еще не существует, создайте ее
         if not cls.objects.exists():
             cls.objects.create()
         return cls.objects.get()
@@ -362,4 +351,3 @@ class Advertisement(models.Model):
     class Meta:
         verbose_name = _('Рекламу')
         verbose_name_plural = _('Рекламы')
-

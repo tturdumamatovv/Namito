@@ -1,10 +1,22 @@
 import random
+
+from faker import Faker
+
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from faker import Faker
-from namito.catalog.models import Category, Brand, Tag, Product, Characteristic, Color, Size, Variant, Image
+
+from namito.catalog.models import (
+    Category,
+    Brand,
+    Tag,
+    Product,
+    Color,
+    Size,
+    Variant
+)
 
 fake = Faker()
+
 
 class Command(BaseCommand):
     help = 'Generates and inserts random data into the database.'
@@ -22,7 +34,7 @@ class Command(BaseCommand):
 
     def create_categories(self):
         categories = []
-        for _ in range(10):  # Create 10 random categories
+        for _ in range(10):
             name = fake.unique.company()
             category = Category(
                 name=name,
@@ -30,33 +42,33 @@ class Command(BaseCommand):
                 background_color=fake.hex_color(),
                 order=random.randint(0, 100)
             )
-            category.save()  # Saving individually to handle MPTT updates and slug generation
+            category.save()
             categories.append(category)
         return categories
 
     def create_brands(self):
-        for _ in range(5):  # Create 5 random brands
+        for _ in range(5):
             Brand.objects.create(
                 name=fake.unique.company(),
                 logo=fake.image_url()
             )
 
     def create_tags(self):
-        for _ in range(20):  # Create 20 random tags
+        for _ in range(20):
             Tag.objects.create(
                 name=fake.word(),
                 color=fake.hex_color()
             )
 
     def create_colors(self):
-        for _ in range(10):  # Create 10 random colors
+        for _ in range(10):
             Color.objects.create(
                 name=fake.color_name(),
                 color=fake.hex_color()
             )
 
     def create_sizes(self):
-        for _ in range(5):  # Create 5 random sizes
+        for _ in range(5):
             Size.objects.create(
                 name=fake.word(),
                 description=fake.sentence()
@@ -66,7 +78,7 @@ class Command(BaseCommand):
         categories = list(Category.objects.all())
         brands = list(Brand.objects.all())
         tags = list(Tag.objects.all())
-        for _ in range(50):  # Create 50 random products
+        for _ in range(50):
             product = Product.objects.create(
                 name=fake.catch_phrase(),
                 description=fake.text(),
@@ -82,7 +94,7 @@ class Command(BaseCommand):
         colors = list(Color.objects.all())
         sizes = list(Size.objects.all())
         for product in products:
-            for _ in range(3):  # Create 3 variants per product
+            for _ in range(3):
                 variant = Variant.objects.create(
                     product=product,
                     color=random.choice(colors),

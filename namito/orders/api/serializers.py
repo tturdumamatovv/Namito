@@ -22,15 +22,16 @@ class CartItemCreateUpdateSerializer(serializers.ModelSerializer):
 
 class CartItemSerializer(serializers.ModelSerializer):
     product_variant = VariantSerializer(required=False)
+    product_name = serializers.CharField(source='product_variant.product.name', read_only=True)  # Новое поле для названия товара
 
     class Meta:
         model = CartItem
-        fields = ['id', 'product_variant', 'quantity', 'to_purchase']
+        fields = ['id', 'product_variant', 'quantity', 'to_purchase', 'product_name']
 
 
 class CartSerializer(ModelSerializer):
     items = CartItemSerializer(many=True)
-
+    
     class Meta:
         model = Cart
         fields = ['id', 'user', 'created_at', 'items']

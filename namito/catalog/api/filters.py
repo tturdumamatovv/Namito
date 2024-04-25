@@ -1,8 +1,8 @@
 import django_filters
+
 from django.db.models import Avg
 
 from namito.catalog.models import Product
-
 
 
 class ProductFilter(django_filters.FilterSet):
@@ -30,14 +30,12 @@ class ProductFilter(django_filters.FilterSet):
                 variants__discount_value__gt=0,
                 variants__discount_type__isnull=False
             ).distinct()
-
         else:
             return queryset.exclude(
                 variants__discount_value__isnull=False,
                 variants__discount_value__gt=0,
                 variants__discount_type__isnull=False
             ).distinct()
-
 
     @property
     def qs(self):
@@ -54,4 +52,3 @@ class ProductFilter(django_filters.FilterSet):
             if 'brand' in self.request.GET:
                 queryset = queryset.filter(brand__name__iexact=self.request.GET['brand'])
         return queryset.distinct()
-

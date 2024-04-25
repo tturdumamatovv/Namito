@@ -29,8 +29,8 @@ from namito.orders.models import CartItem
 class StaticPageSerializer(serializers.ModelSerializer):
     class Meta:
         model = StaticPage
-        fields = ['title', 'slug', 'content', 'image',
-                  'meta_title', 'meta_description', 'created_at', 'updated_at']
+        fields = ['title', 'slug', 'content', 'image', 'meta_title',
+                  'meta_description', 'created_at', 'updated_at']
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -38,8 +38,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ['id', 'name', 'type', 'slug', 'image', 'parent',
-                   'order', 'meta_title', 'meta_description','promotion', 'children']
+        fields = ['id', 'name', 'type', 'slug', 'image', 'parent', 'order',
+                  'meta_title', 'meta_description', 'promotion', 'children']
 
     def get_fields(self):
         fields = super().get_fields()
@@ -51,7 +51,6 @@ class CategorySerializer(serializers.ModelSerializer):
         if obj.id in self.context['serialized_categories']:
             return []
         self.context['serialized_categories'].add(obj.id)
-
         serializer = CategorySerializer(obj.children.all(), many=True, context=self.context)
         return serializer.data
 
@@ -96,7 +95,6 @@ class ImageSerializer(serializers.ModelSerializer):
         return None
 
 
-
 class VariantSerializer(serializers.ModelSerializer):
     color = ColorSerializer(read_only=True)
     size = SizeSerializer(read_only=True)
@@ -139,21 +137,16 @@ class ProductListSerializer(serializers.ModelSerializer):
                   'average_rating', 'tags', 'is_favorite', 'cart_quantity', 'image']
 
     def get_price(self, product):
-        # Fetch the main variant; if it's not there, fetch any variant
         main_variant = Variant.objects.filter(product=product, main=True).first()
         if not main_variant:
             main_variant = Variant.objects.filter(product=product).first()
-
         if main_variant:
             price = main_variant.price
-
             discount = main_variant.get_price()
-
             return {
                 'price': price,
                 'reduced_price': discount
             }
-
         return {'price': 0, 'discount': 0}
 
     def get_average_rating(self, product):
@@ -168,47 +161,37 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     def get_is_favorite(self, product):
         user = self.context.get('request').user if 'request' in self.context else None
-
         if user and user.is_authenticated:
             return Favorite.objects.filter(user=user, product=product).exists()
         return False
 
     def get_cart_quantity(self, product):
         user = self.context.get('request').user if 'request' in self.context else None
-
         if user and user.is_authenticated:
             quantity = CartItem.objects.filter(
                 cart__user=user,
                 product_variant__product=product,
                 to_purchase=True
             ).aggregate(total_quantity=models.Sum('quantity'))['total_quantity']
-
             return quantity if quantity else 0
         return 0
 
     def get_image(self, product):
         base_url = self.context.get('request').build_absolute_uri('/')
         images_data = []
-
-        # Сортируем варианты по признаку главного, затем по ID
         variants = Variant.objects.filter(product=product).order_by('-main', 'id')
-
         for variant in variants:
-            # Пытаемся найти главное изображение варианта
             image = Image.objects.filter(variant=variant, main_image=True).first()
-            # Если главного изображения нет, берем первое попавшееся
             if not image:
                 image = Image.objects.filter(variant=variant).first()
-            # Если изображение есть, добавляем его в результат
             if image:
                 image_url = base_url + image.image.url if image.image else None
                 images_data.append({
                     'variant_id': variant.id,
                     'image_url': image_url
                 })
-
-        # Возвращаем список изображений, по одному на каждый вариант
         return images_data
+
 
 class CharacteristicsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -227,8 +210,8 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating',
-                  'tags', 'is_favorite', 'cart_quantity', 'rating_count', 'characteristics']
+        fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags',
+                  'is_favorite', 'cart_quantity', 'rating_count', 'characteristics']
 
     def get_variants(self, product):
         variants_qs = Variant.objects.filter(product=product).order_by('-main')
@@ -246,23 +229,18 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_is_favorite(self, obj):
         user = self.context.get('request').user if 'request' in self.context else None
-
         if user and user.is_authenticated:
             return Favorite.objects.filter(user=user, product=obj).exists()
         return False
 
     def get_cart_quantity(self, obj):
-        # Check if 'request' is in the context and thus the user
         user = self.context.get('request').user if 'request' in self.context else None
-
         if user and user.is_authenticated:
-            # Aggregate the quantities of this product in the user's cart(s)
             quantity = CartItem.objects.filter(
                 cart__user=user,
                 product_variant__product=obj,
-                to_purchase=True  # Assuming you want to count only items marked for purchase
+                to_purchase=True
             ).aggregate(total_quantity=models.Sum('quantity'))['total_quantity']
-
             return quantity if quantity else 0
         return 0
 
@@ -343,8 +321,8 @@ class MainPageSerializer(serializers.ModelSerializer):
     class Meta:
         model = MainPage
         fields = ['banner1', 'banner2', 'banner3', 'title', 'description', 'counter1_title',
-                   'counter1_value', 'counter2_title', 'counter2_value', 'counter3_title',
-                     'counter3_value', 'button_link', 'button', 'slider']
+                  'counter1_value', 'counter2_title', 'counter2_value', 'counter3_title',
+                  'counter3_value', 'button_link', 'button', 'slider']
 
     def get_slider(self, page):
         slider_qs = MainPageSlider.objects.filter(page=page)
@@ -368,5 +346,7 @@ class ColorSizeBrandSerializer(serializers.Serializer):
         brands = Brand.objects.all()
         return BrandSerializer(brands, many=True).data
 
+
 class FavoriteToggleSerializer(serializers.Serializer):
-    product_id = serializers.IntegerField(help_text="The unique identifier of the product to be favorited or unfavored.")
+    product_id = serializers.IntegerField(help_text="The unique identifier of the product "
+                                                    "to be favorited or unfavored.")

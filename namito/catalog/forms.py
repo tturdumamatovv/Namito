@@ -2,12 +2,12 @@ from django import forms
 from django.contrib.admin.widgets import FilteredSelectMultiple
 
 from namito.catalog.models import (
-    Category, 
-    Color, 
-    SizeChart, 
-    Tag, 
+    Category,
+    Color,
+    SizeChart,
+    Tag,
     Product
-    )
+)
 
 
 class CategoryAdminForm(forms.ModelForm):

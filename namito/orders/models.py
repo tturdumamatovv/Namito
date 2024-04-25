@@ -82,7 +82,7 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, default=None, blank=True)
     delivery_method = models.CharField(max_length=20, choices=DELIVERY_CHOICES, default='courier')
-    delivery_address = models.CharField(max_length=255,null=True, blank=True)
+    delivery_address = models.CharField(max_length=255, null=True, blank=True)
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, default='cash')
 
     def __str__(self):

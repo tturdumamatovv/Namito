@@ -1,9 +1,10 @@
+import nested_admin
+
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from mptt.admin import DraggableMPTTAdmin
-import nested_admin
 
 from .forms import (
     CategoryAdminForm,
