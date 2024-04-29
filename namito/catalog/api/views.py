@@ -184,15 +184,23 @@ class FavoriteToggleAPIView(APIView):
     def post(self, request, *args, **kwargs):
         user = request.user
         product_id = request.data.get('product_id')
+
         if not product_id:
             return Response({"error": "Product ID is required."}, status=status.HTTP_400_BAD_REQUEST)
-        product = Product.objects.get(id=product_id)
+
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response({"error": f"Product with ID {product_id} does not exist."},
+                            status=status.HTTP_404_NOT_FOUND)
+
         favorite, created = Favorite.objects.get_or_create(user=user, product=product)
         if created:
             message = "Added to favorites."
         else:
             favorite.delete()
             message = "Removed from favorites."
+
         return Response({"message": message}, status=status.HTTP_200_OK)
 
 
