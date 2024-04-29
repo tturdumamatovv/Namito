@@ -17,20 +17,9 @@ from namito.catalog.models import (
     SizeChartItem,
     SizeChart,
     Tag,
-    StaticPage,
-    MainPage,
-    Advertisement,
-    MainPageSlider,
     Characteristic
     )
 from namito.orders.models import CartItem
-
-
-class StaticPageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = StaticPage
-        fields = ['title', 'slug', 'content', 'image', 'meta_title',
-                  'meta_description', 'created_at', 'updated_at']
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -294,39 +283,7 @@ class SizeChartSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'items']
 
 
-class AdvertisementSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Advertisement
-        fields = ["image", 'title', 'description', 'button_link', 'button', 'page']
 
-
-class MainPageSliderSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
-
-    class Meta:
-        model = MainPageSlider
-        fields = ['title', 'description', 'image', 'link']
-
-    def get_image(self, slider):
-        request = self.context.get('request')
-        if request is not None:
-            return request.build_absolute_uri(slider.image.url)
-        else:
-            return slider.image.url
-
-
-class MainPageSerializer(serializers.ModelSerializer):
-    slider = serializers.SerializerMethodField()
-
-    class Meta:
-        model = MainPage
-        fields = ['banner1', 'banner2', 'banner3', 'title', 'description', 'counter1_title',
-                  'counter1_value', 'counter2_title', 'counter2_value', 'counter3_title',
-                  'counter3_value', 'button_link', 'button', 'slider']
-
-    def get_slider(self, page):
-        slider_qs = MainPageSlider.objects.filter(page=page)
-        return MainPageSliderSerializer(slider_qs, many=True, context=self.context).data
 
 
 class ColorSizeBrandSerializer(serializers.Serializer):

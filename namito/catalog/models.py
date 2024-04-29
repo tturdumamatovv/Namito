@@ -35,30 +35,6 @@ class ProcessedImageModel(models.Model):
                                          name=self.image.name.split('.')[0] + '.webp')
 
 
-class StaticPage(ProcessedImageModel):
-    title = models.CharField(max_length=200, unique=True)
-    slug = models.SlugField(max_length=200, unique=True, blank=True)
-    content = models.TextField()
-    image = models.ImageField(upload_to='static_pages/', blank=True, null=True)
-    meta_title = models.CharField(max_length=60, blank=True, null=True)
-    meta_description = models.CharField(max_length=160, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.title
-
-    class Meta:
-        verbose_name = 'Static Page'
-        verbose_name_plural = 'Static Pages'
-        ordering = ['title']
-
-
 class Category(MPTTModel, models.Model):
     CATEGORY_TYPES = [
         (0, _("For men")),
@@ -288,66 +264,3 @@ class SizeChartItem(models.Model):
 
     def __str__(self):
         return self.size
-
-
-class SingletonModel(models.Model):
-
-    class Meta:
-        abstract = True
-
-    def save(self, *args, **kwargs):
-        self.__class__.objects.exclude(id=self.id).delete()
-        super(SingletonModel, self).save(*args, **kwargs)
-
-    @classmethod
-    def load(cls):
-        if not cls.objects.exists():
-            cls.objects.create()
-        return cls.objects.get()
-
-
-class MainPage(SingletonModel):
-    banner1 = models.ImageField(upload_to='banners/', blank=True, null=True)
-    banner1_link = models.URLField(blank=True, null=True)
-    banner2 = models.ImageField(upload_to='banners/', blank=True, null=True)
-    banner2_link = models.URLField(blank=True, null=True)
-    banner3 = models.ImageField(upload_to='banners/', blank=True, null=True)
-    banner3_link = models.URLField(blank=True, null=True)
-    title = models.CharField(verbose_name=_('Заголовок'), max_length=100, blank=True, null=True)
-    description = models.TextField(verbose_name=_('Описание'), blank=True, null=True)
-    counter1_title = models.CharField(max_length=30, verbose_name=_('Значение показателя 1'), blank=True, null=True)
-    counter1_value = models.CharField(max_length=30, verbose_name=_('Название показателя 1'), blank=True, null=True)
-    counter2_title = models.CharField(max_length=30, verbose_name=_('Значение показателя 2'), blank=True, null=True)
-    counter2_value = models.CharField(max_length=30, verbose_name=_('Название показателя 2'), blank=True, null=True)
-    counter3_value = models.CharField(max_length=30, verbose_name=_('Значение показателя 3'), blank=True, null=True)
-    counter3_title = models.CharField(max_length=30, verbose_name=_('Название показателя 3'), blank=True, null=True)
-
-    button_link = models.URLField(verbose_name=_('Ссылка'), blank=True, null=True)
-    button = models.CharField(max_length=50, verbose_name=_('Кнопка'), blank=True, null=True)
-
-    class Meta:
-        verbose_name = _('Главная страница')
-
-
-class MainPageSlider(models.Model):
-    title = models.CharField(max_length=100, verbose_name=_('Загловок'), blank=True, null=True)
-    description = models.CharField(max_length=100, verbose_name=_('Описание'), blank=True, null=True)
-    image = models.ImageField(upload_to='slider/', blank=True, null=True)
-    link = models.URLField(blank=True, null=True)
-    page = models.ForeignKey(MainPage, on_delete=models.PROTECT, blank=True, null=True)
-
-    class Meta:
-        verbose_name = _('Слайдер')
-
-
-class Advertisement(models.Model):
-    image = models.ImageField(upload_to='banners/', verbose_name='Картинка', blank=True, null=True)
-    title = models.CharField(max_length=30, verbose_name='Заголовок', blank=True, null=True)
-    description = models.CharField(max_length=100, verbose_name='Описание', blank=True, null=True)
-    button_link = models.URLField(verbose_name='Ссылка', blank=True, null=True)
-    button = models.CharField(max_length=30, verbose_name='Кнопка', blank=True, null=True)
-    page = models.ForeignKey(MainPage, on_delete=models.PROTECT, blank=True, null=True)
-
-    class Meta:
-        verbose_name = _('Рекламу')
-        verbose_name_plural = _('Рекламы')
