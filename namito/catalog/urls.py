@@ -24,9 +24,6 @@ from namito.catalog.api.views import (
     UserReviewListView,
     TopProductListView,
     NewProductListView,
-    StaticPageDetailView,
-    MainPageView,
-    AdvertisementView,
     CategoryBySlugAPIView,
     CategoryByNameStartsWithAPIView,
     ProductByNameStartsWithAPIView,
@@ -36,9 +33,7 @@ from namito.catalog.api.views import (
     DiscountAPIView
     )
 
-static_page_patterns = [
-    path('static-pages/<slug:slug>/', StaticPageDetailView.as_view(), name='static-page-detail'),
-]
+
 
 category_patterns = [
     path('categories/', CategoryListView.as_view()),
@@ -81,12 +76,10 @@ utility_patterns = [
     path('favorites/', FavoriteListView.as_view(), name='favorite-list'),
     path('size-charts/', SizeChartListView.as_view(), name='size-chart-list'),
     path('size-charts/<int:category_id>/', SizeChartListView.as_view(), name='size-chart-list-by-category'),
-    path('main-page/', MainPageView.as_view(), name='main-page'),
-    path('advertisement/', AdvertisementView.as_view(), name='advertisement'),
+
 ]
 
 urlpatterns = [
-    *static_page_patterns,
     *category_patterns,
     *product_patterns,
     *entity_patterns,

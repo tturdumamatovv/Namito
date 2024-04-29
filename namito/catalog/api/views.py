@@ -19,10 +19,8 @@ from namito.catalog.models import (
     Rating,
     Favorite,
     SizeChart,
-    StaticPage,
-    MainPage,
     Brand
-    )
+)
 from .serializers import (
     CategorySerializer,
     ProductSerializer,
@@ -36,20 +34,11 @@ from .serializers import (
     BrandSerializer,
     SizeChartSerializer,
     ProductListSerializer,
-    StaticPageSerializer,
-    MainPageSerializer,
-    AdvertisementSerializer,
     ColorSizeBrandSerializer,
     FavoriteToggleSerializer
 
 )
 from .filters import ProductFilter
-
-
-class StaticPageDetailView(generics.RetrieveAPIView):
-    queryset = StaticPage.objects.all()
-    serializer_class = StaticPageSerializer
-    lookup_field = 'slug'
 
 
 class CategoryListView(generics.ListCreateAPIView):
@@ -227,16 +216,6 @@ class SizeChartListView(generics.ListAPIView):
         return queryset
 
 
-class MainPageView(generics.ListAPIView):
-    queryset = MainPage.objects.all()
-    serializer_class = MainPageSerializer
-
-
-class AdvertisementView(generics.ListAPIView):
-    queryset = MainPage.objects.all()
-    serializer_class = AdvertisementSerializer
-
-
 class CategoryBySlugAPIView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -290,5 +269,6 @@ class ColorSizeBrandAPIView(generics.ListAPIView):
 
 
 class DiscountAPIView(generics.ListAPIView):
-    queryset = Product.objects.filter(variants__discount_value__isnull=False, variants__discount_type__isnull=False).distinct()
+    queryset = Product.objects.filter(variants__discount_value__isnull=False,
+                                      variants__discount_type__isnull=False).distinct()
     serializer_class = ProductListSerializer
