@@ -91,7 +91,7 @@ class CharacteristicsInline(nested_admin.NestedTabularInline):
 @admin.register(Product)
 class ProductAdmin(nested_admin.NestedModelAdmin):
     form = ProductForm
-    list_display = ['name', 'category']
+    list_display = ['name_ru', 'name_en', 'category']
     search_fields = ['name', 'category__name']
     inlines = [CharacteristicsInline, VariantInline, ReviewInline]
 
@@ -103,8 +103,8 @@ class ProductAdmin(nested_admin.NestedModelAdmin):
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
-    list_display = ('name', 'logo_preview')
-    search_fields = ('name',)
+    list_display = ('name_en', 'name_ru', 'logo_preview')
+    search_fields = ('name_en', 'name_ru',)
     readonly_fields = ('logo_preview',)
 
     def logo_preview(self, obj):
@@ -117,22 +117,22 @@ class BrandAdmin(admin.ModelAdmin):
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    list_display = ['name', 'color']
-    search_fields = ['name']
+    list_display = ['name_en', 'name_ru', 'color']
+    search_fields = ['name_en', 'name_ru',]
     form = TagAdminForm
 
 
 @admin.register(Color)
 class ColorAdmin(admin.ModelAdmin):
-    list_display = ['name', 'color']
-    search_fields = ['name']
+    list_display = ['name_en', 'name_ru', 'color']
+    search_fields = ['name_en', 'name_ru',]
     form = ColorAdminForm
 
 
 @admin.register(Size)
 class SizeAdmin(admin.ModelAdmin):
-    list_display = ['name', 'description']
-    search_fields = ['name']
+    list_display = ['name_en', 'name_ru', 'description']
+    search_fields = ['name_en', 'name_ru',]
 
 
 @admin.register(Variant)

@@ -16,22 +16,29 @@ class MainPageAdmin(admin.ModelAdmin):
     inlines = [AdvertisementInline, MainPageSliderInline]
     fieldsets = (
         (None, {
-            'fields': ('title', 'description',)
+            'fields': (
+                'title',
+                'title_ru',
+                'title_en',
+                'description',
+                'description_ru',
+                'description_en',
+            )
         }),
         ("Банера", {
             'fields': (
-                ('banner1', 'banner1_link'),
-                ('banner2', 'banner2_link'),
-                ('banner3', 'banner3_link')
+                ('banner1',),
+                ('banner2',),
+                ('banner3',)
             )
         }),
         ("Сетчики", {
-            'fields': (('counter1_title', 'counter1_value'),
-                       ('counter2_title', 'counter2_value'),
-                       ('counter3_title', 'counter3_value'),)
+            'fields': (('counter1_title', 'counter1_title_ru', 'counter1_title_en', 'counter1_value', 'counter1_value_ru', 'counter1_value_en'),
+                       ('counter2_title', 'counter2_title_ru', 'counter2_title_en', 'counter2_value', 'counter2_value_ru', 'counter2_value_en'),
+                       ('counter3_title', 'counter3_title_ru', 'counter3_title_en', 'counter3_value', 'counter3_value_ru', 'counter3_value_en'),)
         }),
         ("Кнопка", {
-            'fields': ('button', 'button_link',)
+            'fields': ('button', 'button_ru', 'button_en', 'button_link',)
         }),
     )
 
@@ -45,10 +52,10 @@ class StaticPageAdmin(admin.ModelAdmin):
     ordering = ('title',)
     fieldsets = (
         (None, {
-            'fields': ('title', 'content', 'meta_title', 'meta_description', 'image')
+            'fields': ('title', 'title_ru', 'title_en', 'content', 'content_ru', 'content_en', 'image')
         }),
         ('Advanced options', {
             'classes': ('collapse',),
-            'fields': ('slug',),
+            'fields': ('slug', 'meta_title', 'meta_description', 'meta_image'),
         }),
     )
