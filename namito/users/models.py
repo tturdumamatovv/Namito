@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class CustomUserManager(BaseUserManager):
@@ -39,3 +40,25 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.phone_number
+
+
+class UserAddress(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses')
+    city = models.CharField(max_length=100, verbose_name=_("City"))
+    apartment_number = models.CharField(max_length=10, verbose_name=_("Номер квартиры"), null=True, blank=True)
+    entrance = models.CharField(max_length=10, verbose_name=_("Подъезд"), null=True, blank=True)
+    floor = models.CharField(max_length=10, verbose_name=_("Этаж"), null=True, blank=True)
+    intercom = models.CharField(max_length=10, verbose_name=_("Домофон"), null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Дата создания"))
+
+    def __str__(self):
+        address = f"{self.street} {self.house_number}"
+        if self.apartment_number:
+            address += f", кв. {self.apartment_number}"
+        return f"{address}, {self.city}"
+
+    class Meta:
+        verbose_name = _("Адрес пользователя")
+        verbose_name_plural = _("Адреса пользователей")
+        ordering = ['-created_at']
+

@@ -1,13 +1,17 @@
 from rest_framework import generics, status, permissions
-# from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from namito.users.models import User
+from namito.users.models import (
+    User,
+    UserAddress
+)
 from .serializers import (
     CustomUserSerializer,
     VerifyCodeSerializer,
-    UserProfileSerializer
+    UserProfileSerializer,
+    UserAddressSerializer,
+    UserAddressUpdateSerializer
 )
 from namito.users.utils import (
     send_sms,
@@ -96,3 +100,31 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+
+
+class UserAddressCreateAPIView(generics.CreateAPIView):
+    serializer_class = UserAddressSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class UserAddressUpdateAPIView(generics.RetrieveUpdateAPIView):
+    queryset = UserAddress.objects.all()
+    serializer_class = UserAddressUpdateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return UserAddress.objects.filter(user=user)
+
+
+class UserAddressDeleteAPIView(generics.RetrieveDestroyAPIView):
+    queryset = UserAddress.objects.all()
+    serializer_class = UserAddressSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return UserAddress.objects.filter(user=user)

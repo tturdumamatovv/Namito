@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from namito.users.models import User
+from namito.users.models import UserAddress
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -20,3 +21,26 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'phone_number', 'profile_picture', 'full_name', 'date_of_birth', 'email', 'first_visit')
+
+
+class UserAddressSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserAddress
+        fields = ['id', 'user', 'city', 'apartment_number', 'entrance', 'floor', 'intercom', 'created_at']
+        read_only_fields = ['user', 'created_at']
+
+
+class UserAddressForOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserAddress
+        fields = ['city', 'apartment_number', 'entrance', 'floor', 'intercom']
+
+
+class UserAddressUpdateSerializer(serializers.ModelSerializer):
+    city = serializers.CharField(required=False)
+
+    class Meta:
+        model = UserAddress
+        fields = ['id', 'user', 'city', 'apartment_number', 'entrance', 'floor', 'intercom', 'created_at']
+        read_only_fields = ['user', 'created_at']
