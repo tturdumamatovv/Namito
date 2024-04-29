@@ -31,7 +31,7 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 class CartSerializer(ModelSerializer):
     items = CartItemSerializer(many=True)
-    
+
     class Meta:
         model = Cart
         fields = ['id', 'user', 'created_at', 'items']
@@ -55,6 +55,7 @@ class OrderedItemSerializer(ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderedItemSerializer(many=True, read_only=True, source='ordered_items')
     user = CustomUserSerializer(required=False)
+    total_amount = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Order
@@ -118,3 +119,13 @@ class OrderHistorySerializer(ModelSerializer):
     class Meta:
         model = OrderHistory
         fields = '__all__'
+
+
+class OrderListSerializer(serializers.ModelSerializer):
+    total_amount = serializers.IntegerField()
+
+    class Meta:
+        model = Order
+        fields = ['id', 'order_number', 'created_at', 'status', 'total_amount']
+        read_only_fields = ['id', 'order_number', 'created_at', 'status', 'total_amount']
+
