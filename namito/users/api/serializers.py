@@ -31,10 +31,10 @@ class UserAddressSerializer(serializers.ModelSerializer):
         read_only_fields = ['user', 'created_at']
 
 
-class UserAddressForOrderSerializer(serializers.ModelSerializer):
+class UserAddressDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserAddress
-        fields = ['city', 'apartment_number', 'entrance', 'floor', 'intercom']
+        fields = [field.name for field in UserAddress._meta.fields if field.name not in ('id', 'user')]
 
 
 class UserAddressUpdateSerializer(serializers.ModelSerializer):
