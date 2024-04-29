@@ -442,12 +442,12 @@ SIMPLEUI_CONFIG = {
         {
             'name': 'Главная страница',
             'icon': 'fa fa-window-maximize',
-            'url': '/admin/catalog/mainpage/'
+            'url': '/admin/pages/mainpage/'
         },
         {
             'name': 'Static Pages',
             'icon': 'fa fa-file-text',
-            'url': '/admin/catalog/staticpage/'
+            'url': '/admin/pages/staticpage/'
         },
     ]
 }
