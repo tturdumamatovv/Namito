@@ -64,6 +64,7 @@ class StaticPage(ProcessedImageModel):
     image = models.ImageField(upload_to='static_pages/', blank=True, null=True)
     meta_title = models.CharField(max_length=60, blank=True, null=True)
     meta_description = models.CharField(max_length=160, blank=True, null=True)
+    meta_image = models.ImageField(upload_to='static_pages_meta/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

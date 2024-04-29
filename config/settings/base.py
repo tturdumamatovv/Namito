@@ -29,12 +29,12 @@ PRODUCTION = True
 # In Windows, this must be set to your system time zone.
 TIME_ZONE = "UTC"
 # https://docs.djangoproject.com/en/dev/ref/settings/#language-code
-LANGUAGE_CODE = "ru-ru"
+LANGUAGE_CODE = "ru"
 # https://docs.djangoproject.com/en/dev/ref/settings/#languages
 from django.utils.translation import gettext_lazy as _
 LANGUAGES = [
     ('en', _('English')),
-    ('ru-ru', _('Russian')),
+    ('ru', _('Russian')),
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = 1
@@ -165,6 +165,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    'namito.pages.middleware.LanguageMiddleware',
+
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",

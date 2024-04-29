@@ -36,8 +36,12 @@ class Command(BaseCommand):
         categories = []
         for _ in range(10):
             name = fake.unique.company()
+            name_ru = fake.unique.company()
+            name_en = fake.unique.company()
             category = Category(
                 name=name,
+                name_ru=name_ru,
+                name_en=name_en,
                 type=random.choice([0, 1, 2, 3]),
                 background_color=fake.hex_color(),
                 order=random.randint(0, 100)
@@ -50,6 +54,8 @@ class Command(BaseCommand):
         for _ in range(5):
             Brand.objects.create(
                 name=fake.unique.company(),
+                name_ru=fake.unique.company(),
+                name_en=fake.unique.company(),
                 logo=fake.image_url()
             )
 
@@ -57,6 +63,8 @@ class Command(BaseCommand):
         for _ in range(20):
             Tag.objects.create(
                 name=fake.word(),
+                name_ru=fake.word(),
+                name_en=fake.word(),
                 color=fake.hex_color()
             )
 
@@ -64,6 +72,9 @@ class Command(BaseCommand):
         for _ in range(10):
             Color.objects.create(
                 name=fake.color_name(),
+                name_ru=fake.color_name(),
+                name_en=fake.color_name(),
+
                 color=fake.hex_color()
             )
 
@@ -71,6 +82,8 @@ class Command(BaseCommand):
         for _ in range(5):
             Size.objects.create(
                 name=fake.word(),
+                name_ru=fake.word(),
+                name_en=fake.word(),
                 description=fake.sentence()
             )
 
@@ -81,7 +94,13 @@ class Command(BaseCommand):
         for _ in range(50):
             product = Product.objects.create(
                 name=fake.catch_phrase(),
+                name_ru=fake.catch_phrase(),
+                name_en=fake.catch_phrase(),
+
                 description=fake.text(),
+                description_ru=fake.text(),
+                description_en=fake.text(),
+
                 category=random.choice(categories),
                 brand=random.choice(brands),
                 min_price=random.randint(100, 10000),

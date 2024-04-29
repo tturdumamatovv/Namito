@@ -1,10 +1,9 @@
 from rest_framework import generics
-from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from namito.pages.api.serializers import MainPageSerializer, StaticPageSerializer
 from namito.pages.models import MainPage, StaticPage
-
+from namito.pages.api import pages_default_texts
 
 class MainPageView(generics.ListAPIView):
     queryset = MainPage.objects.all()
@@ -23,11 +22,15 @@ class StaticPageDetailView(generics.RetrieveAPIView):
         try:
             instance = StaticPage.objects.get(slug=slug)
         except StaticPage.DoesNotExist:
-            # Если страница не существует, создаем новую
             if slug == 'about-us':
                 instance = StaticPage.objects.create(
-                    title="About Us",
-                    content="Your about us content here...",
+                    title=pages_default_texts.ABOUTUS_TITLE_EN,
+                    title_ru=pages_default_texts.ABOUTUS_TITLE_RU,
+                    title_en=pages_default_texts.ABOUTUS_TITLE_EN,
+
+                    content=pages_default_texts.ABOUTUS_CONTENT_EN,
+                    content_ru=pages_default_texts.ABOUTUS_CONTENT_RU,
+                    content_en=pages_default_texts.ABOUTUS_CONTENT_EN,
                     slug="about-us"
                 )
             elif slug == 'delivery':
@@ -36,7 +39,6 @@ class StaticPageDetailView(generics.RetrieveAPIView):
                     content="Your delivery content here...",
                     slug="delivery"
                 )
-            # Добавьте другие варианты для различных страниц
 
         return instance
 
