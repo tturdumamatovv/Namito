@@ -188,4 +188,3 @@ class OrderCancelAPIView(generics.RetrieveUpdateAPIView):
         # Возвращаем сериализованные данные обновленного заказа
         serializer = self.get_serializer(instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
