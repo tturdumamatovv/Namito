@@ -1,3 +1,5 @@
+import random
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.db import transaction
@@ -52,47 +54,56 @@ class OrderedItem(models.Model):
 
 class Order(models.Model):
     STATUSES = [
-        (0, "New"),
-        (1, "In_progress"),
-        (2, "Complete"),
-        (3, "Canceled"),
+        (0, _("В процессе")),
+        (1, _("Доставлено")),
+        (3, _("Доставка отменена")),
     ]
 
     PAYMENT_STATUSES = [
-        (0, "Not Paid"),
-        (1, "Payment in progress"),
-        (2, "Paid"),
+        (0, _("Не оплачено")),
+        (1, _("Платеж в процессе")),
+        (2, _("Оплачено")),
     ]
 
     DELIVERY_CHOICES = [
-        ('courier', _("Courier")),
-        ('pickup', _("Pickup")),
+        ('курьером', _("Курьером")),
+        ('самовызов', _("Самовывоз")),
     ]
 
     PAYMENT_METHODS = [
-        ('cash', _("Cash")),
-        ('card', _("Card")),
+        ('наличкой', _("Наличкой")),
+        ('картой', _("Картой")),
     ]
 
-    payment_status = models.IntegerField(choices=PAYMENT_STATUSES, default=0)
+    payment_status = models.IntegerField(choices=PAYMENT_STATUSES, default=1)
     status = models.IntegerField(choices=STATUSES, default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
     cart = models.ForeignKey(Cart, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, default=None, blank=True)
-    delivery_method = models.CharField(max_length=20, choices=DELIVERY_CHOICES, default='courier')
+    delivery_method = models.CharField(max_length=20, choices=DELIVERY_CHOICES, default='курьером')
     delivery_address = models.CharField(max_length=255, null=True, blank=True)
-    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, default='cash')
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, default='картой')
+    order_number = models.CharField(max_length=20, unique=True, blank=True, null=True)
 
     def __str__(self):
         return f"Order {self.id} by {self.user}"
 
     def clean(self):
-        if self.delivery_method == 'courier' and not self.delivery_address:
+        if self.delivery_method == 'курьером' and not self.delivery_address:
             raise ValidationError(_('Delivery address is required for courier delivery.'))
 
+    def generate_order_number(self):
+        while True:
+            order_number = f"#{random.randint(1000000000, 9999999999)}"
+            if not Order.objects.filter(order_number=order_number).exists():
+                return order_number
+
     def save(self, *args, **kwargs):
+        if not self.order_number:
+            self.order_number = self.generate_order_number()
+
         super().save(*args, **kwargs)
         if self.status == 2 and not OrderHistory.objects.filter(order=self).exists():
             OrderHistory.objects.create(user=self.user, order=self)
@@ -104,3 +115,20 @@ class Order(models.Model):
                     variant = ordered_item.product_variant  # Получаем соответствующий вариант товара
                     variant.stock -= ordered_item.quantity  # Уменьшаем количество товара на складе
                     variant.save()
+
+        def cancel_order(self):
+            # Проверяем, можно ли отменить заказ (например, статус должен быть "В процессе")
+            if self.status != 0:  # 0 - "В процессе"
+                raise ValidationError(_("Order cannot be canceled in its current state."))
+
+            with transaction.atomic():
+                # Меняем статус заказа на "Доставка отменена"
+                self.status = 2  # 2 - "Доставка отменена"
+                self.save()
+
+                for ordered_item in self.ordered_items.all():
+                    variant = ordered_item.product_variant
+                    variant.stock += ordered_item.quantity
+                    variant.save()
+
+            return True

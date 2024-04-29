@@ -88,8 +88,9 @@ class VariantSerializer(serializers.ModelSerializer):
     color = ColorSerializer(read_only=True)
     size = SizeSerializer(read_only=True)
     images = serializers.SerializerMethodField()
-    price = serializers.SerializerMethodField()
+    price = serializers.IntegerField()
     discounted_price = serializers.SerializerMethodField()
+    discount_value = serializers.IntegerField()
 
     class Meta:
         model = Variant
@@ -104,11 +105,6 @@ class VariantSerializer(serializers.ModelSerializer):
     def get_discounted_price(variant):
         discounted_price = variant.get_price()
         return discounted_price
-
-    @staticmethod
-    def get_price(variant):
-        price = variant.get_price()
-        return price
 
 
 class ProductListSerializer(serializers.ModelSerializer):

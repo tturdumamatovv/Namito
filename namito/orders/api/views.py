@@ -6,7 +6,8 @@ from namito.orders.api.serializers import (
     OrderSerializer,
     OrderHistorySerializer,
     CartItemSerializer,
-    CartItemCreateUpdateSerializer
+    CartItemCreateUpdateSerializer,
+    OrderListSerializer
     )
 from namito.orders.models import (
     Cart,
@@ -152,9 +153,39 @@ class OrderHistoryListAPIView(generics.ListAPIView):
 
 
 class UserOrderListAPIView(generics.ListAPIView):
-    serializer_class = OrderSerializer
+    serializer_class = OrderListSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
         return Order.objects.filter(user=user)
+
+
+class OrderCancelAPIView(generics.RetrieveUpdateAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def update(self, request, *args, **kwargs):
+        # Получаем объект заказа
+        instance = self.get_object()
+
+        # Проверяем текущий статус заказа
+        if instance.status == 1:  # Заказ уже доставлен
+            return Response({"detail": "Order cannot be canceled because it has already been delivered."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        # Отменяем заказ
+        instance.status = 2  # Устанавливаем статус "доставка отменена"
+        instance.save()
+
+        # Возвращаем товары на склад
+        for ordered_item in instance.ordered_items.all():
+            variant = ordered_item.product_variant
+            variant.stock += ordered_item.quantity
+            variant.save()
+
+        # Возвращаем сериализованные данные обновленного заказа
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
