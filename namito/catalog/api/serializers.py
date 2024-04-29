@@ -260,9 +260,11 @@ class RatingSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
+
     class Meta:
         model = Favorite
-        fields = '__all__'
+        fields = ['id', 'user', 'product']
 
 
 class SizeChartItemSerializer(serializers.ModelSerializer):
