@@ -109,7 +109,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         if 'delivery_method' in validated_data and validated_data['delivery_method'] == 'курьером':
-            delivery_address = validated_data.get('delivery_address')
+            delivery_address = validated_data.get('user_address')
             if not delivery_address:
                 raise serializers.ValidationError("Delivery address is required for courier delivery.")
 

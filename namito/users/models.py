@@ -51,12 +51,6 @@ class UserAddress(models.Model):
     intercom = models.CharField(max_length=10, verbose_name=_("Домофон"), null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Дата создания"))
 
-    def __str__(self):
-        address = f"{self.street} {self.house_number}"
-        if self.apartment_number:
-            address += f", кв. {self.apartment_number}"
-        return f"{address}, {self.city}"
-
     class Meta:
         verbose_name = _("Адрес пользователя")
         verbose_name_plural = _("Адреса пользователей")

@@ -19,7 +19,7 @@ urlpatterns = [
     path('carts/', include('namito.orders.urls')),
 
     path("api/", include("namito.catalog.urls")),
-    path("api/pages/", include("namito.pages.urls")),
+    path("api/", include("namito.pages.urls")),
 
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]
