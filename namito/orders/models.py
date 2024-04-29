@@ -6,7 +6,7 @@ from django.db import transaction
 from django.core.exceptions import ValidationError
 
 from namito.catalog.models import Variant
-from namito.users.models import User
+from namito.users.models import User, UserAddress
 
 
 class Cart(models.Model):
@@ -83,7 +83,7 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, default=None, blank=True)
     delivery_method = models.CharField(max_length=20, choices=DELIVERY_CHOICES, default='курьером')
-    delivery_address = models.CharField(max_length=255, null=True, blank=True)
+    user_address = models.ForeignKey(UserAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, default='картой')
     order_number = models.CharField(max_length=20, unique=True, blank=True, null=True)
 
