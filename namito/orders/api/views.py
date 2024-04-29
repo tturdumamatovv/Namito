@@ -14,7 +14,7 @@ from namito.orders.models import (
     CartItem,
     Order,
     OrderHistory
-    )
+)
 
 
 class CartItemCreateAPIView(generics.CreateAPIView):
