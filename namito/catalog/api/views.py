@@ -21,6 +21,7 @@ from namito.catalog.models import (
     SizeChart,
     Brand
 )
+from .pagination import CustomPageNumberPagination
 from .serializers import (
     CategorySerializer,
     ProductSerializer,
@@ -75,6 +76,7 @@ class ProductListView(generics.ListCreateAPIView):
     serializer_class = ProductListSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilter
+    pagination_class = CustomPageNumberPagination
 
 
 class TopProductListView(generics.ListAPIView):
