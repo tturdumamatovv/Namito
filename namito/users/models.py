@@ -51,6 +51,7 @@ class UserAddress(models.Model):
     floor = models.CharField(max_length=10, verbose_name=_("Этаж"), null=True, blank=True)
     intercom = models.CharField(max_length=10, verbose_name=_("Домофон"), null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Дата создания"))
+    is_primary = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = _("Адрес пользователя")
