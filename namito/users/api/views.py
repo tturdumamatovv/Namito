@@ -102,7 +102,7 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
         return Response(serializer.data)
 
 
-class UserAddressCreateAPIView(generics.CreateAPIView):
+class UserAddressCreateAPIView(generics.ListCreateAPIView):
     serializer_class = UserAddressSerializer
     permission_classes = [permissions.IsAuthenticated]
 
