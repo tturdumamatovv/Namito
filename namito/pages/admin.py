@@ -18,11 +18,12 @@ class MainPageAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 'title',
-                'title_ru',
                 'title_en',
+                'title_ru',
                 'description',
-                'description_ru',
                 'description_en',
+                'description_ru',
+
             )
         }),
         ("Банера", {

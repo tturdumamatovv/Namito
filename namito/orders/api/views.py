@@ -57,7 +57,7 @@ class CartDetailAPIView(generics.RetrieveAPIView):
         if cart.items.exists():
             return super().get(request, *args, **kwargs)
         else:
-            return Response({"detail": "Cart is empty."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Cart is empty."}, status=status.HTTP_200_OK)
 
 
 class MultiCartItemUpdateAPIView(generics.GenericAPIView):

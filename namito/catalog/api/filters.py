@@ -6,6 +6,7 @@ from namito.catalog.models import Product
 
 
 class ProductFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(field_name="name", lookup_expr='icontains')
     min_price = django_filters.NumberFilter(field_name="variants__price", lookup_expr='gte')
     max_price = django_filters.NumberFilter(field_name="variants__price", lookup_expr='lte')
     color = django_filters.CharFilter(field_name="variants__color__name", lookup_expr='iexact')
