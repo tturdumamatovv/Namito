@@ -32,6 +32,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_of_birth = models.DateField(blank=True, null=True)
     email = models.EmailField(blank=True)
     first_visit = models.BooleanField(default=True)
+    fcm_token = models.CharField(max_length=255, blank=True, null=True)
 
     objects = CustomUserManager()
 
