@@ -1,6 +1,12 @@
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
+from firebase_admin import auth as firebase_auth
+import firebase_admin
+from firebase_admin import credentials
 
 from namito.users.models import (
     User,
@@ -17,6 +23,10 @@ from namito.users.utils import (
     send_sms,
     generate_confirmation_code,
 )
+
+
+cred = credentials.Certificate("firebase_key.json")
+firebase_admin.initialize_app(cred)
 
 
 class UserLoginView(generics.CreateAPIView):
@@ -139,3 +149,32 @@ class UserAddressDeleteAPIView(generics.RetrieveDestroyAPIView):
     def get_queryset(self):
         user = self.request.user
         return UserAddress.objects.filter(user=user)
+
+
+@csrf_exempt
+def google_login(request):
+    if request.method == 'POST':
+        # Получаем токен от фронтенда
+        token = request.POST.get('id_token')
+        if not token:
+            return JsonResponse({'status': 'error', 'message': 'ID token is required.'}, status=400)
+
+        # Верификация токена с помощью Firebase
+        try:
+            decoded_token = firebase_auth.verify_id_token(token)
+            uid = decoded_token['uid']
+            email = decoded_token.get('email')
+
+            # Найдите или создайте пользователя в вашей базе данных
+            user, created = User.objects.get_or_create(email=email, defaults={'username': uid})
+
+            # Здесь можно создать JWT токен или установить сессию для пользователя
+
+            # Пример: Возврат успешного ответа
+            return JsonResponse({'status': 'success', 'user_id': user.id})
+
+        except Exception as e:
+            # Обработка ошибок верификации
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Only POST requests are allowed'}, status=405)
