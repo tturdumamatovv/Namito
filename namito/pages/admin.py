@@ -33,9 +33,9 @@ class MainPageAdmin(admin.ModelAdmin):
             )
         }),
         ("Сетчики", {
-            'fields': (('counter1_title', 'counter1_title_ru', 'counter1_title_en', 'counter1_value', 'counter1_value_ru', 'counter1_value_en'),
-                       ('counter2_title', 'counter2_title_ru', 'counter2_title_en', 'counter2_value', 'counter2_value_ru', 'counter2_value_en'),
-                       ('counter3_title', 'counter3_title_ru', 'counter3_title_en', 'counter3_value', 'counter3_value_ru', 'counter3_value_en'),)
+            'fields': (('counter1_title', 'counter1_title_ru', 'counter1_title_en', 'counter1_value'),
+                       ('counter2_title', 'counter2_title_ru', 'counter2_title_en', 'counter2_value'),
+                       ('counter3_title', 'counter3_title_ru', 'counter3_title_en', 'counter3_value'),)
         }),
         ("Кнопка", {
             'fields': ('button', 'button_ru', 'button_en', 'button_link',)
