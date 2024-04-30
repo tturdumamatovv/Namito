@@ -103,6 +103,7 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
 
 
 class UserAddressCreateAPIView(generics.ListCreateAPIView):
+    queryset = UserAddress.objects.all()
     serializer_class = UserAddressSerializer
     permission_classes = [permissions.IsAuthenticated]
 
