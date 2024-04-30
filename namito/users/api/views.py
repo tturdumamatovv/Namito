@@ -102,12 +102,16 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
         return Response(serializer.data)
 
 
-class UserAddressCreateAPIView(generics.CreateAPIView):
+class UserAddressCreateAPIView(generics.ListCreateAPIView):
+    queryset = UserAddress.objects.all()
     serializer_class = UserAddressSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        user = self.request.user
+
+        # Directly save the user as the owner of the address
+        serializer.save(user=user)
 
 
 class UserAddressUpdateAPIView(generics.RetrieveUpdateAPIView):
@@ -115,9 +119,16 @@ class UserAddressUpdateAPIView(generics.RetrieveUpdateAPIView):
     serializer_class = UserAddressUpdateSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
+    def perform_update(self, serializer):
         user = self.request.user
-        return UserAddress.objects.filter(user=user)
+
+        # Check if 'is_primary' is set to True
+        if serializer.validated_data.get('is_primary', False):
+            # Set 'is_primary' of all other addresses to False for this user
+            UserAddress.objects.filter(user=user, is_primary=True).update(is_primary=False)
+
+        # Perform the update
+        serializer.save()
 
 
 class UserAddressDeleteAPIView(generics.RetrieveDestroyAPIView):

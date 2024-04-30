@@ -24,23 +24,25 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class UserAddressSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = UserAddress
-        fields = ['id', 'user', 'city', 'apartment_number', 'entrance', 'floor', 'intercom', 'created_at']
+        fields = ['id', 'user', 'city', 'street', 'apartment_number', 'entrance',
+                  'floor', 'intercom', 'created_at', 'is_primary']  # Include 'is_primary'
         read_only_fields = ['user', 'created_at']
 
 
-class UserAddressForOrderSerializer(serializers.ModelSerializer):
+class UserAddressDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserAddress
-        fields = ['city', 'apartment_number', 'entrance', 'floor', 'intercom']
+        fields = [field.name for field in UserAddress._meta.fields if field.name not in ('id', 'user')]
 
 
 class UserAddressUpdateSerializer(serializers.ModelSerializer):
     city = serializers.CharField(required=False)
+    is_primary = serializers.BooleanField(required=False)  # Include 'is_primary' as an optional field
 
     class Meta:
         model = UserAddress
-        fields = ['id', 'user', 'city', 'apartment_number', 'entrance', 'floor', 'intercom', 'created_at']
+        fields = ['id', 'user', 'city', 'street', 'apartment_number', 'entrance',
+                  'floor', 'intercom', 'created_at', 'is_primary']  # Include 'is_primary'
         read_only_fields = ['user', 'created_at']

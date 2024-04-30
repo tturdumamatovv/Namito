@@ -281,9 +281,6 @@ class SizeChartSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'items']
 
 
-
-
-
 class ColorSizeBrandSerializer(serializers.Serializer):
     colors = serializers.SerializerMethodField()
     sizes = serializers.SerializerMethodField()

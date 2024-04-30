@@ -67,7 +67,7 @@ class Order(models.Model):
 
     DELIVERY_CHOICES = [
         ('курьером', _("Курьером")),
-        ('самовызов', _("Самовывоз")),
+        ('самовывоз', _("Самовывоз")),
     ]
 
     PAYMENT_METHODS = [
