@@ -12,11 +12,13 @@ class MainPageSliderSerializer(serializers.ModelSerializer):
         fields = ['title', 'description', 'image', 'link']
 
     def get_image(self, slider):
-        request = self.context.get('request')
-        if request is not None:
-            return request.build_absolute_uri(slider.image.url)
-        else:
-            return slider.image.url
+        if slider.image and slider.image.file:
+            request = self.context.get('request')
+            if request is not None:
+                return request.build_absolute_uri(slider.image.url)
+            else:
+                return slider.image.url
+        return None
 
 
 class MainPageSerializer(serializers.ModelSerializer):
