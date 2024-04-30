@@ -136,7 +136,7 @@ class Product(models.Model):
             return ""
 
     def generate_meta_title(self):
-        return self.name
+        return self.name[:59]
 
     def __str__(self):
         return self.name
@@ -198,8 +198,24 @@ class Variant(models.Model):
 
 class Image(ProcessedImageModel):
     image = models.ImageField(upload_to='product_images/')
+    small_image = models.ImageField(upload_to='product_images/', blank=True, null=True)
     main_image = models.BooleanField(default=False)
     variant = models.ForeignKey(Variant, related_name='images', on_delete=models.CASCADE, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        self.process_image()
+        super().save(*args, **kwargs)
+
+    def process_image(self):
+        if self.image:
+            pil_image = PILImage.open(self.image)
+            small_image = pil_image.copy()
+            small_image.thumbnail((150, 150))
+            output_io_stream = io.BytesIO()
+            small_image.save(output_io_stream, format='WEBP', quality=90)
+            output_io_stream.seek(0)
+            self.small_image.save(f"{self.image.name.split('.')[0]}_small.webp", ContentFile(output_io_stream.read()),
+                                  save=False)
 
 
 class Review(models.Model):

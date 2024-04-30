@@ -28,15 +28,16 @@ Thank you for choosing Namito - your trusted partner in the world of fashion and
 '''
 
 DELIVERY_TITLE_RU = '''
-
+ДОСТАВКА
 '''
 DELIVERY_TITLE_EN = '''
-
+DELIVERY
 '''
 DELIVERY_CONTENT_RU = '''
-
+Доставка товаров в нашем онлайн магазине осуществляется быстро и надежно. Мы предлагаем несколько вариантов доставки: курьерскую доставку до двери, почтовую службу или самовывоз из пунктов выдачи.  При заказе товаров с доставкой курьером, наш сотрудник оперативно доставит ваш заказ прямо до вашей двери. Вы сможете выбрать удобное время и дату доставки. Почтовая служба также гарантирует надежную доставку заказа в удобное для вас время.  Для тех, кто предпочитает самостоятельно забирать свои покупки, мы предлагаем возможность самовывоза из пунктов выдачи. Вы можете выбрать ближайший к вам пункт выдачи и забрать свой заказ в удобное время.  Мы гарантируем, что все товары упакованы надежно и безопасно, чтобы они достигли вас в целости и сохранности. Также у нас предусмотрена система отслеживания заказа, чтобы вы всегда могли быть в курсе местоположения вашей посылки.  Благодаря нашей слаженной работе с партнерскими службами доставки, мы можем предоставить вам быструю и удобную доставку заказов в любую точку России.  Оставайтесь с нами и наслаждайтесь покупками без хлопот!
 '''
 DELIVERY_CONTENT_EN = '''
+Delivery of goods in our online store is fast and reliable. We offer several delivery options: courier delivery to the door, postal service or self-collection from the points of delivery.  When ordering goods with courier delivery, our employee will promptly deliver your order directly to your door. You will be able to choose a convenient time and date of delivery. Postal service also guarantees reliable delivery of the order at a convenient time for you.  For those who prefer to pick up their purchases themselves, we offer the possibility of self-delivery from the points of delivery. You can choose the nearest outlet and pick up your order at a convenient time.  We guarantee that all goods are packed safely and securely so that they reach you safe and sound. We also have an order tracking system so that you can always be aware of the location of your parcel.  Thanks to our well-coordinated work with partner delivery services, we can provide you with fast and convenient delivery of orders anywhere in Russia.  Stay with us and enjoy hassle-free shopping!
 
 '''
 TERM_TITLE_RU = '''

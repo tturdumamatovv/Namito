@@ -5,9 +5,8 @@ from .models import MainPage, MainPageSlider, StaticPage
 @register(MainPage)
 class MainPageTranslationOptions(TranslationOptions):
     fields = (
-        'title', 'description', 'counter1_title', 'counter1_value', 'counter2_title', 'counter2_value',
-        'counter3_title',
-        'counter3_value', 'button')
+        'title', 'description', 'counter1_title', 'counter2_title',
+        'counter3_title', 'button')
 
 
 @register(MainPageSlider)

@@ -1,9 +1,11 @@
+import os
 import random
-
-from faker import Faker
+import shutil
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.conf import settings
+from faker import Faker
 
 from namito.catalog.models import (
     Category,
@@ -12,11 +14,12 @@ from namito.catalog.models import (
     Product,
     Color,
     Size,
-    Variant
+    Variant,
+    Image
 )
 
-fake = Faker()
-
+fake_ru = Faker('ru_RU')
+fake_en = Faker()
 
 class Command(BaseCommand):
     help = 'Generates and inserts random data into the database.'
@@ -32,18 +35,23 @@ class Command(BaseCommand):
             self.create_variants()
             self.stdout.write(self.style.SUCCESS('Successfully populated the database with random data.'))
 
+    def get_random_image_path(self):
+        images_path = os.path.join(settings.STATIC_ROOT, 'test_images')
+        image_files = [f for f in os.listdir(images_path) if os.path.isfile(os.path.join(images_path, f))]
+        return os.path.join(images_path, random.choice(image_files)) if image_files else None
+
     def create_categories(self):
         categories = []
         for _ in range(10):
-            name = fake.unique.company()
-            name_ru = fake.unique.company()
-            name_en = fake.unique.company()
+            name = fake_en.unique.company()
+            name_ru = fake_ru.unique.company()
+            name_en = fake_en.unique.company()
             category = Category(
                 name=name,
                 name_ru=name_ru,
                 name_en=name_en,
                 type=random.choice([0, 1, 2, 3]),
-                background_color=fake.hex_color(),
+                background_color=fake_en.hex_color(),
                 order=random.randint(0, 100)
             )
             category.save()
@@ -53,38 +61,37 @@ class Command(BaseCommand):
     def create_brands(self):
         for _ in range(5):
             Brand.objects.create(
-                name=fake.unique.company(),
-                name_ru=fake.unique.company(),
-                name_en=fake.unique.company(),
-                logo=fake.image_url()
+                name=fake_en.unique.company(),
+                name_ru=fake_ru.unique.company_suffix(),
+                name_en=fake_en.unique.company_suffix(),
+                logo=self.get_random_image_path()
             )
 
     def create_tags(self):
         for _ in range(20):
             Tag.objects.create(
-                name=fake.word(),
-                name_ru=fake.word(),
-                name_en=fake.word(),
-                color=fake.hex_color()
+                name=fake_en.word(),
+                name_ru=fake_ru.word(),
+                name_en=fake_en.word(),
+                color=fake_en.hex_color()
             )
 
     def create_colors(self):
         for _ in range(10):
             Color.objects.create(
-                name=fake.color_name(),
-                name_ru=fake.color_name(),
-                name_en=fake.color_name(),
-
-                color=fake.hex_color()
+                name=fake_en.color_name(),
+                name_ru=fake_ru.color_name(),
+                name_en=fake_en.color_name(),
+                color=fake_en.hex_color()
             )
 
     def create_sizes(self):
         for _ in range(5):
             Size.objects.create(
-                name=fake.word(),
-                name_ru=fake.word(),
-                name_en=fake.word(),
-                description=fake.sentence()
+                name=fake_en.word(),
+                name_ru=fake_ru.word(),
+                name_en=fake_en.word(),
+                description=fake_en.sentence()
             )
 
     def create_products(self):
@@ -93,18 +100,16 @@ class Command(BaseCommand):
         tags = list(Tag.objects.all())
         for _ in range(50):
             product = Product.objects.create(
-                name=fake.catch_phrase(),
-                name_ru=fake.catch_phrase(),
-                name_en=fake.catch_phrase(),
-
-                description=fake.text(),
-                description_ru=fake.text(),
-                description_en=fake.text(),
-
+                name=fake_en.catch_phrase(),
+                name_ru=fake_ru.catch_phrase(),
+                name_en=fake_en.catch_phrase(),
+                description=fake_en.text(),
+                description_ru=fake_ru.text(),
+                description_en=fake_en.text(),
                 category=random.choice(categories),
                 brand=random.choice(brands),
                 min_price=random.randint(100, 10000),
-                is_top=fake.boolean()
+                is_top=fake_en.boolean()
             )
             product.tags.set(random.sample(tags, k=random.randint(1, min(5, len(tags)))))
 
@@ -121,9 +126,12 @@ class Command(BaseCommand):
                     price=random.uniform(10.0, 500.0),
                     stock=random.randint(0, 100)
                 )
-                # Optionally create an image for each variant
-                # Image.objects.create(
-                #     image=fake.image_url(),
-                #     main_image=fake.boolean(),
-                #     variant=variant
-                # )
+                # Copy image file to media directory
+                image_path = self.get_random_image_path()
+                if image_path:
+                    destination = os.path.join(settings.MEDIA_ROOT, 'product_images', os.path.basename(image_path))
+                    shutil.copy(image_path, destination)
+                    variant_image_path = os.path.join('product_images', os.path.basename(image_path))
+                    variant_image = Image(image=variant_image_path)
+                    variant_image.save()
+                    variant.images.add(variant_image)
