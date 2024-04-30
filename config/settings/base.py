@@ -330,7 +330,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
 }
 
 SIMPLE_JWT = {
@@ -365,7 +365,7 @@ SIMPLEUI_HOME_QUICK = True
 SIMPLEUI_INDEX = '#'
 
 SIMPLEUI_CONFIG = {
-    'system_keep': True,
+    'system_keep': False,
     'menus': [
         {
             'name': 'Catalog',
