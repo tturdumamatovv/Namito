@@ -352,3 +352,5 @@ Control.system-ca-bundle
 
 static/
 postgres/
+
+firebase_key.json
