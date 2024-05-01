@@ -49,7 +49,6 @@ class ProductFilter(django_filters.FilterSet):
         # Apply filters from request
         queryset = self.apply_filters(queryset)
 
-        # Sort based on sort_by_discount parameter
         sort_by_discount = self.request.GET.get('sort_by_discount')
         if sort_by_discount:
             queryset = self.sort_by_discount(queryset, sort_by_discount)
