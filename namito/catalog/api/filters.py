@@ -1,7 +1,5 @@
 import django_filters
-
-from django.db.models import Avg
-
+from django.db.models import Avg, Q
 from namito.catalog.models import Product
 
 
@@ -18,7 +16,7 @@ class ProductFilter(django_filters.FilterSet):
 
     class Meta:
         model = Product
-        fields = ['min_price', 'max_price', 'color', 'size', 'brand', 'min_rating']
+        fields = ['name', 'min_price', 'max_price', 'color', 'size', 'brand', 'category', 'min_rating', 'has_discount']
 
     def filter_by_min_rating(self, queryset, name, value):
         queryset = queryset.annotate(avg_rating=Avg('ratings__score')).filter(avg_rating__gte=value)
@@ -27,20 +25,38 @@ class ProductFilter(django_filters.FilterSet):
     def filter_by_discount_presence(self, queryset, name, value):
         if value:
             return queryset.filter(
-                variants__discount_value__isnull=False,
-                variants__discount_value__gt=0,
-                variants__discount_type__isnull=False
+                Q(variants__discount_value__gt=0) &
+                Q(variants__discount_type__isnull=False)
             ).distinct()
         else:
             return queryset.exclude(
-                variants__discount_value__isnull=False,
-                variants__discount_value__gt=0,
-                variants__discount_type__isnull=False
+                Q(variants__discount_value__gt=0) &
+                Q(variants__discount_type__isnull=False)
             ).distinct()
+
+    def sort_by_discount(self, queryset, order):
+        if order == 'asc':
+            return queryset.order_by('variants__discount_value').distinct()
+        elif order == 'desc':
+            return queryset.order_by('-variants__discount_value').distinct()
+        else:
+            return queryset
 
     @property
     def qs(self):
         queryset = super().qs
+
+        # Apply filters from request
+        queryset = self.apply_filters(queryset)
+
+        # Sort based on sort_by_discount parameter
+        sort_by_discount = self.request.GET.get('sort_by_discount')
+        if sort_by_discount:
+            queryset = self.sort_by_discount(queryset, sort_by_discount)
+
+        return queryset.distinct()
+
+    def apply_filters(self, queryset):
         if self.request:
             if 'min_price' in self.request.GET:
                 queryset = queryset.filter(variants__price__gte=self.request.GET['min_price'])
@@ -52,4 +68,12 @@ class ProductFilter(django_filters.FilterSet):
                 queryset = queryset.filter(variants__size__name__iexact=self.request.GET['size'])
             if 'brand' in self.request.GET:
                 queryset = queryset.filter(brand__name__iexact=self.request.GET['brand'])
-        return queryset.distinct()
+            if 'category' in self.request.GET:
+                queryset = queryset.filter(category__name__iexact=self.request.GET['category'])
+            if 'min_rating' in self.request.GET:
+                queryset = self.filter_by_min_rating(queryset, 'min_rating', float(self.request.GET['min_rating']))
+            if 'has_discount' in self.request.GET:
+                has_discount = self.request.GET['has_discount'].lower() == 'true'
+                queryset = self.filter_by_discount_presence(queryset, 'has_discount', has_discount)
+
+        return queryset
