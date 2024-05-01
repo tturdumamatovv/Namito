@@ -274,17 +274,19 @@ class ProductSearchByNameAndDescriptionAPIView(generics.ListAPIView):
         # Подготовьте фильтры для поиска
         filters = Q()
 
-        # Поиск по имени и переводу имени на текущем языке
+        # Если есть запрос по имени
         if search_query:
-            field_name = f"name_{language_code}__icontains"
-            filters |= Q(**{field_name: search_query})
+            # Учитывайте переводы имени на текущем языке
+            name_field = f"name_{language_code}__icontains"
+            filters |= Q(**{name_field: search_query})
 
-        # Поиск по описанию и переводу описания на текущем языке
+        # Если есть запрос по описанию
         if description_query:
-            field_description = f"description_{language_code}__icontains"
-            filters |= Q(**{field_description: description_query})
+            # Учитывайте переводы описания на текущем языке
+            description_field = f"description_{language_code}__icontains"
+            filters |= Q(**{description_field: description_query})
 
-        # Примените фильтры к queryset и верните результат
+        # Фильтруйте queryset с учетом языковых фильтров
         queryset = Product.objects.filter(filters)
         return queryset
 
