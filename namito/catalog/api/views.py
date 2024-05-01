@@ -3,13 +3,13 @@ from django.db.models.functions import Lower
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
+from modeltranslation.utils import get_translation_fields
 
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from drf_yasg.utils import swagger_auto_schema
-from drf_spectacular.utils import extend_schema, OpenApiParameter
 
 from namito.catalog.models import (
     Category,
@@ -263,25 +263,42 @@ class ProductSearchByNameAndBrandAPIView(generics.ListAPIView):
     serializer_class = ProductListSerializer
 
     def get_queryset(self):
-        # Получите параметры запроса
+        # Get request parameters
         search_query = self.request.query_params.get('name', None)
         brand_query = self.request.query_params.get('brand', None)
 
-        # Подготовьте фильтры для поиска
+        # Prepare filters for search
         filters = Q()
 
-        # Поиск по имени
+        # Search by product name in all translated fields
         if search_query:
-            filters |= Q(name__icontains=search_query)
+            # Get all translated fields for 'name' from the 'Product' model
+            translated_name_fields = get_translation_fields(Product, 'name')
 
-        # Поиск по бренду (предполагая, что у вас есть поле `brand` в модели `Product`)
+            # Create a Q object to search in all translated 'name' fields
+            name_filter = Q()
+            for field in translated_name_fields:
+                name_filter |= Q(**{f"{field}__icontains": search_query})
+
+            # Add the name filter to the main filters
+            filters &= name_filter
+
+        # Search by brand name in all translated fields
         if brand_query:
-            filters |= Q(brand__name__icontains=brand_query)
+            # Get all translated fields for 'name' from the 'Brand' model
+            translated_brand_fields = get_translation_fields(Brand, 'name')
 
-        # Примените фильтры к queryset
+            # Create a Q object to search in all translated 'name' fields of the Brand model
+            brand_filter = Q()
+            for field in translated_brand_fields:
+                brand_filter |= Q(**{f"brand__{field}__icontains": brand_query})
+
+            # Add the brand filter to the main filters
+            filters &= brand_filter
+
+        # Apply filters to the queryset and return the filtered queryset
         queryset = Product.objects.filter(filters)
 
-        # Верните отфильтрованный queryset
         return queryset
 
 
