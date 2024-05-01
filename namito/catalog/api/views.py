@@ -260,7 +260,7 @@ class CategoryByNameStartsWithAPIView(generics.ListAPIView):
 
 class ProductSearchByNameAndDescriptionAPIView(generics.ListAPIView):
     queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+    serializer_class = ProductListSerializer
 
     def get_queryset(self):
         search_query = self.request.query_params.get('name', None)

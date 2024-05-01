@@ -193,11 +193,12 @@ class ProductSerializer(serializers.ModelSerializer):
     cart_quantity = serializers.SerializerMethodField()
     rating_count = serializers.SerializerMethodField()
     characteristics = CharacteristicsSerializer(many=True, read_only=True)
+    brand = BrandSerializer(read_only=True, many=False)
 
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags',
-                  'is_favorite', 'cart_quantity', 'rating_count', 'characteristics']
+                  'brand', 'is_favorite', 'cart_quantity', 'rating_count', 'characteristics']
 
     def get_variants(self, product):
         variants_qs = Variant.objects.filter(product=product).order_by('-main')
