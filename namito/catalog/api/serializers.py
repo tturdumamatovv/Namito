@@ -118,7 +118,7 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'price',
+        fields = ['id', 'name', 'description', 'category', 'price', 'brand',
                   'average_rating', 'tags', 'is_favorite', 'cart_quantity', 'image']
 
     def get_price(self, product):
