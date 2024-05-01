@@ -258,26 +258,30 @@ class CategoryByNameStartsWithAPIView(generics.ListAPIView):
         return queryset
 
 
-class ProductSearchByNameAndDescriptionAPIView(generics.ListAPIView):
+class ProductSearchByNameAndBrandAPIView(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductListSerializer
 
     def get_queryset(self):
+        # Получите параметры запроса
         search_query = self.request.query_params.get('name', None)
         brand_query = self.request.query_params.get('brand', None)
 
-        if search_query:
-            queryset = Product.objects.filter(
-                Q(name__icontains=search_query) |
-                Q(description__icontains=search_query)
-            )
-        elif brand_query:
-            queryset = Product.objects.filter(
-                Q(description__icontains=brand_query)
-            )
-        else:
-            queryset = Product.objects.none()
+        # Подготовьте фильтры для поиска
+        filters = Q()
 
+        # Поиск по имени
+        if search_query:
+            filters |= Q(name__icontains=search_query)
+
+        # Поиск по бренду (предполагая, что у вас есть поле `brand` в модели `Product`)
+        if brand_query:
+            filters |= Q(brand__name__icontains=brand_query)
+
+        # Примените фильтры к queryset
+        queryset = Product.objects.filter(filters)
+
+        # Верните отфильтрованный queryset
         return queryset
 
 
