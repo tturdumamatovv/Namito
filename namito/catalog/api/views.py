@@ -1,12 +1,15 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models.functions import Lower
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
+
 
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 
 from namito.catalog.models import (
     Category,
@@ -252,18 +255,26 @@ class CategoryByNameStartsWithAPIView(generics.ListAPIView):
         return queryset
 
 
-class ProductByNameStartsWithAPIView(generics.ListAPIView):
+class ProductSearchByNameAndDescriptionAPIView(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    lookup_field = 'name'
 
     def get_queryset(self):
-        name_query = self.request.query_params.get('name', None)
-        if name_query:
-            name_query = name_query.lower()
-            queryset = Product.objects.annotate(lower_name=Lower('name')).filter(lower_name__startswith=name_query)
+        search_query = self.request.query_params.get('name', None)
+        description_query = self.request.query_params.get('description', None)
+
+        if search_query:
+            queryset = Product.objects.filter(
+                Q(name__icontains=search_query) |
+                Q(description__icontains=search_query)
+            )
+        elif description_query:
+            queryset = Product.objects.filter(
+                Q(description__icontains=description_query)
+            )
         else:
             queryset = Product.objects.none()
+
         return queryset
 
 
