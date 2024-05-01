@@ -111,6 +111,7 @@ class Product(models.Model):
     min_price = models.PositiveIntegerField(default=0)
     tags = models.ManyToManyField(Tag, blank=True)
     is_top = models.BooleanField(default=False)
+    is_new = models.BooleanField(default=False)
     sku = models.CharField(max_length=50, unique=True, blank=True, null=True)
 
     def save(self, *args, **kwargs):
