@@ -354,3 +354,4 @@ static/
 postgres/
 
 firebase_key.json
+/media/
