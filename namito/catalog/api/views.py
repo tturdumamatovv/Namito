@@ -1,8 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models.functions import Lower
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
-import logging
 
 from modeltranslation.translator import translator
 
@@ -250,10 +248,8 @@ class CategoryByNameStartsWithAPIView(generics.ListAPIView):
         name_query = self.request.query_params.get('name', None)
 
         if name_query:
-            # Используем `icontains` для поиска категорий, которые содержат запрос в любом месте имени категории
             queryset = Category.objects.filter(name__icontains=name_query)
         else:
-            # Если параметр `name` не передан, возвращаем все категории
             queryset = Category.objects.all()
 
         return queryset
@@ -266,38 +262,28 @@ class ProductSearchByNameAndBrandAPIView(generics.ListAPIView):
     serializer_class = ProductListSerializer
 
     def get_queryset(self):
-        # Get the language code from the request
         language_code = self.request.LANGUAGE_CODE
 
-        # Get the search queries from request parameters
         search_query = self.request.query_params.get('name')
         brand_query = self.request.query_params.get('brand')
 
-        # Check if both search parameters are None
         if search_query is None and brand_query is None:
-            # Return an empty queryset if no search parameters are provided
             return Product.objects.none()
 
-        # Initialize an empty filter object
         filters = Q()
 
-        # Add filters for product name
         if search_query:
-            # Create filters for each translated product name field based on the language code
             product_translation_opts = translator.get_options_for_model(Product)
             for field in product_translation_opts.fields:
                 translated_field = f"{field}_{language_code}"
                 filters |= Q(**{f"{translated_field}__icontains": search_query})
 
-        # Add filters for brand name
         if brand_query:
-            # Create filters for each translated brand name field based on the language code
             brand_translation_opts = translator.get_options_for_model(Brand)
             for field in brand_translation_opts.fields:
                 translated_field = f"brand__{field}_{language_code}"
                 filters |= Q(**{f"{translated_field}__icontains": brand_query})
 
-        # Filter the queryset using the constructed filters and return the results
         queryset = self.queryset.filter(filters)
         return queryset
 

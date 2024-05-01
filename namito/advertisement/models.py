@@ -1,8 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-
-# Create your models here.
 from namito.pages.models import MainPage
 
 
@@ -17,4 +15,3 @@ class Advertisement(models.Model):
     class Meta:
         verbose_name = _('Рекламу')
         verbose_name_plural = _('Рекламы')
-

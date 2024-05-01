@@ -1,5 +1,18 @@
-from modeltranslation.translator import register, TranslationOptions
-from .models import Category, Brand, Tag, Product, Review, Characteristic, Color, Size
+from modeltranslation.translator import (
+    register,
+    TranslationOptions
+)
+
+from .models import (
+    Category,
+    Brand,
+    Tag,
+    Product,
+    Review,
+    Characteristic,
+    Color,
+    Size
+)
 
 
 @register(Category)
