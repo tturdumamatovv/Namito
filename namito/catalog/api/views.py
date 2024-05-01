@@ -3,7 +3,7 @@ from django.db.models.functions import Lower
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
-from modeltranslation.utils import get_translation_fields
+from modeltranslation.translator import translator
 
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
@@ -272,8 +272,13 @@ class ProductSearchByNameAndBrandAPIView(generics.ListAPIView):
 
         # Search by product name in all translated fields
         if search_query:
-            # Get all translated fields for 'name' from the 'Product' model
-            translated_name_fields = get_translation_fields(Product, 'name')
+            # Get the translation options for the Product model
+            translation_options = translator.get_options_for_model(Product)
+
+            # Get translated fields for the 'name' attribute
+            translated_name_fields = [
+                f"{field.name}" for field in translation_options.get_fields() if field.name == 'name'
+            ]
 
             # Create a Q object to search in all translated 'name' fields
             name_filter = Q()
@@ -285,8 +290,13 @@ class ProductSearchByNameAndBrandAPIView(generics.ListAPIView):
 
         # Search by brand name in all translated fields
         if brand_query:
-            # Get all translated fields for 'name' from the 'Brand' model
-            translated_brand_fields = get_translation_fields(Brand, 'name')
+            # Get the translation options for the Brand model
+            translation_options = translator.get_options_for_model(Brand)
+
+            # Get translated fields for the 'name' attribute of the Brand model
+            translated_brand_fields = [
+                f"{field.name}" for field in translation_options.get_fields() if field.name == 'name'
+            ]
 
             # Create a Q object to search in all translated 'name' fields of the Brand model
             brand_filter = Q()
