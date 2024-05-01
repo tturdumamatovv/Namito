@@ -276,13 +276,14 @@ class ProductSearchByNameAndBrandAPIView(generics.ListAPIView):
             translation_options = translator.get_options_for_model(Product)
 
             # Get translated fields for the 'name' attribute
-            translated_name_fields = [
-                f"{field.name}" for field in translation_options.get_fields() if field.name == 'name'
+            name_translations = [
+                f"{field}" for field in translation_options.get_fields() if field == 'name'
             ]
 
             # Create a Q object to search in all translated 'name' fields
             name_filter = Q()
-            for field in translated_name_fields:
+            for lang in name_translations:
+                field = f'name_{lang}'
                 name_filter |= Q(**{f"{field}__icontains": search_query})
 
             # Add the name filter to the main filters
@@ -291,17 +292,18 @@ class ProductSearchByNameAndBrandAPIView(generics.ListAPIView):
         # Search by brand name in all translated fields
         if brand_query:
             # Get the translation options for the Brand model
-            translation_options = translator.get_options_for_model(Brand)
+            brand_translation_options = translator.get_options_for_model(Brand)
 
             # Get translated fields for the 'name' attribute of the Brand model
-            translated_brand_fields = [
-                f"{field.name}" for field in translation_options.get_fields() if field.name == 'name'
+            brand_name_translations = [
+                f"{field}" for field in brand_translation_options.get_fields() if field == 'name'
             ]
 
             # Create a Q object to search in all translated 'name' fields of the Brand model
             brand_filter = Q()
-            for field in translated_brand_fields:
-                brand_filter |= Q(**{f"brand__{field}__icontains": brand_query})
+            for lang in brand_name_translations:
+                field = f'brand__name_{lang}'
+                brand_filter |= Q(**{f"{field}__icontains": brand_query})
 
             # Add the brand filter to the main filters
             filters &= brand_filter
