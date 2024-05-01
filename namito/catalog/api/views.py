@@ -247,11 +247,14 @@ class CategoryByNameStartsWithAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         name_query = self.request.query_params.get('name', None)
+
         if name_query:
-            name_query = name_query.lower()
-            queryset = Category.objects.annotate(lower_name=Lower('name')).filter(lower_name__startswith=name_query)
+            # Используем `icontains` для поиска категорий, которые содержат запрос в любом месте имени категории
+            queryset = Category.objects.filter(name__icontains=name_query)
         else:
-            queryset = Category.objects.none()
+            # Если параметр `name` не передан, возвращаем все категории
+            queryset = Category.objects.all()
+
         return queryset
 
 
@@ -260,21 +263,20 @@ class ProductSearchByNameAndDescriptionAPIView(generics.ListAPIView):
     serializer_class = ProductSerializer
 
     def get_queryset(self):
+        # Получите запросы для поиска
         search_query = self.request.query_params.get('name', None)
         description_query = self.request.query_params.get('description', None)
 
+        # Подготовьте фильтры для поиска
+        filters = Q()
         if search_query:
-            queryset = Product.objects.filter(
-                Q(name__icontains=search_query) |
-                Q(description__icontains=search_query)
-            )
-        elif description_query:
-            queryset = Product.objects.filter(
-                Q(description__icontains=description_query)
-            )
-        else:
-            queryset = Product.objects.none()
+            # Поиск по переведенным полям (укажите языковой код)
+            filters |= Q(name__icontains=search_query) | Q(name_translated__icontains=search_query)
+        if description_query:
+            filters |= Q(description__icontains=description_query) | Q(description_translated__icontains=description_query)
 
+        # Фильтрация по переведенным полям
+        queryset = Product.objects.filter(filters)
         return queryset
 
 
