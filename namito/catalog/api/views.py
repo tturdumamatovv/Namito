@@ -2,7 +2,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models.functions import Lower
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
-from django.utils.translation import get_language
 
 
 from rest_framework import generics, permissions, status
@@ -264,30 +263,21 @@ class ProductSearchByNameAndDescriptionAPIView(generics.ListAPIView):
     serializer_class = ProductSerializer
 
     def get_queryset(self):
-        # Получите текущий язык запроса
-        language_code = get_language()
-
-        # Получите запросы для поиска
         search_query = self.request.query_params.get('name', None)
-        description_query = self.request.query_params.get('description', None)
+        brand_query = self.request.query_params.get('brand', None)
 
-        # Подготовьте фильтры для поиска
-        filters = Q()
-
-        # Если есть запрос по имени
         if search_query:
-            # Учитывайте переводы имени на текущем языке
-            name_field = f"name_{language_code}__icontains"
-            filters |= Q(**{name_field: search_query})
+            queryset = Product.objects.filter(
+                Q(name__icontains=search_query) |
+                Q(description__icontains=search_query)
+            )
+        elif brand_query:
+            queryset = Product.objects.filter(
+                Q(description__icontains=brand_query)
+            )
+        else:
+            queryset = Product.objects.none()
 
-        # Если есть запрос по описанию
-        if description_query:
-            # Учитывайте переводы описания на текущем языке
-            description_field = f"description_{language_code}__icontains"
-            filters |= Q(**{description_field: description_query})
-
-        # Фильтруйте queryset с учетом языковых фильтров
-        queryset = Product.objects.filter(filters)
         return queryset
 
 
