@@ -115,6 +115,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     is_favorite = serializers.SerializerMethodField()
     cart_quantity = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
+    brand = BrandSerializer(many=False, read_only=True)
 
     class Meta:
         model = Product
