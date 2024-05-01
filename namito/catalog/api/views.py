@@ -1,15 +1,14 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models.functions import Lower
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
+from modeltranslation.translator import translator
 
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from drf_yasg.utils import swagger_auto_schema
-from drf_spectacular.utils import extend_schema, OpenApiParameter
 
 from namito.catalog.models import (
     Category,
@@ -247,34 +246,45 @@ class CategoryByNameStartsWithAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         name_query = self.request.query_params.get('name', None)
+
         if name_query:
-            name_query = name_query.lower()
-            queryset = Category.objects.annotate(lower_name=Lower('name')).filter(lower_name__startswith=name_query)
+            queryset = Category.objects.filter(name__icontains=name_query)
         else:
-            queryset = Category.objects.none()
+            queryset = Category.objects.all()
+
         return queryset
 
 
-class ProductSearchByNameAndDescriptionAPIView(generics.ListAPIView):
+
+
+class ProductSearchByNameAndBrandAPIView(generics.ListAPIView):
     queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+    serializer_class = ProductListSerializer
 
     def get_queryset(self):
-        search_query = self.request.query_params.get('name', None)
-        description_query = self.request.query_params.get('description', None)
+        language_code = self.request.LANGUAGE_CODE
+
+        search_query = self.request.query_params.get('name')
+        brand_query = self.request.query_params.get('brand')
+
+        if search_query is None and brand_query is None:
+            return Product.objects.none()
+
+        filters = Q()
 
         if search_query:
-            queryset = Product.objects.filter(
-                Q(name__icontains=search_query) |
-                Q(description__icontains=search_query)
-            )
-        elif description_query:
-            queryset = Product.objects.filter(
-                Q(description__icontains=description_query)
-            )
-        else:
-            queryset = Product.objects.none()
+            product_translation_opts = translator.get_options_for_model(Product)
+            for field in product_translation_opts.fields:
+                translated_field = f"{field}_{language_code}"
+                filters |= Q(**{f"{translated_field}__icontains": search_query})
 
+        if brand_query:
+            brand_translation_opts = translator.get_options_for_model(Brand)
+            for field in brand_translation_opts.fields:
+                translated_field = f"brand__{field}_{language_code}"
+                filters |= Q(**{f"{translated_field}__icontains": brand_query})
+
+        queryset = self.queryset.filter(filters)
         return queryset
 
 

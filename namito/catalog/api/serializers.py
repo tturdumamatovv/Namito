@@ -28,7 +28,7 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'name', 'type', 'slug', 'image', 'parent', 'order',
-                  'meta_title', 'meta_description', 'promotion', 'children']
+                  'meta_title', 'meta_description', 'promotion', 'children', 'background_color']
 
     def get_fields(self):
         fields = super().get_fields()
@@ -47,19 +47,19 @@ class CategorySerializer(serializers.ModelSerializer):
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand
-        fields = '__all__'
+        fields = ['name', 'logo']
 
 
 class ColorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Color
-        fields = '__all__'
+        fields = ['name', 'color']
 
 
 class SizeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Size
-        fields = '__all__'
+        fields = ['name', 'description']
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -115,10 +115,11 @@ class ProductListSerializer(serializers.ModelSerializer):
     is_favorite = serializers.SerializerMethodField()
     cart_quantity = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
+    brand = BrandSerializer(many=False, read_only=True)
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'price',
+        fields = ['id', 'name', 'description', 'category', 'price', 'brand',
                   'average_rating', 'tags', 'is_favorite', 'cart_quantity', 'image']
 
     def get_price(self, product):
@@ -192,11 +193,12 @@ class ProductSerializer(serializers.ModelSerializer):
     cart_quantity = serializers.SerializerMethodField()
     rating_count = serializers.SerializerMethodField()
     characteristics = CharacteristicsSerializer(many=True, read_only=True)
+    brand = BrandSerializer(read_only=True, many=False)
 
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags',
-                  'is_favorite', 'cart_quantity', 'rating_count', 'characteristics']
+                  'brand', 'is_favorite', 'cart_quantity', 'rating_count', 'characteristics']
 
     def get_variants(self, product):
         variants_qs = Variant.objects.filter(product=product).order_by('-main')

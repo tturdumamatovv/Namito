@@ -15,11 +15,13 @@ from namito.catalog.models import (
     Color,
     Size,
     Variant,
-    Image
+    Image,
+    Characteristic
 )
 
 fake_ru = Faker('ru_RU')
 fake_en = Faker()
+
 
 class Command(BaseCommand):
     help = 'Generates and inserts random data into the database.'
@@ -94,6 +96,19 @@ class Command(BaseCommand):
                 description=fake_en.sentence()
             )
 
+    def create_characteristics(self):
+        for _ in range(30):
+            Characteristic.objects.create(
+                key=fake_en.word(),
+                key_ru=fake_ru.word(),
+                key_en=fake_en.word(),
+                value=fake_en.word(),
+                value_ru=fake_ru.word(),
+                value_en=fake_en.word(),
+
+            )
+
+
     def create_products(self):
         categories = list(Category.objects.all())
         brands = list(Brand.objects.all())
@@ -109,7 +124,7 @@ class Command(BaseCommand):
                 category=random.choice(categories),
                 brand=random.choice(brands),
                 min_price=random.randint(100, 10000),
-                is_top=fake_en.boolean()
+                is_top=fake_en.boolean(),
             )
             product.tags.set(random.sample(tags, k=random.randint(1, min(5, len(tags)))))
 
