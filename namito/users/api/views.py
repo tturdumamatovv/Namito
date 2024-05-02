@@ -117,10 +117,13 @@ class UserAddressCreateAPIView(generics.ListCreateAPIView):
     serializer_class = UserAddressSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+        user = self.request.user
+        return UserAddress.objects.filter(user=user)
+
     def perform_create(self, serializer):
         user = self.request.user
 
-        # Directly save the user as the owner of the address
         serializer.save(user=user)
 
 
