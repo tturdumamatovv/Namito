@@ -57,7 +57,10 @@ class CartDetailAPIView(generics.RetrieveAPIView):
         if cart.items.exists():
             return super().get(request, *args, **kwargs)
         else:
-            return Response({"detail": "Cart is empty."}, status=status.HTTP_200_OK)
+            if self.request.LANGUAGE_CODE == 'ru':
+                return Response({"detail": "Карзина пуста"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"detail": "Cart is empty."}, status=status.HTTP_200_OK)
 
 
 class MultiCartItemUpdateAPIView(generics.GenericAPIView):
