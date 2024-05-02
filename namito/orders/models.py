@@ -56,7 +56,7 @@ class Order(models.Model):
     STATUSES = [
         (0, _("В процессе")),
         (1, _("Доставлено")),
-        (3, _("Доставка отменена")),
+        (2, _("Доставка отменена")),
     ]
 
     PAYMENT_STATUSES = [
@@ -91,7 +91,7 @@ class Order(models.Model):
         return f"Order {self.id} by {self.user}"
 
     def clean(self):
-        if self.delivery_method == 'курьером' and not self.delivery_address:
+        if self.delivery_method == 'курьером' and not self.user_address:
             raise ValidationError(_('Delivery address is required for courier delivery.'))
 
     def generate_order_number(self):
