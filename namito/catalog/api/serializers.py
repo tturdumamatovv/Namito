@@ -116,11 +116,12 @@ class ProductListSerializer(serializers.ModelSerializer):
     cart_quantity = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
     brand = BrandSerializer(many=False, read_only=True)
+    characteristics = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'category', 'price', 'brand',
-                  'average_rating', 'tags', 'is_favorite', 'cart_quantity', 'image']
+                  'average_rating', 'tags', 'is_favorite', 'cart_quantity', 'image', 'characteristics']
 
     def get_price(self, product):
         main_variant = Variant.objects.filter(product=product, main=True).first()
@@ -165,7 +166,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     def get_image(self, product):
         base_url = self.context.get('request').build_absolute_uri('/')
         images_data = []
-        variants = Variant.objects.filter(product=product).order_by('-main', 'id')
+        variants = Variant.objects.filter(product=product, stock__gt=0).order_by('-main', 'id')
         for variant in variants:
             image = Image.objects.filter(variant=variant, main_image=True).first()
             if not image:
@@ -177,6 +178,10 @@ class ProductListSerializer(serializers.ModelSerializer):
                     'image_url': image_url
                 })
         return images_data
+
+    def get_characteristics(self, product):
+        characteristics = Characteristic.objects.filter(product=product)
+        return CharacteristicsSerializer(characteristics, many=True).data
 
 
 class CharacteristicsSerializer(serializers.ModelSerializer):
@@ -201,7 +206,7 @@ class ProductSerializer(serializers.ModelSerializer):
                   'brand', 'is_favorite', 'cart_quantity', 'rating_count', 'characteristics']
 
     def get_variants(self, product):
-        variants_qs = Variant.objects.filter(product=product).order_by('-main')
+        variants_qs = Variant.objects.filter(product=product, stock__gt=0).order_by('-main')
         return VariantSerializer(variants_qs, many=True, context=self.context).data
 
     def get_average_rating(self, product):
@@ -234,6 +239,10 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_rating_count(self, product):
         count = Rating.objects.filter(product=product).count()
         return count
+
+    def get_characteristics(self, product):
+        characteristics = Characteristic.objects.filter(product=product)
+        return CharacteristicsSerializer(characteristics, many=True).data
 
 
 class ReviewSerializer(serializers.ModelSerializer):

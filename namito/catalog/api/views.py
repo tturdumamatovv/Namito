@@ -1,6 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from django.db import models
 
 from modeltranslation.translator import translator
 
@@ -81,14 +82,30 @@ class ProductListView(generics.ListCreateAPIView):
     pagination_class = CustomPageNumberPagination
 
 
+    def get_queryset(self):
+        # Фильтруем продукты по наличию вариантов с запасом больше 0
+        products_with_stock_variants = Product.objects.filter(
+            variants__stock__gt=0
+        ).distinct()
+        return products_with_stock_variants
+
+
 class TopProductListView(generics.ListAPIView):
-    queryset = Product.objects.filter(is_top=True).order_by('?')[:15]
     serializer_class = ProductListSerializer
+
+    def get_queryset(self):
+        return Product.objects.filter(
+            is_top=True, variants__stock__gt=0
+        ).distinct().order_by('?')[:15]
 
 
 class NewProductListView(generics.ListAPIView):
-    queryset = Product.objects.filter(is_new=True).order_by('-id')[:15]
     serializer_class = ProductListSerializer
+
+    def get_queryset(self):
+        return Product.objects.filter(
+            is_new=True, variants__stock__gt=0
+        ).distinct().order_by('-id')[:15]
 
 
 class SimilarProductsView(generics.ListAPIView):
@@ -97,12 +114,15 @@ class SimilarProductsView(generics.ListAPIView):
     def get_queryset(self):
         product_id = self.kwargs.get('product_id')
         product = get_object_or_404(Product, pk=product_id)
-        queryset = Product.objects.filter(category=product.category).exclude(pk=product_id)[:10]
+        queryset = Product.objects.filter(
+            category=product.category,
+            variants__stock__gt=0
+        ).exclude(pk=product_id).distinct()[:10]
         return queryset
 
 
 class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Product.objects.all()
+    queryset = Product.objects.filter(variants__stock__gt=0).distinct()
     serializer_class = ProductSerializer
 
     def get_serializer_context(self):
@@ -132,13 +152,21 @@ class SizeDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class VariantListView(generics.ListCreateAPIView):
-    queryset = Variant.objects.all()
     serializer_class = VariantSerializer
+
+    def get_queryset(self):
+        # Отфильтруйте варианты, у которых stock > 0
+        queryset = Variant.objects.filter(stock__gt=0)
+        return queryset
 
 
 class VariantDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Variant.objects.all()
     serializer_class = VariantSerializer
+
+    def get_queryset(self):
+        # Отфильтруйте варианты, у которых stock > 0
+        queryset = Variant.objects.filter(stock__gt=0)
+        return queryset
 
 
 class ImageCreateView(generics.ListCreateAPIView):
@@ -284,7 +312,7 @@ class ProductSearchByNameAndBrandAPIView(generics.ListAPIView):
                 translated_field = f"brand__{field}_{language_code}"
                 filters |= Q(**{f"{translated_field}__icontains": brand_query})
 
-        queryset = self.queryset.filter(filters)
+        queryset = self.queryset.filter(filters).filter(variants__stock__gt=0).distinct()
         return queryset
 
 

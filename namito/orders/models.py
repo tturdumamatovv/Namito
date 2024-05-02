@@ -108,7 +108,7 @@ class Order(models.Model):
         if self.status == 2 and not OrderHistory.objects.filter(order=self).exists():
             OrderHistory.objects.create(user=self.user, order=self)
 
-        if self.status == 2:  # Если статус заказа "Complete"
+        if self.status == 1:  # Если статус заказа "Complete"
             with transaction.atomic():  # Обертка для обеспечения атомарности операций
                 ordered_items = self.ordered_items.all()  # Получаем все заказанные товары
                 for ordered_item in ordered_items:
