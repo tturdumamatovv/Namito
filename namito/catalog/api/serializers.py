@@ -85,6 +85,7 @@ class ImageSerializer(serializers.ModelSerializer):
 
 
 class VariantSerializer(serializers.ModelSerializer):
+    product = serializers.CharField(source='product.name', read_only=True)
     color = ColorSerializer(read_only=True)
     size = SizeSerializer(read_only=True)
     images = serializers.SerializerMethodField()
@@ -95,7 +96,7 @@ class VariantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Variant
         fields = ['id', 'color', 'size', 'price', 'discounted_price',
-                  'images', 'stock', 'discount_value', 'discount_type', 'main']
+                  'images', 'stock', 'discount_value', 'discount_type', 'main', 'product']
 
     def get_images(self, variant):
         images_qs = Image.objects.filter(variant=variant).order_by('-main_image')
