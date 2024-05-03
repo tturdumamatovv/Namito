@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
+from namito.advertisement.api.serializers import AdvertisementSerializer
 from namito.pages.models import MainPageSlider, MainPage, StaticPage
-
+from namito.advertisement.models import Advertisement
 
 
 class MainPageSliderSerializer(serializers.ModelSerializer):
@@ -23,12 +24,17 @@ class MainPageSliderSerializer(serializers.ModelSerializer):
 
 class MainPageSerializer(serializers.ModelSerializer):
     slider = serializers.SerializerMethodField()
+    advertisement = serializers.SerializerMethodField()
 
     class Meta:
         model = MainPage
         fields = ['banner1', 'banner2', 'banner3', 'title', 'description', 'counter1_title',
                   'counter1_value', 'counter2_title', 'counter2_value', 'counter3_title',
-                  'counter3_value', 'button_link', 'button', 'slider']
+                  'counter3_value', 'button_link', 'button', 'slider', 'advertisement']
+
+    def get_advertisement(self, page):
+        slider_qs = Advertisement.objects.filter(page=page)
+        return AdvertisementSerializer(slider_qs, many=True, context=self.context).data
 
     def get_slider(self, page):
         slider_qs = MainPageSlider.objects.filter(page=page)
