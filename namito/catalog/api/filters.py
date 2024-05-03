@@ -1,6 +1,6 @@
 import django_filters
 from django.db.models import Avg, Q
-from namito.catalog.models import Product
+from namito.catalog.models import Product, Category
 
 
 class ProductFilter(django_filters.FilterSet):
@@ -10,7 +10,11 @@ class ProductFilter(django_filters.FilterSet):
     color = django_filters.CharFilter(field_name="variants__color__name", lookup_expr='iexact')
     size = django_filters.CharFilter(field_name="variants__size__name", lookup_expr='iexact')
     brand = django_filters.CharFilter(field_name="brand__name", lookup_expr='iexact')
-    category = django_filters.CharFilter(field_name="category__name", lookup_expr='iexact')
+    category = django_filters.ModelChoiceFilter(
+        field_name='category',
+        queryset=Category.objects.all(),
+        method='filter_by_category'
+    )
     min_rating = django_filters.NumberFilter(method='filter_by_min_rating')
     has_discount = django_filters.BooleanFilter(method='filter_by_discount_presence')
 
@@ -46,7 +50,6 @@ class ProductFilter(django_filters.FilterSet):
     def qs(self):
         queryset = super().qs
 
-        # Apply filters from request
         queryset = self.apply_filters(queryset)
 
         sort_by_discount = self.request.GET.get('sort_by_discount')
@@ -54,6 +57,12 @@ class ProductFilter(django_filters.FilterSet):
             queryset = self.sort_by_discount(queryset, sort_by_discount)
 
         return queryset.distinct()
+
+    def filter_by_category(self, queryset, name, value):
+        category = value
+        descendants = category.get_descendants(include_self=True)
+        descendant_ids = descendants.values_list('id', flat=True)
+        return queryset.filter(category__id__in=descendant_ids)
 
     def apply_filters(self, queryset):
         if self.request:

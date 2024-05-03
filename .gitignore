@@ -354,4 +354,10 @@ static/
 postgres/
 
 firebase_key.json
-/media/
+
+media/**
+
+
+
+**/migrations/**
+!**/migrations/__init__.py
