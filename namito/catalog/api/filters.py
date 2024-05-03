@@ -1,5 +1,6 @@
 import django_filters
 from django.db.models import Avg, Q
+
 from namito.catalog.models import Product
 
 

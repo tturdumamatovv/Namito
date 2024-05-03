@@ -27,8 +27,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ['id', 'name', 'type', 'slug', 'image', 'parent', 'order',
-                  'meta_title', 'meta_description', 'promotion', 'children', 'background_color']
+        fields = ['id', 'name', 'type', 'slug', 'image', 'parent', 'order', 'meta_title',
+                  'meta_description', 'promotion', 'children', 'background_color']
 
     def get_fields(self):
         fields = super().get_fields()
@@ -95,8 +95,8 @@ class VariantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Variant
-        fields = ['id', 'color', 'size', 'price', 'discounted_price',
-                  'images', 'stock', 'discount_value', 'discount_type', 'main', 'product']
+        fields = ['id', 'color', 'size', 'price', 'discounted_price', 'images', 'stock',
+                  'discount_value', 'discount_type', 'main', 'product']
 
     def get_images(self, variant):
         images_qs = Image.objects.filter(variant=variant).order_by('-main_image')
@@ -121,8 +121,8 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'price', 'brand',
-                  'average_rating', 'tags', 'is_favorite', 'cart_quantity', 'image', 'characteristics']
+        fields = ['id', 'name', 'description', 'category', 'price', 'brand', 'average_rating',
+                  'tags', 'is_favorite', 'cart_quantity', 'image', 'characteristics']
 
     def get_price(self, product):
         main_variant = Variant.objects.filter(product=product, main=True).first()

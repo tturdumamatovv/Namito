@@ -1,15 +1,13 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
-from django.db import models
-
-from modeltranslation.translator import translator
 
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from drf_yasg.utils import swagger_auto_schema
+from modeltranslation.translator import translator
 
 from namito.catalog.models import (
     Category,
@@ -24,7 +22,6 @@ from namito.catalog.models import (
     SizeChart,
     Brand
 )
-from .pagination import CustomPageNumberPagination
 from .serializers import (
     CategorySerializer,
     ProductSerializer,
@@ -42,6 +39,7 @@ from .serializers import (
     FavoriteToggleSerializer
 
 )
+from .pagination import CustomPageNumberPagination
 from .filters import ProductFilter
 
 
@@ -83,7 +81,6 @@ class ProductListView(generics.ListCreateAPIView):
 
 
     def get_queryset(self):
-        # Фильтруем продукты по наличию вариантов с запасом больше 0
         products_with_stock_variants = Product.objects.filter(
             variants__stock__gt=0
         ).distinct()
@@ -155,7 +152,6 @@ class VariantListView(generics.ListCreateAPIView):
     serializer_class = VariantSerializer
 
     def get_queryset(self):
-        # Отфильтруйте варианты, у которых stock > 0
         queryset = Variant.objects.filter(stock__gt=0)
         return queryset
 
@@ -164,7 +160,6 @@ class VariantDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = VariantSerializer
 
     def get_queryset(self):
-        # Отфильтруйте варианты, у которых stock > 0
         queryset = Variant.objects.filter(stock__gt=0)
         return queryset
 
@@ -281,8 +276,6 @@ class CategoryByNameStartsWithAPIView(generics.ListAPIView):
             queryset = Category.objects.all()
 
         return queryset
-
-
 
 
 class ProductSearchByNameAndBrandAPIView(generics.ListAPIView):
