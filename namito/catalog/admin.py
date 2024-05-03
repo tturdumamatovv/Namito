@@ -164,4 +164,3 @@ class SizeChartAdmin(admin.ModelAdmin):
     form = SizeChartForm
     list_display = ('name',)
     inlines = [SizeChartItemInline]
-

@@ -18,7 +18,7 @@ services:
       - ./media:/app/media
     ports:
     - "8013:8013"
-    command: bash -c "python manage.py collectstatic --no-input && python manage.py migrate && gunicorn config.wsgi:application -b 0.0.0.0:8013"
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic --no-input && gunicorn config.wsgi:application -b 0.0.0.0:8013"
     env_file:
       - .env
     depends_on:

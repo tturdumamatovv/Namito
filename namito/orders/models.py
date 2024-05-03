@@ -56,7 +56,7 @@ class Order(models.Model):
     STATUSES = [
         (0, _("В процессе")),
         (1, _("Доставлено")),
-        (3, _("Доставка отменена")),
+        (2, _("Доставка отменена")),
     ]
 
     PAYMENT_STATUSES = [
@@ -91,7 +91,7 @@ class Order(models.Model):
         return f"Order {self.id} by {self.user}"
 
     def clean(self):
-        if self.delivery_method == 'курьером' and not self.delivery_address:
+        if self.delivery_method == 'курьером' and not self.user_address:
             raise ValidationError(_('Delivery address is required for courier delivery.'))
 
     def generate_order_number(self):
@@ -108,7 +108,7 @@ class Order(models.Model):
         if self.status == 2 and not OrderHistory.objects.filter(order=self).exists():
             OrderHistory.objects.create(user=self.user, order=self)
 
-        if self.status == 2:  # Если статус заказа "Complete"
+        if self.status == 1:  # Если статус заказа "Complete"
             with transaction.atomic():  # Обертка для обеспечения атомарности операций
                 ordered_items = self.ordered_items.all()  # Получаем все заказанные товары
                 for ordered_item in ordered_items:

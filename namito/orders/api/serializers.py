@@ -20,6 +20,12 @@ class CartItemCreateUpdateSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ['id', 'product_variant', 'quantity', 'to_purchase']
 
+    def validate_product_variant(self, value):
+        if value.stock <= 0:
+            raise serializers.ValidationError("Товар не доступен для добавления в корзину.")
+
+        return value
+
 
 class CartItemSerializer(serializers.ModelSerializer):
     product_variant = VariantSerializer(required=False)
