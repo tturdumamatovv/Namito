@@ -10,7 +10,11 @@ class ProductFilter(django_filters.FilterSet):
     max_price = django_filters.NumberFilter(field_name="variants__price", lookup_expr='lte')
     color = django_filters.ModelMultipleChoiceFilter(field_name="variants__color__name", lookup_expr='iexact')
     size = django_filters.ModelMultipleChoiceFilter(field_name="variants__size__name", lookup_expr='iexact')
-    brand = django_filters.ModelMultipleChoiceFilter(field_name="brand", queryset=Brand.objects.all(), lookup_expr='in')
+    brand = django_filters.ModelMultipleChoiceFilter(
+        field_name='brand',
+        queryset=Brand.objects.all(),
+        lookup_expr='in'
+    )
     category = django_filters.ModelMultipleChoiceFilter(field_name="category__name", lookup_expr='iexact')
     min_rating = django_filters.NumberFilter(method='filter_by_min_rating')
     has_discount = django_filters.BooleanFilter(method='filter_by_discount_presence')
@@ -67,7 +71,7 @@ class ProductFilter(django_filters.FilterSet):
             if 'size' in self.request.GET:
                 queryset = queryset.filter(variants__size__name__iexact=self.request.GET['size'])
             if 'brand' in self.request.GET:
-                queryset = queryset.filter(brand__name__iexact=self.request.GET['brand'])
+                queryset = queryset.filter(brand__name__in=self.request.GET.getlist('brand'))
             if 'category' in self.request.GET:
                 queryset = queryset.filter(category__name__iexact=self.request.GET['category'])
             if 'min_rating' in self.request.GET:
