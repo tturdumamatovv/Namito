@@ -1,7 +1,7 @@
 import django_filters
 from django.db.models import Avg, Q
 
-from namito.catalog.models import Product
+from namito.catalog.models import Product, Brand
 
 
 class ProductFilter(django_filters.FilterSet):
@@ -10,7 +10,7 @@ class ProductFilter(django_filters.FilterSet):
     max_price = django_filters.NumberFilter(field_name="variants__price", lookup_expr='lte')
     color = django_filters.ModelMultipleChoiceFilter(field_name="variants__color__name", lookup_expr='iexact')
     size = django_filters.ModelMultipleChoiceFilter(field_name="variants__size__name", lookup_expr='iexact')
-    brand = django_filters.ModelMultipleChoiceFilter(field_name="brand__name", lookup_expr='iexact')
+    brand = django_filters.ModelMultipleChoiceFilter(field_name="brand", queryset=Brand.objects.all(), lookup_expr='in')
     category = django_filters.ModelMultipleChoiceFilter(field_name="category__name", lookup_expr='iexact')
     min_rating = django_filters.NumberFilter(method='filter_by_min_rating')
     has_discount = django_filters.BooleanFilter(method='filter_by_discount_presence')
