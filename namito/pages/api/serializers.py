@@ -1,7 +1,11 @@
 from rest_framework import serializers
 
+from namito.pages.models import (
+    MainPageSlider,
+    MainPage,
+    StaticPage
+)
 from namito.advertisement.api.serializers import AdvertisementSerializer
-from namito.pages.models import MainPageSlider, MainPage, StaticPage
 from namito.advertisement.models import Advertisement
 
 
