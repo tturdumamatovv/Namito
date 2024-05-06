@@ -1,21 +1,19 @@
 import django_filters
 from django.db.models import Avg, Q
-
-from namito.catalog.models import Product, Brand
-
+from namito.catalog.models import Product, Brand  # Импортируем Brand
 
 class ProductFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(field_name="name", lookup_expr='icontains')
     min_price = django_filters.NumberFilter(field_name="variants__price", lookup_expr='gte')
     max_price = django_filters.NumberFilter(field_name="variants__price", lookup_expr='lte')
-    color = django_filters.ModelMultipleChoiceFilter(field_name="variants__color__name", lookup_expr='iexact')
-    size = django_filters.ModelMultipleChoiceFilter(field_name="variants__size__name", lookup_expr='iexact')
+    color = django_filters.CharFilter(field_name="variants__color__name", lookup_expr='iexact')
+    size = django_filters.CharFilter(field_name="variants__size__name", lookup_expr='iexact')
     brand = django_filters.ModelMultipleChoiceFilter(
         field_name='brand',
-        queryset=Brand.objects.all(),
+        queryset=Brand.objects.all(),  # Задаем queryset для брендов
         lookup_expr='in'
     )
-    category = django_filters.ModelMultipleChoiceFilter(field_name="category__name", lookup_expr='iexact')
+    category = django_filters.CharFilter(field_name="category__name", lookup_expr='iexact')
     min_rating = django_filters.NumberFilter(method='filter_by_min_rating')
     has_discount = django_filters.BooleanFilter(method='filter_by_discount_presence')
 
@@ -71,6 +69,7 @@ class ProductFilter(django_filters.FilterSet):
             if 'size' in self.request.GET:
                 queryset = queryset.filter(variants__size__name__iexact=self.request.GET['size'])
             if 'brand' in self.request.GET:
+                # Используем фильтр по нескольким брендам
                 queryset = queryset.filter(brand__name__in=self.request.GET.getlist('brand'))
             if 'category' in self.request.GET:
                 queryset = queryset.filter(category__name__iexact=self.request.GET['category'])
