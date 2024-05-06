@@ -10,7 +10,10 @@ class ProductFilter(django_filters.FilterSet):
     max_price = django_filters.NumberFilter(field_name="variants__price", lookup_expr='lte')
     color = django_filters.CharFilter(field_name="variants__color__name", lookup_expr='iexact')
     size = django_filters.CharFilter(field_name="variants__size__name", lookup_expr='iexact')
-    brand = django_filters.MultipleChoiceFilter(field_name="brand__name", choices=Brand.objects.values_list('name', flat=True))
+    brand = django_filters.MultipleChoiceFilter(
+        field_name="brand__id",
+        choices=Brand.objects.values_list('id', 'name')
+    )
     category = django_filters.CharFilter(field_name="category__name", lookup_expr='iexact')
     min_rating = django_filters.NumberFilter(method='filter_by_min_rating')
     has_discount = django_filters.BooleanFilter(method='filter_by_discount_presence')
