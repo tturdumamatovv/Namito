@@ -20,7 +20,7 @@ class ProductFilter(django_filters.FilterSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Populate the choices for the brand filter dynamically
-        self.filters['brand'].choices = [(brand.name, brand.name) for brand in Product.objects.values_list('brand__name', flat=True).distinct()]
+        self.filters['brand'].choices = [(brand, brand) for brand in Product.objects.values_list('brand__name', flat=True).distinct()]
 
     def filter_by_min_rating(self, queryset, name, value):
         queryset = queryset.annotate(avg_rating=Avg('ratings__score')).filter(avg_rating__gte=value)
