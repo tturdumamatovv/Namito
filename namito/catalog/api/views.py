@@ -1,9 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
-
 
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
@@ -81,44 +78,6 @@ class ProductListView(generics.ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilter
     pagination_class = CustomPageNumberPagination
-
-    @swagger_auto_schema(
-        manual_parameters=[
-            openapi.Parameter(
-                'name', openapi.IN_QUERY, description="Название продукта", type=openapi.TYPE_STRING
-            ),
-            openapi.Parameter(
-                'min_price', openapi.IN_QUERY, description="Минимальная цена", type=openapi.TYPE_NUMBER
-            ),
-            openapi.Parameter(
-                'max_price', openapi.IN_QUERY, description="Максимальная цена", type=openapi.TYPE_NUMBER
-            ),
-            openapi.Parameter(
-                'color', openapi.IN_QUERY, description="Цвет", type=openapi.TYPE_STRING
-            ),
-            openapi.Parameter(
-                'size', openapi.IN_QUERY, description="Размер", type=openapi.TYPE_STRING
-            ),
-            openapi.Parameter(
-                'brand', openapi.IN_QUERY, description="Бренд", type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_STRING)
-            ),
-            openapi.Parameter(
-                'category', openapi.IN_QUERY, description="Категория", type=openapi.TYPE_STRING
-            ),
-            openapi.Parameter(
-                'min_rating', openapi.IN_QUERY, description="Минимальный рейтинг", type=openapi.TYPE_NUMBER
-            ),
-            openapi.Parameter(
-                'has_discount', openapi.IN_QUERY, description="Наличие скидки", type=openapi.TYPE_BOOLEAN
-            ),
-            openapi.Parameter(
-                'sort_by_discount', openapi.IN_QUERY, description="Сортировка по скидке", type=openapi.TYPE_STRING, enum=['asc', 'desc']
-            )
-        ],
-        operation_description="Получить список продуктов с возможностью фильтрации"
-    )
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
 
 
     def get_queryset(self):

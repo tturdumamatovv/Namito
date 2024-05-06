@@ -1,6 +1,6 @@
 import django_filters
 from django.db.models import Avg, Q
-from namito.catalog.models import Product, Brand  # Импортируем Brand
+from namito.catalog.models import Product
 
 class ProductFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(field_name="name", lookup_expr='icontains')
@@ -8,11 +8,7 @@ class ProductFilter(django_filters.FilterSet):
     max_price = django_filters.NumberFilter(field_name="variants__price", lookup_expr='lte')
     color = django_filters.CharFilter(field_name="variants__color__name", lookup_expr='iexact')
     size = django_filters.CharFilter(field_name="variants__size__name", lookup_expr='iexact')
-    brand = django_filters.ModelMultipleChoiceFilter(
-        field_name='brand',
-        queryset=Brand.objects.all(),  # Задаем queryset для брендов
-        lookup_expr='in'
-    )
+    brand = django_filters.MultipleChoiceFilter(field_name="brand__name", lookup_expr='in', choices=[])
     category = django_filters.CharFilter(field_name="category__name", lookup_expr='iexact')
     min_rating = django_filters.NumberFilter(method='filter_by_min_rating')
     has_discount = django_filters.BooleanFilter(method='filter_by_discount_presence')
@@ -20,6 +16,11 @@ class ProductFilter(django_filters.FilterSet):
     class Meta:
         model = Product
         fields = ['name', 'min_price', 'max_price', 'color', 'size', 'brand', 'category', 'min_rating', 'has_discount']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Populate the choices for the brand filter dynamically
+        self.filters['brand'].choices = [(brand.name, brand.name) for brand in Product.objects.values_list('brand__name', flat=True).distinct()]
 
     def filter_by_min_rating(self, queryset, name, value):
         queryset = queryset.annotate(avg_rating=Avg('ratings__score')).filter(avg_rating__gte=value)
@@ -69,8 +70,8 @@ class ProductFilter(django_filters.FilterSet):
             if 'size' in self.request.GET:
                 queryset = queryset.filter(variants__size__name__iexact=self.request.GET['size'])
             if 'brand' in self.request.GET:
-                # Используем фильтр по нескольким брендам
-                queryset = queryset.filter(brand__name__in=self.request.GET.getlist('brand'))
+                brand_values = self.request.GET.getlist('brand')
+                queryset = queryset.filter(brand__name__in=brand_values)
             if 'category' in self.request.GET:
                 queryset = queryset.filter(category__name__iexact=self.request.GET['category'])
             if 'min_rating' in self.request.GET:
