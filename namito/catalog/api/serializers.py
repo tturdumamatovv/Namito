@@ -1,6 +1,5 @@
 from django.db import models
 from django.db.models import Avg
-from django.core.cache import cache
 
 from rest_framework import serializers
 
@@ -11,7 +10,6 @@ from namito.catalog.models import (
     Size,
     Variant,
     Image,
-    Rating,
     Review,
     Favorite,
     Brand,
@@ -200,7 +198,6 @@ class ProductSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField()
     is_favorite = serializers.SerializerMethodField()
     cart_quantity = serializers.SerializerMethodField()
-    rating_count = serializers.SerializerMethodField()
     characteristics = CharacteristicsSerializer(many=True, read_only=True)
     brand = BrandSerializer(read_only=True, many=False)
     reviews = serializers.SerializerMethodField()
@@ -209,30 +206,19 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags',
-                  'brand', 'is_favorite', 'cart_quantity', 'rating_count', 'review_count', 'characteristics', 'reviews']
+                  'brand', 'is_favorite', 'cart_quantity', 'review_count', 'characteristics', 'reviews']
 
     def get_variants(self, product):
         variants_qs = Variant.objects.filter(product=product, stock__gt=0).order_by('-main')
         return VariantSerializer(variants_qs, many=True, context=self.context).data
 
     def get_average_rating(self, product):
-        # Проверяем кэш
-        cache_key = f"product_{product.id}_average_rating"
-        average_rating = cache.get(cache_key)
-
-        if average_rating is not None:
-            return average_rating
-
         # Рассчитайте средний рейтинг на основе отзывов
-        average_rating = Review.objects.filter(product=product).aggregate(Avg('rating'))['rating__avg']
+        reviews = Review.objects.filter(product=product)
+        average_rating = reviews.aggregate(Avg('rating'))['rating__avg']
 
         # Если средний рейтинг отсутствует, вернуть 0
-        average_rating = average_rating if average_rating is not None else 0
-
-        # Кэшируем результат на определенный период (например, 1 час)
-        cache.set(cache_key, average_rating, timeout=3600)
-
-        return average_rating
+        return average_rating if average_rating is not None else 0
 
     def get_tags(self, product):
         tags_qs = product.tags.all()
@@ -255,9 +241,6 @@ class ProductSerializer(serializers.ModelSerializer):
             return quantity if quantity else 0
         return 0
 
-    def get_rating_count(self, product):
-        count = Rating.objects.filter(product=product).count()
-        return count
 
     def get_characteristics(self, product):
         characteristics = Characteristic.objects.filter(product=product)
@@ -298,25 +281,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         for i in self.context.get('request').FILES.getlist('images'):
             ReviewImage.objects.create(review=review, image=i)
         return review
-
-
-class RatingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Rating
-        fields = ['id', 'product', 'user', 'score', 'created_at']
-
-    def create(self, validated_data):
-        rating, created = Rating.objects.update_or_create(
-            product=validated_data.get('product'),
-            user=validated_data.get('user'),
-            defaults={'score': validated_data.get('score')}
-        )
-        return rating
-
-    def update(self, instance, validated_data):
-        instance.score = validated_data.get('score', instance.score)
-        instance.save()
-        return instance
 
 
 class FavoriteSerializer(serializers.ModelSerializer):

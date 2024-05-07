@@ -18,7 +18,6 @@ from namito.catalog.models import (
     Variant,
     Image,
     Review,
-    Rating,
     Favorite,
     SizeChart,
     Brand
@@ -30,7 +29,7 @@ from .serializers import (
     SizeSerializer,
     VariantSerializer,
     ImageSerializer,
-    RatingSerializer,
+
     ReviewSerializer,
     FavoriteSerializer,
     BrandSerializer,
@@ -220,11 +219,6 @@ class ReviewCreate(generics.CreateAPIView):
 
         # Если все проверки прошли, создайте отзыв
         serializer.save(user=user)
-
-
-class RatingCreate(generics.CreateAPIView):
-    queryset = Rating.objects.all()
-    serializer_class = RatingSerializer
 
 
 class FavoriteToggleAPIView(APIView):

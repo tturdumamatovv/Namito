@@ -245,21 +245,6 @@ class ReviewImage(ProcessedImageModel):
         return f"Image for {self.review}"
 
 
-class Rating(models.Model):
-    product = models.ForeignKey(Product, related_name='ratings', on_delete=models.CASCADE, verbose_name=_("Product"))
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("User"))
-    score = models.PositiveIntegerField(default=4, verbose_name=_("Score"))
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Created at"))
-
-    def __str__(self):
-        return f"{self.score}/5 by {self.user.username}"
-
-    class Meta:
-        verbose_name = _("Rating")
-        verbose_name_plural = _("Ratings")
-        ordering = ["-created_at"]
-
-
 class Favorite(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorites')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='favorites')
