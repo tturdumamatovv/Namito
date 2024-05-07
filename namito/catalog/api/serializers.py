@@ -139,7 +139,7 @@ class ProductListSerializer(serializers.ModelSerializer):
         return {'price': 0, 'discount': 0}
 
     def get_average_rating(self, product):
-        average = Rating.objects.filter(product=product).aggregate(Avg('score'))['score__avg']
+        average = Review.objects.filter(product=product).aggregate(Avg('rating'))['rating__avg']
         if average is None:
             return 0
         return round(average, 2)
@@ -213,12 +213,10 @@ class ProductSerializer(serializers.ModelSerializer):
         return VariantSerializer(variants_qs, many=True, context=self.context).data
 
     def get_average_rating(self, product):
-        # Рассчитайте средний рейтинг на основе отзывов
-        reviews = Review.objects.filter(product=product)
-        average_rating = reviews.aggregate(Avg('rating'))['rating__avg']
-
-        # Если средний рейтинг отсутствует, вернуть 0
-        return average_rating if average_rating is not None else 0
+        average = Review.objects.filter(product=product).aggregate(Avg('rating'))['rating__avg']
+        if average is None:
+            return 0
+        return round(average, 2)
 
     def get_tags(self, product):
         tags_qs = product.tags.all()

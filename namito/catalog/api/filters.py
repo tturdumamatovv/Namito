@@ -19,21 +19,15 @@ class ProductFilter(django_filters.FilterSet):
         fields = ['name', 'min_price', 'max_price', 'brand', 'category', 'min_rating', 'has_discount', 'color', 'size']
 
     def filter_by_brands(self, queryset, name, value):
-        # Разделяем строку значений брендов по запятым
         brands = value.split(',')
-        # Применяем фильтр по множеству значений
         return queryset.filter(brand__name__in=brands)
 
     def filter_by_colors(self, queryset, name, value):
-        # Разделяем строку значений цветов по запятым
         colors = value.split(',')
-        # Применяем фильтр по множеству значений
         return queryset.filter(variants__color__name__in=colors)
 
     def filter_by_sizes(self, queryset, name, value):
-        # Разделяем строку значений размеров по запятым
         sizes = value.split(',')
-        # Применяем фильтр по множеству значений
         return queryset.filter(variants__size__name__in=sizes)
 
     def filter_by_min_rating(self, queryset, name, value):
