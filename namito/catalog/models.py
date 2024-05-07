@@ -267,6 +267,3 @@ class SizeChartItem(models.Model):
 
     def __str__(self):
         return self.size
-
-class Muha(models.Model):
-    muha = models.CharField(null=True, blank=True, max_length=100)
