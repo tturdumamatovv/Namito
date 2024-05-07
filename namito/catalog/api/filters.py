@@ -19,25 +19,22 @@ class ProductFilter(django_filters.FilterSet):
         fields = ['name', 'min_price', 'max_price', 'brand', 'category', 'min_rating', 'has_discount', 'color', 'size']
 
     def filter_by_brands(self, queryset, name, value):
-        # Получаем список значений для параметра brand
-        brands = self.request.GET.getlist('brand')
-        if brands:
-            queryset = queryset.filter(brand__name__in=brands)
-        return queryset
+        # Разделяем строку значений брендов по запятым
+        brands = value.split(',')
+        # Применяем фильтр по множеству значений
+        return queryset.filter(brand__name__in=brands)
 
     def filter_by_colors(self, queryset, name, value):
-        # Получаем список значений для параметра color
-        colors = self.request.GET.getlist('color')
-        if colors:
-            queryset = queryset.filter(variants__color__name__in=colors)
-        return queryset
+        # Разделяем строку значений цветов по запятым
+        colors = value.split(',')
+        # Применяем фильтр по множеству значений
+        return queryset.filter(variants__color__name__in=colors)
 
     def filter_by_sizes(self, queryset, name, value):
-        # Получаем список значений для параметра size
-        sizes = self.request.GET.getlist('size')
-        if sizes:
-            queryset = queryset.filter(variants__size__name__in=sizes)
-        return queryset
+        # Разделяем строку значений размеров по запятым
+        sizes = value.split(',')
+        # Применяем фильтр по множеству значений
+        return queryset.filter(variants__size__name__in=sizes)
 
     def filter_by_min_rating(self, queryset, name, value):
         queryset = queryset.annotate(avg_rating=Avg('ratings__score')).filter(avg_rating__gte=value)
