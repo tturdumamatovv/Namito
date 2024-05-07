@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Avg
+from django.core.cache import cache
 
 from rest_framework import serializers
 
@@ -215,12 +216,23 @@ class ProductSerializer(serializers.ModelSerializer):
         return VariantSerializer(variants_qs, many=True, context=self.context).data
 
     def get_average_rating(self, product):
+        # Проверяем кэш
+        cache_key = f"product_{product.id}_average_rating"
+        average_rating = cache.get(cache_key)
+
+        if average_rating is not None:
+            return average_rating
+
         # Рассчитайте средний рейтинг на основе отзывов
-        reviews = Review.objects.filter(product=product)
-        average_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+        average_rating = Review.objects.filter(product=product).aggregate(Avg('rating'))['rating__avg']
 
         # Если средний рейтинг отсутствует, вернуть 0
-        return average_rating if average_rating is not None else 0
+        average_rating = average_rating if average_rating is not None else 0
+
+        # Кэшируем результат на определенный период (например, 1 час)
+        cache.set(cache_key, average_rating, timeout=3600)
+
+        return average_rating
 
     def get_tags(self, product):
         tags_qs = product.tags.all()
