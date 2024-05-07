@@ -283,9 +283,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         review = Review.objects.create(**validated_data)
-        print(self.context.get('request').FILES.getlist('images'))
         for i in self.context.get('request').FILES.getlist('images'):
-            print(i)
             ReviewImage.objects.create(review=review, image=i)
         return review
 
