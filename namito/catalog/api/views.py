@@ -5,6 +5,7 @@ from django.db.models import Q
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
 
 from drf_yasg.utils import swagger_auto_schema
 from modeltranslation.translator import translator
@@ -41,6 +42,7 @@ from .serializers import (
 )
 from .pagination import CustomPageNumberPagination
 from .filters import ProductFilter
+from ...orders.models import OrderedItem
 
 
 class CategoryListView(generics.ListCreateAPIView):
@@ -194,9 +196,30 @@ class ProductReviewListView(generics.ListAPIView):
         return queryset
 
 
+
 class ReviewCreate(generics.CreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        product = serializer.validated_data['product']
+
+        # Получите все варианты данного продукта
+        variants = Variant.objects.filter(product=product)
+
+        # Проверьте, покупал ли пользователь любой из вариантов данного продукта
+        has_purchased_product = OrderedItem.objects.filter(
+            order__user=user,  # Фильтр по пользователю
+            product_variant__in=variants,  # Фильтр по вариантам продукта
+            order__status=1  # Убедитесь, что заказ завершен (status=1)
+        ).exists()
+
+        if not has_purchased_product:
+            raise PermissionDenied("You must have purchased the product to leave a review.")
+
+        # Если все проверки прошли, создайте отзыв
+        serializer.save(user=user)
 
 
 class RatingCreate(generics.CreateAPIView):

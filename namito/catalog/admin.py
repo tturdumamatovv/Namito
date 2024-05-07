@@ -25,7 +25,8 @@ from .models import (
     SizeChart,
     SizeChartItem,
     Tag,
-    Characteristic
+    Characteristic,
+    ReviewImage
 )
 
 
@@ -73,12 +74,24 @@ class VariantInline(nested_admin.NestedTabularInline):
     inlines = [ImageInline]
 
 
+class ReviewImageInline(nested_admin.NestedTabularInline):
+    model = ReviewImage
+    extra = 0
+    readonly_fields = ("get_image",)
+
+    def get_image(self, obj):
+        return mark_safe(f'<img src="{obj.image.url}" width="150" height="auto" />')
+
+    get_image.short_description = "Image Preview"
+
+
 class ReviewInline(nested_admin.NestedTabularInline):
     model = Review
     extra = 0
     show_change_link = False
-    fields = ['user', 'text']
+    fields = ['user', 'text', 'rating']
     can_delete = False
+    inlines = [ReviewImageInline]
 
 
 class CharacteristicsInline(nested_admin.NestedTabularInline):

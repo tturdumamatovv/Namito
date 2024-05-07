@@ -17,9 +17,11 @@ from namito.catalog.models import (
     SizeChartItem,
     SizeChart,
     Tag,
-    Characteristic
+    Characteristic,
+    ReviewImage
     )
 from namito.orders.models import CartItem
+from namito.users.models import User
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -200,21 +202,25 @@ class ProductSerializer(serializers.ModelSerializer):
     rating_count = serializers.SerializerMethodField()
     characteristics = CharacteristicsSerializer(many=True, read_only=True)
     brand = BrandSerializer(read_only=True, many=False)
+    reviews = serializers.SerializerMethodField()
+    review_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags',
-                  'brand', 'is_favorite', 'cart_quantity', 'rating_count', 'characteristics']
+                  'brand', 'is_favorite', 'cart_quantity', 'rating_count', 'review_count', 'characteristics', 'reviews']
 
     def get_variants(self, product):
         variants_qs = Variant.objects.filter(product=product, stock__gt=0).order_by('-main')
         return VariantSerializer(variants_qs, many=True, context=self.context).data
 
     def get_average_rating(self, product):
-        average = Rating.objects.filter(product=product).aggregate(Avg('score'))['score__avg']
-        if average is None:
-            return 0
-        return round(average, 2)
+        # Рассчитайте средний рейтинг на основе отзывов
+        reviews = Review.objects.filter(product=product)
+        average_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+
+        # Если средний рейтинг отсутствует, вернуть 0
+        return average_rating if average_rating is not None else 0
 
     def get_tags(self, product):
         tags_qs = product.tags.all()
@@ -245,11 +251,43 @@ class ProductSerializer(serializers.ModelSerializer):
         characteristics = Characteristic.objects.filter(product=product)
         return CharacteristicsSerializer(characteristics, many=True).data
 
+    def get_reviews(self, product):
+        reviews_qs = Review.objects.filter(product=product)
+        return ReviewSerializer(reviews_qs, many=True, context=self.context).data
+
+    def get_review_count(self, product):
+        # Подсчитайте количество отзывов для продукта
+        review_count = Review.objects.filter(product=product).count()
+        return review_count
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'name', 'profile_picture']
+
+
+class ReviewImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReviewImage
+        fields = ['id', 'image', 'main_image']
+
 
 class ReviewSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    images = ReviewImageSerializer(many=True, required=False)
+
     class Meta:
         model = Review
-        fields = ['id', 'product', 'user', 'text', 'created_at', 'updated_at']
+        fields = ['id', 'product', 'user', 'text', 'created_at', 'updated_at', 'rating', 'images']
+
+    def create(self, validated_data):
+        review = Review.objects.create(**validated_data)
+        print(self.context.get('request').FILES.getlist('images'))
+        for i in self.context.get('request').FILES.getlist('images'):
+            print(i)
+            ReviewImage.objects.create(review=review, image=i)
+        return review
 
 
 class RatingSerializer(serializers.ModelSerializer):

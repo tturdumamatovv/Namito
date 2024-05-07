@@ -225,6 +225,7 @@ class Review(models.Model):
     text = models.TextField(verbose_name=_("Text"))
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Created at"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("Updated at"))
+    rating = models.IntegerField(default=0, choices=[(i, str(i)) for i in range(1, 6)])
 
     def __str__(self):
         return f"{self.created_at} by {self.user}"
