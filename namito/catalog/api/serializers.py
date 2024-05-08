@@ -286,6 +286,8 @@ class ReviewImageSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     images = ReviewImageSerializer(many=True, required=False)
+    created_at = serializers.DateTimeField(format='%d.%m.%Y', read_only=True)
+    updated_at = serializers.DateTimeField(format='%d.%m.%Y', read_only=True)
 
     class Meta:
         model = Review
