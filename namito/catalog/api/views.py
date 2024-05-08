@@ -5,7 +5,7 @@ from django.db.models import Q
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from drf_yasg.utils import swagger_auto_schema
 from modeltranslation.translator import translator
@@ -204,26 +204,21 @@ class ReviewCreate(generics.CreateAPIView):
         user = self.request.user
         product = serializer.validated_data.get('product')
 
-        # Если продукт не был передан в `validated_data`, вернуть ошибку
         if not product:
             raise ValidationError("Product is required to create a review.")
 
-        # Проверить, имеет ли пользователь право оставить отзыв на этот продукт
         if not self.user_can_review_product(user, product):
             raise PermissionDenied("You must have purchased the product to leave a review.")
 
-        # Если пользователь имеет право, создать отзыв
         serializer.save(user=user)
 
     def user_can_review_product(self, user, product):
-        # Получите все варианты данного продукта
         variants = Variant.objects.filter(product=product)
 
-        # Проверьте, покупал ли пользователь любой из вариантов данного продукта
         return OrderedItem.objects.filter(
             order__user=user,
             product_variant__in=variants,
-            order__status=1  # Проверка завершенного заказа (status=1)
+            order__status=1
         ).exists()
 
 
