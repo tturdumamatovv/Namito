@@ -274,7 +274,7 @@ class ProductSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'name', 'profile_picture']
+        fields = ['id', 'full_name', 'profile_picture']
 
 
 class ReviewImageSerializer(serializers.ModelSerializer):
