@@ -19,7 +19,7 @@ from namito.catalog.models import (
     Characteristic,
     ReviewImage
     )
-from namito.orders.models import CartItem
+from namito.orders.models import CartItem, OrderedItem
 from namito.users.models import User
 
 
@@ -202,11 +202,12 @@ class ProductSerializer(serializers.ModelSerializer):
     brand = BrandSerializer(read_only=True, many=False)
     reviews = serializers.SerializerMethodField()
     review_count = serializers.SerializerMethodField()
+    review_allowed = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags',
-                  'brand', 'is_favorite', 'cart_quantity', 'review_count', 'characteristics', 'reviews']
+        fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags', 'brand', 'is_favorite',
+                  'cart_quantity', 'review_count', 'characteristics', 'reviews', 'review_allowed']
 
     def get_variants(self, product):
         variants_qs = Variant.objects.filter(product=product, stock__gt=0).order_by('-main')
@@ -252,6 +253,22 @@ class ProductSerializer(serializers.ModelSerializer):
         # Подсчитайте количество отзывов для продукта
         review_count = Review.objects.filter(product=product).count()
         return review_count
+
+    def get_review_allowed(self, product):
+        user = self.context.get('request').user
+        if user.is_authenticated:
+            # Получите все варианты данного продукта
+            variants = Variant.objects.filter(product=product)
+
+            # Проверьте, покупал ли пользователь любой из вариантов данного продукта
+            has_purchased_product = OrderedItem.objects.filter(
+                order__user=user,
+                product_variant__in=variants,
+                order__status=1  # Убедитесь, что заказ завершен (status=1)
+            ).exists()
+
+            return has_purchased_product
+        return False
 
 
 class UserSerializer(serializers.ModelSerializer):

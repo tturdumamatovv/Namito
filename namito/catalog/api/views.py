@@ -202,23 +202,29 @@ class ReviewCreate(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         user = self.request.user
-        product = serializer.validated_data['product']
+        product = serializer.validated_data.get('product')
 
+        # Если продукт не был передан в `validated_data`, вернуть ошибку
+        if not product:
+            raise ValidationError("Product is required to create a review.")
+
+        # Проверить, имеет ли пользователь право оставить отзыв на этот продукт
+        if not self.user_can_review_product(user, product):
+            raise PermissionDenied("You must have purchased the product to leave a review.")
+
+        # Если пользователь имеет право, создать отзыв
+        serializer.save(user=user)
+
+    def user_can_review_product(self, user, product):
         # Получите все варианты данного продукта
         variants = Variant.objects.filter(product=product)
 
         # Проверьте, покупал ли пользователь любой из вариантов данного продукта
-        has_purchased_product = OrderedItem.objects.filter(
-            order__user=user,  # Фильтр по пользователю
-            product_variant__in=variants,  # Фильтр по вариантам продукта
-            order__status=1  # Убедитесь, что заказ завершен (status=1)
+        return OrderedItem.objects.filter(
+            order__user=user,
+            product_variant__in=variants,
+            order__status=1  # Проверка завершенного заказа (status=1)
         ).exists()
-
-        if not has_purchased_product:
-            raise PermissionDenied("You must have purchased the product to leave a review.")
-
-        # Если все проверки прошли, создайте отзыв
-        serializer.save(user=user)
 
 
 class FavoriteToggleAPIView(APIView):
