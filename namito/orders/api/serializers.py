@@ -147,7 +147,6 @@ class OrderHistorySerializer(ModelSerializer):
 
 
 class OrderListSerializer(serializers.ModelSerializer):
-    created_at = serializers.DateTimeField(format='%d %B %Y', read_only=True)
     total_amount = serializers.IntegerField()
 
     class Meta:
