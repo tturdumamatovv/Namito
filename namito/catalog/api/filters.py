@@ -31,7 +31,11 @@ class ProductFilter(django_filters.FilterSet):
         return queryset.filter(variants__size__name__in=sizes)
 
     def filter_by_min_rating(self, queryset, name, value):
-        queryset = queryset.annotate(avg_rating=Avg('ratings__score')).filter(avg_rating__gte=value)
+        queryset = queryset.annotate(
+            avg_rating=Avg('reviews__rating')  # Обратите внимание на путь к рейтингу
+        ).filter(
+            Q(avg_rating__gte=value) | Q(avg_rating__isnull=False)
+        )
         return queryset.distinct()
 
     def filter_by_discount_presence(self, queryset, name, value):
