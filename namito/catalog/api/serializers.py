@@ -301,7 +301,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)
+    product = ProductListSerializer(read_only=True)
 
     class Meta:
         model = Favorite
