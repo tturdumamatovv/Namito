@@ -27,7 +27,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         if not ret['profile_picture']:
-            ret['profile_picture'] = settings.DEFAULT_PROFILE_PICTURE_URL  # Путь к вашей дефолтной фотографии
+            ret['profile_picture'] = settings.DEFAULT_PROFILE_PICTURE_URL
         return ret
 
 
