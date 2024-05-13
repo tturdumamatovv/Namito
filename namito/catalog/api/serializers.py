@@ -102,7 +102,15 @@ class VariantSerializer(serializers.ModelSerializer):
 
     def get_images(self, variant):
         images_qs = Image.objects.filter(variant=variant).order_by('-main_image')
-        return ImageSerializer(images_qs, many=True, context=self.context).data
+        images_data = ImageSerializer(images_qs, many=True, context=self.context).data
+
+        # Check if images_data is empty, indicating no images found
+        if not images_data:
+            # Add default image URL to images_data
+            default_image_url = settings.DEFAULT_PRODUCT_URL
+            images_data.append({'image': default_image_url})
+
+        return images_data
 
     @staticmethod
     def get_discounted_price(variant):
