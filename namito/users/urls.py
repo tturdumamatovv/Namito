@@ -7,7 +7,8 @@ from namito.users.api.views import (
     UserAddressCreateAPIView,
     UserAddressUpdateAPIView,
     UserAddressDeleteAPIView,
-    google_login
+    google_login,
+    UserDeleteAPIView
     )
 
 urlpatterns = [
@@ -18,4 +19,5 @@ urlpatterns = [
     path('addresses/<int:pk>/update/', UserAddressUpdateAPIView.as_view(), name='update_address'),
     path('addresses/<int:pk>/delete/', UserAddressDeleteAPIView.as_view(), name='delete_address'),
     path('google/', google_login, name='google_login'),
+    path('delete/', UserDeleteAPIView.as_view(), name='user-delete'),
 ]
