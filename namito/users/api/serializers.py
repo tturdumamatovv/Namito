@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from django.conf import settings
 from namito.users.models import User
 from namito.users.models import UserAddress
 
@@ -17,10 +18,17 @@ class VerifyCodeSerializer(serializers.Serializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(read_only=True)
+    profile_picture = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = User
         fields = ('id', 'phone_number', 'profile_picture', 'full_name', 'date_of_birth', 'email', 'first_visit')
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if not ret['profile_picture']:
+            ret['profile_picture'] = settings.DEFAULT_PROFILE_PICTURE_URL  # Путь к вашей дефолтной фотографии
+        return ret
 
 
 class UserAddressSerializer(serializers.ModelSerializer):

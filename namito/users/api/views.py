@@ -1,9 +1,12 @@
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+
 from firebase_admin import auth as firebase_auth
 import firebase_admin
 from firebase_admin import credentials
@@ -96,6 +99,12 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
 
     def put(self, request, *args, **kwargs):
         instance = self.get_object()
+        profile_picture = request.data.get('profile_picture')
+
+        # Если пользователь не загрузил фотографию, устанавливаем дефолтную
+        if not profile_picture and not instance.profile_picture:
+            instance.profile_picture = settings.DEFAULT_PROFILE_PICTURE_URL
+
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
