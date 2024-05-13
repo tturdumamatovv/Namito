@@ -200,6 +200,11 @@ class ProductListSerializer(serializers.ModelSerializer):
         characteristics = Characteristic.objects.filter(product=product)
         return CharacteristicsSerializer(characteristics, many=True).data
 
+    def to_representation(self, instance):
+        if not instance.active:
+            return None
+        return super().to_representation(instance)
+
 
 class CharacteristicsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -225,7 +230,7 @@ class ProductSerializer(serializers.ModelSerializer):
                   'cart_quantity', 'review_count', 'characteristics', 'reviews', 'review_allowed']
 
     def get_variants(self, product):
-        variants_qs = Variant.objects.filter(product=product, stock__gt=0).order_by('-main')
+        variants_qs = Variant.objects.filter(product=product, stock__gt=0, product__active=True).order_by('-main')
         return VariantSerializer(variants_qs, many=True, context=self.context).data
 
     def get_average_rating(self, product):
@@ -284,6 +289,11 @@ class ProductSerializer(serializers.ModelSerializer):
 
             return has_purchased_product
         return False
+
+    def to_representation(self, instance):
+        if not instance.active:
+            return None
+        return super().to_representation(instance)
 
 
 class UserSerializer(serializers.ModelSerializer):

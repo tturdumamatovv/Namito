@@ -113,6 +113,7 @@ class Product(models.Model):
     is_top = models.BooleanField(default=False)
     is_new = models.BooleanField(default=False)
     sku = models.CharField(max_length=50, unique=True, blank=True, null=True)
+    active = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
         if not self.sku:
