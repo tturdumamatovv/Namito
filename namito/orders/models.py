@@ -42,7 +42,7 @@ class OrderHistory(models.Model):
 
 class OrderedItem(models.Model):
     order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name='ordered_items')
-    product_variant = models.ForeignKey(Variant, on_delete=models.CASCADE, related_name='ordered_items')
+    product_variant = models.ForeignKey(Variant, on_delete=models.PROTECT, related_name='ordered_items')
     quantity = models.PositiveIntegerField(default=1)
 
     def subtotal(self):

@@ -104,7 +104,7 @@ class CharacteristicsInline(nested_admin.NestedTabularInline):
 @admin.register(Product)
 class ProductAdmin(nested_admin.NestedModelAdmin):
     form = ProductForm
-    list_display = ['name_ru', 'name_en', 'category']
+    list_display = ['name_ru', 'name_en', 'category', 'active']
     search_fields = ['name', 'category__name']
     inlines = [CharacteristicsInline, VariantInline, ReviewInline]
 
