@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Avg
+from django.conf import settings
 
 from rest_framework import serializers
 
@@ -179,6 +180,12 @@ class ProductListSerializer(serializers.ModelSerializer):
                     'variant_id': variant.id,
                     'image_url': image_url
                 })
+            else:
+                images_data.append({
+                    'variant_id': variant.id,
+                    'image_url': settings.DEFAULT_PRODUCT_URL
+                })
+
         return images_data
 
     def get_characteristics(self, product):
