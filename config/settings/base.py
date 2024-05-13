@@ -333,7 +333,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
 }
 
-DEFAULT_PROFILE_PICTURE_URL = "https://avatars.githubusercontent.com/u/108809880?s=400&u=72c66f05cfdcc57fd9c07e3681c6cc1be1d37ff8&v=4"
+DEFAULT_PROFILE_PICTURE_URL = "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=14),
