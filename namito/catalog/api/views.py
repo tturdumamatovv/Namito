@@ -177,12 +177,15 @@ class ImageDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class UserReviewListView(generics.ListAPIView):
     serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         queryset = Review.objects.all()
-        user_id = self.request.user.id
-        if user_id:
-            queryset = queryset.filter(user_id=user_id)
+        user = self.request.user
+        if user.is_authenticated:
+            queryset = queryset.filter(user=user)
+        else:
+            raise PermissionDenied(detail="Authentication credentials were not provided.")
         return queryset
 
 
