@@ -63,22 +63,23 @@ class OrderedItemSerializer(ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderedItemSerializer(many=True, read_only=True, source='ordered_items')
     total_amount = serializers.IntegerField(read_only=True)
-    delivery_address = serializers.PrimaryKeyRelatedField(
-        queryset=UserAddress.objects.all(), required=False, source='user_address'
+    user_address = serializers.PrimaryKeyRelatedField(
+        queryset=UserAddress.objects.all(), required=False
     )
 
     class Meta:
         model = Order
         fields = [
             'id', 'cart', 'total_amount', 'payment_status', 'status', 'created_at', 'finished_at',
-            'items', 'delivery_method', 'delivery_address', 'payment_method'
+            'items', 'delivery_method', 'user_address', 'payment_method'
         ]
         read_only_fields = ['cart', 'total_amount', 'created_at', 'finished_at']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        # Use the detail serializer to represent user_address in the response
         user_address_serializer = UserAddressDetailSerializer(instance.user_address)
-        representation['delivery_address'] = user_address_serializer.data
+        representation['user_address'] = user_address_serializer.data
         return representation
 
     def create(self, validated_data):
@@ -90,44 +91,26 @@ class OrderSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("There are no items to purchase in the cart.")
 
         delivery_method = validated_data.get('delivery_method', 'курьером')
-        delivery_address_id = validated_data.get('user_address')  # Using 'user_address' as source
-
+        user_address = validated_data.get('user_address')  # This will be an ID
         payment_method = validated_data.get('payment_method', 'картой')
 
-        # Check if delivery address is required
-        if delivery_method == 'курьером':
-            if not delivery_address_id:
-                raise serializers.ValidationError("Delivery address is required for courier delivery.")
-
-            user_address = None
-            if delivery_address_id:
-                try:
-                    user_address = UserAddress.objects.get(id=delivery_address_id, user=user)
-                except UserAddress.DoesNotExist:
-                    raise serializers.ValidationError(
-                        "The provided delivery address does not exist or does not belong to the user.")
-            else:
-                # Create a new address if none is provided
-                address_data = self.context['request'].data.get('delivery_address_data')
-                if not address_data:
-                    raise serializers.ValidationError("Address data is required to create a new delivery address.")
-
-                user_address_serializer = UserAddressDetailSerializer(data=address_data)
-                if user_address_serializer.is_valid(raise_exception=True):
-                    user_address = user_address_serializer.save(user=user)
+        if delivery_method == 'курьером' and not user_address:
+            raise serializers.ValidationError("Delivery address is required for courier delivery.")
 
         total_amount = 0
 
         with transaction.atomic():
+            # Create order with initial values
             order = Order.objects.create(
                 user=user,
                 cart=cart,
-                total_amount=0,
+                total_amount=0,  # Initial total_amount
                 delivery_method=delivery_method,
                 user_address=user_address,
                 payment_method=payment_method
             )
 
+            # Calculate total_amount and create ordered items
             for item in items_to_purchase:
                 price = item.product_variant.get_price()
                 total_amount += price * item.quantity
@@ -138,17 +121,20 @@ class OrderSerializer(serializers.ModelSerializer):
                     quantity=item.quantity
                 )
 
+            # Set the calculated total_amount
             order.total_amount = total_amount
             order.save()
 
+            # Remove the purchased items from the cart
             items_to_purchase.delete()
 
         return order
 
     def update(self, instance, validated_data):
+        # Handle delivery method and user_address for updates
         if 'delivery_method' in validated_data and validated_data['delivery_method'] == 'курьером':
-            delivery_address_id = validated_data.get('user_address')
-            if delivery_address_id is None:
+            user_address_id = validated_data.get('user_address')
+            if user_address_id is None:
                 raise serializers.ValidationError("Delivery address is required for courier delivery.")
 
         return super().update(instance, validated_data)
