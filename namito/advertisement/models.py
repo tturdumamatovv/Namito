@@ -15,3 +15,6 @@ class Advertisement(models.Model):
     class Meta:
         verbose_name = _('Рекламу')
         verbose_name_plural = _('Рекламы')
+
+    def __str__(self):
+        return f'{self.title}'

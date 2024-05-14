@@ -74,7 +74,7 @@ class Category(MPTTModel, models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name
+        return f'{self.name}'
 
 
 class Brand(models.Model):
@@ -83,7 +83,7 @@ class Brand(models.Model):
                              help_text="The logo of the brand", verbose_name=_('Логотип'))
 
     def __str__(self):
-        return self.name
+        return f'{self.name}'
 
     class Meta:
         verbose_name = "Бренд"
@@ -99,7 +99,7 @@ class Tag(models.Model):
         verbose_name_plural = "Теги"
 
     def __str__(self):
-        return self.name
+        return f'{self.name}'
 
 
 class Product(models.Model):
@@ -148,10 +148,10 @@ class Product(models.Model):
             return ""
 
     def generate_meta_title(self):
-        return self.name[:59]
+        return f'{self.name[:59]}'
 
     def __str__(self):
-        return self.name
+        return f'{self.name}'
 
 
 class Characteristic(models.Model):
@@ -164,7 +164,7 @@ class Characteristic(models.Model):
         verbose_name_plural = "Характеристики"
 
     def __str__(self):
-        return self.key
+        return f'{self.key}'
 
 
 class Color(models.Model):
@@ -176,7 +176,7 @@ class Color(models.Model):
         verbose_name_plural = "Цвета"
 
     def __str__(self):
-        return self.name
+        return f'{self.name}'
 
 
 class Size(models.Model):
@@ -188,24 +188,24 @@ class Size(models.Model):
         verbose_name_plural = "Размеры"
 
     def __str__(self):
-        return self.name
+        return f'{self.name}'
 
 
 class Variant(models.Model):
-    product = models.ForeignKey(Product, related_name='variants', on_delete=models.CASCADE)
-    color = models.ForeignKey(Color, on_delete=models.PROTECT, related_name='variants')
-    size = models.ForeignKey(Size, on_delete=models.PROTECT, related_name='variants')
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    stock = models.PositiveIntegerField(blank=True, null=True)
-    main = models.BooleanField(default=False)
+    product = models.ForeignKey(Product, related_name='variants', on_delete=models.CASCADE, verbose_name=_(''))
+    color = models.ForeignKey(Color, on_delete=models.PROTECT, related_name='variants', verbose_name=_(''))
+    size = models.ForeignKey(Size, on_delete=models.PROTECT, related_name='variants', verbose_name=_(''))
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_(''))
+    stock = models.PositiveIntegerField(blank=True, null=True, verbose_name=_(''))
+    main = models.BooleanField(default=False, verbose_name=_(''))
     DISCOUNT_TYPE_CHOICES = [
         ('percent', _("Percent")),
         ('unit', _("Unit")),
     ]
     discount_value = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text=_(
-        "Discount amount, either in percentage or fixed unit based on the discount type."))
+        "Discount amount, either in percentage or fixed unit based on the discount type."), verbose_name=_(''))
     discount_type = models.CharField(default=0, max_length=7, choices=DISCOUNT_TYPE_CHOICES, blank=True, null=True,
-                                     help_text=_("Type of the discount - either a percent or a fixed unit."))
+                                     help_text=_("Type of the discount - either a percent or a fixed unit."), verbose_name=_(''))
 
     class Meta:
         verbose_name = 'Вариант'
@@ -300,7 +300,7 @@ class SizeChart(models.Model):
         verbose_name_plural = _("Карты размеров")
 
     def __str__(self):
-        return self.name
+        return f'{self.name}'
 
 
 class SizeChartItem(models.Model):
@@ -312,4 +312,4 @@ class SizeChartItem(models.Model):
         verbose_name_plural = _("Элементы карты размеров")
 
     def __str__(self):
-        return self.size
+        return f'{self.size}'
