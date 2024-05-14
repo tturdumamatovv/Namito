@@ -6,7 +6,6 @@ from namito.catalog.models import ProcessedImageModel
 
 
 class SingletonModel(models.Model):
-
     class Meta:
         abstract = True
 
@@ -42,6 +41,7 @@ class MainPage(SingletonModel):
 
     class Meta:
         verbose_name = _('Главная страница')
+        verbose_name_plural = _("Главная страница")
 
 
 class MainPageSlider(models.Model):
@@ -53,18 +53,19 @@ class MainPageSlider(models.Model):
 
     class Meta:
         verbose_name = _('Слайдер')
+        verbose_name_plural = _("Слайдер")
 
 
 class StaticPage(ProcessedImageModel):
-    title = models.CharField(max_length=200, unique=True)
-    slug = models.SlugField(max_length=200, unique=True, blank=True)
-    content = models.TextField()
-    image = models.ImageField(upload_to='static_pages/', blank=True, null=True)
-    meta_title = models.CharField(max_length=60, blank=True, null=True)
-    meta_description = models.CharField(max_length=160, blank=True, null=True)
-    meta_image = models.ImageField(upload_to='static_pages_meta/', blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    title = models.CharField(max_length=200, unique=True, verbose_name=_('Заголовок'))
+    slug = models.SlugField(max_length=200, unique=True, blank=True, verbose_name=_('Слаг'))
+    content = models.TextField(verbose_name=_('Контент'))
+    image = models.ImageField(upload_to='static_pages/', blank=True, null=True, verbose_name=_('Изображение'))
+    meta_title = models.CharField(max_length=60, blank=True, null=True, verbose_name=_('Мета заголовок'))
+    meta_description = models.CharField(max_length=160, blank=True, null=True, verbose_name=_('Мета описание'))
+    meta_image = models.ImageField(upload_to='static_pages_meta/', blank=True, null=True, verbose_name=_('Мета описание'))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('Время создания'))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_('Время обновления'))
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -75,6 +76,6 @@ class StaticPage(ProcessedImageModel):
         return self.title
 
     class Meta:
-        verbose_name = 'Static Page'
-        verbose_name_plural = 'Static Pages'
+        verbose_name = 'Статичные страницы'
+        verbose_name_plural = 'Статичные страницы'
         ordering = ['title']

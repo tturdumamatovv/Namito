@@ -42,20 +42,21 @@ class Category(MPTTModel, models.Model):
         (2, _("For children")),
         (3, _("Unisex"))
     ]
-    name = models.CharField(max_length=255)
-    type = models.IntegerField(choices=CATEGORY_TYPES, default=3)
-    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
-    image = models.ImageField(null=True, blank=True)
-    background_color = ColorField(default='#FF0000', null=True)
+    name = models.CharField(max_length=255, verbose_name=_('Название'))
+    type = models.IntegerField(choices=CATEGORY_TYPES, default=3, verbose_name=_('Тип'))
+    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True, verbose_name=_('Слаг'))
+    image = models.ImageField(null=True, blank=True, verbose_name=_('Изображение'))
+    background_color = ColorField(default='#FF0000', null=True, verbose_name=_('Фоновый цвет'))
     parent = TreeForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True,
-                            related_name="children", verbose_name=_("Parent category"))
-    order = models.PositiveIntegerField(default=0, editable=False, db_index=True)
-    meta_title = models.CharField(max_length=59, blank=True)
-    meta_description = models.CharField(max_length=160, blank=True)
-    promotion = models.BooleanField(default=False)
+                            related_name="children", verbose_name=_("Родительская категория"))
+    order = models.PositiveIntegerField(default=0, editable=False, db_index=True, verbose_name=_('Порядок'))
+    meta_title = models.CharField(max_length=59, blank=True, verbose_name=_('Мета заголовок'))
+    meta_description = models.CharField(max_length=160, blank=True, verbose_name=_('Мета описание'))
+    promotion = models.BooleanField(default=False, verbose_name=_('Продвижение'))
 
     class Meta:
-        verbose_name_plural = _("Categories")
+        verbose_name = _("Категория")
+        verbose_name_plural = _("Категории")
         ordering = ["order", "name"]
 
     class MPTTMeta:
@@ -77,43 +78,52 @@ class Category(MPTTModel, models.Model):
 
 
 class Brand(models.Model):
-    name = models.CharField(max_length=255, unique=True, help_text="The name of the brand")
+    name = models.CharField(max_length=255, unique=True, help_text="The name of the brand", verbose_name=_('Название'))
     logo = models.ImageField(upload_to='brand_logos/', blank=True, null=True,
-                             help_text="The logo of the brand")
+                             help_text="The logo of the brand", verbose_name=_('Логотип'))
 
     def __str__(self):
         return self.name
 
     class Meta:
-        verbose_name = "Brand"
-        verbose_name_plural = "Brands"
+        verbose_name = "Бренд"
+        verbose_name_plural = "Бренды"
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=30)
-    color = ColorField(default='#FFFFFF', null=True)
+    name = models.CharField(max_length=30, verbose_name=_('Название'))
+    color = ColorField(default='#FFFFFF', null=True, verbose_name=_('Цвет'))
+
+    class Meta:
+        verbose_name = "Тег"
+        verbose_name_plural = "Теги"
 
     def __str__(self):
         return self.name
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField()
+    name = models.CharField(max_length=100, verbose_name=_('Название'))
+    description = models.TextField(verbose_name=_('Описание'))
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE,
-                                 verbose_name=_("Category"))
+                                 verbose_name=_("Категория"))
     brand = models.ForeignKey(Brand, related_name='products', on_delete=models.PROTECT,
-                              blank=True, null=True)
-    meta_title = models.CharField(max_length=59, blank=True, null=True)
-    meta_description = models.TextField(blank=True, null=True)
-    meta_image = models.ImageField(upload_to='product_meta_images/', blank=True, null=True)
-    keywords = models.JSONField(null=True, blank=True)
-    min_price = models.PositiveIntegerField(default=0)
-    tags = models.ManyToManyField(Tag, blank=True)
-    is_top = models.BooleanField(default=False)
-    is_new = models.BooleanField(default=False)
-    sku = models.CharField(max_length=50, unique=True, blank=True, null=True)
-    active = models.BooleanField(default=True)
+                              blank=True, null=True, verbose_name=_('Бренд'))
+    meta_title = models.CharField(max_length=59, blank=True, null=True, verbose_name=_('Мета заголовок'))
+    meta_description = models.TextField(blank=True, null=True, verbose_name=_('Мета описание'))
+    meta_image = models.ImageField(upload_to='product_meta_images/', blank=True, null=True,
+                                   verbose_name=_('Мета картинка'))
+    keywords = models.JSONField(null=True, blank=True, verbose_name=_('Ключевые слова'))
+    min_price = models.PositiveIntegerField(default=0, verbose_name=_('Минимальная цена'))
+    tags = models.ManyToManyField(Tag, blank=True, verbose_name=_('Теги'))
+    is_top = models.BooleanField(default=False, verbose_name=_('Топ продукт'))
+    is_new = models.BooleanField(default=False, verbose_name=_('Новый продукт'))
+    sku = models.CharField(max_length=50, unique=True, blank=True, null=True, verbose_name=_('Артикул'))
+    active = models.BooleanField(default=True, verbose_name=_('Активность'))
+
+    class Meta:
+        verbose_name = "Продукт"
+        verbose_name_plural = "Продукты"
 
     def save(self, *args, **kwargs):
         if not self.sku:
@@ -145,25 +155,37 @@ class Product(models.Model):
 
 
 class Characteristic(models.Model):
-    key = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Key'))
-    value = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Value'))
+    key = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Ключь'))
+    value = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Значение'))
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='characteristics')
+
+    class Meta:
+        verbose_name = "Характеристика"
+        verbose_name_plural = "Характеристики"
 
     def __str__(self):
         return self.key
 
 
 class Color(models.Model):
-    name = models.CharField(max_length=50)
-    color = ColorField(default='#FFFFFF')
+    name = models.CharField(max_length=50, verbose_name=_('Название'))
+    color = ColorField(default='#FFFFFF', verbose_name=_('Хекс'))
+
+    class Meta:
+        verbose_name = "Цвет"
+        verbose_name_plural = "Цвета"
 
     def __str__(self):
         return self.name
 
 
 class Size(models.Model):
-    name = models.CharField(max_length=50)
-    description = models.CharField(max_length=100, blank=True)
+    name = models.CharField(max_length=50, verbose_name=_('Название'))
+    description = models.CharField(max_length=100, blank=True, verbose_name=_('Описание'))
+
+    class Meta:
+        verbose_name = "Размер"
+        verbose_name_plural = "Размеры"
 
     def __str__(self):
         return self.name
@@ -185,6 +207,10 @@ class Variant(models.Model):
     discount_type = models.CharField(default=0, max_length=7, choices=DISCOUNT_TYPE_CHOICES, blank=True, null=True,
                                      help_text=_("Type of the discount - either a percent or a fixed unit."))
 
+    class Meta:
+        verbose_name = 'Вариант'
+        verbose_name_plural = 'Варианты'
+
     def __str__(self):
         return f"{self.product.name} - {self.color} - {self.size}"
 
@@ -203,6 +229,10 @@ class Image(ProcessedImageModel):
     small_image = models.ImageField(upload_to='product_images/', blank=True, null=True)
     main_image = models.BooleanField(default=False)
     variant = models.ForeignKey(Variant, related_name='images', on_delete=models.CASCADE, null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Изображение'
+        verbose_name_plural = 'Изображения'
 
     def save(self, *args, **kwargs):
         self.process_image()
@@ -232,8 +262,8 @@ class Review(models.Model):
         return f"{self.created_at} by {self.user}"
 
     class Meta:
-        verbose_name = _("Review")
-        verbose_name_plural = _("Reviews")
+        verbose_name = _("Отзыв")
+        verbose_name_plural = _("Отзывы")
         ordering = ["-created_at"]
 
 
@@ -241,6 +271,10 @@ class ReviewImage(ProcessedImageModel):
     review = models.ForeignKey(Review, related_name='images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='review_images/')
     main_image = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = _("Картинка отзыва")
+        verbose_name_plural = _("Картинки отзывов")
 
     def __str__(self):
         return f"Image for {self.review}"
@@ -253,10 +287,17 @@ class Favorite(models.Model):
     class Meta:
         unique_together = ['user', 'product']
 
+        verbose_name = _("Лайк")
+        verbose_name_plural = _("Лайки")
+
 
 class SizeChart(models.Model):
     categories = models.ManyToManyField(Category, related_name='size_charts')
     name = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = _("Карта размеров")
+        verbose_name_plural = _("Карты размеров")
 
     def __str__(self):
         return self.name
@@ -265,6 +306,10 @@ class SizeChart(models.Model):
 class SizeChartItem(models.Model):
     size_cart = models.ForeignKey(SizeChart, on_delete=models.CASCADE)
     size = models.CharField(max_length=10)
+
+    class Meta:
+        verbose_name = _("Элемент карты размеров")
+        verbose_name_plural = _("Элементы карты размеров")
 
     def __str__(self):
         return self.size

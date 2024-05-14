@@ -186,11 +186,15 @@ MIDDLEWARE = [
 # STATIC_URL = "/static/"
 # # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 
+# STATIC_URL = 'static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+#
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'assets'),
+# ]
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'assets'),
+    os.path.join(BASE_DIR, 'static'),
 ]
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATICFILES_FINDERS = [
@@ -367,26 +371,28 @@ SIMPLEUI_HOME_INFO = False
 SIMPLEUI_HOME_ACTION = False
 SIMPLEUI_HOME_QUICK = True
 SIMPLEUI_INDEX = '#'
+SIMPLEUI_LOGO = '/admin/logo/logo.png'
+
 
 SIMPLEUI_CONFIG = {
     'system_keep': False,
     'menus': [
         {
-            'name': 'Catalog',
+            'name': 'Каталог',
             'icon': 'fa fa-book',
             'models': [
                 {
-                    'name': 'Categories',
+                    'name': 'Категории',
                     'icon': 'fa fa-list',
                     'url': '/admin/catalog/category/'
                 },
                 {
-                    'name': 'Brands',
+                    'name': 'Бренды',
                     'icon': 'fa fa-money-bill',
                     'url': '/admin/catalog/brand/'
                 },
                 {
-                    'name': 'Products',
+                    'name': 'Продукты',
                     'icon': 'fa fa-cube',
                     'url': '/admin/catalog/product/'
                 },
@@ -397,25 +403,25 @@ SIMPLEUI_CONFIG = {
                 #     'url': '/admin/catalog/image/'
                 # },
                 {
-                    'name': 'Configurations',
+                    'name': 'Конфигурация',
                     'models': [
                         {
-                            'name': 'Sizes',
+                            'name': 'Размеры',
                             'icon': 'fa fa-ruler',
                             'url': '/admin/catalog/size/'
                         },
                         {
-                            'name': 'Colors',
+                            'name': 'Цвета',
                             'icon': 'fa fa-circle',
                             'url': '/admin/catalog/color/'
                         },
                         {
-                            'name': 'Tags',
+                            'name': 'Теги',
                             'icon': 'fa fa-tag',
                             'url': '/admin/catalog/tag/'
                         },
                         {
-                            'name': 'Size Chart',
+                            'name': 'Карты размеров',
                             'icon': 'fa fa-table',
                             'url': '/admin/catalog/sizechart/'
                         },
@@ -424,16 +430,16 @@ SIMPLEUI_CONFIG = {
             ]
         },
         {
-            'name': 'Users',
+            'name': 'Пользователи',
             'icon': 'fa fa-user',
             'models': [
                 {
-                    'name': 'Users',
+                    'name': 'Пользователи',
                     'icon': 'fa fa-user',
                     'url': '/admin/users/user/'
                 },
                 {
-                    'name': 'Carts',
+                    'name': 'Корзины',
                     'icon': 'fa fa-shopping-cart',
                     'url': '/admin/orders/cart/'
                 },
@@ -441,7 +447,7 @@ SIMPLEUI_CONFIG = {
             ]
         },
         {
-            'name': 'Orders',
+            'name': 'Заказы',
             'icon': 'fa fa-star',
             'url': '/admin/orders/order/'
         },
@@ -451,7 +457,7 @@ SIMPLEUI_CONFIG = {
             'url': '/admin/pages/mainpage/'
         },
         {
-            'name': 'Static Pages',
+            'name': 'Статичные страницы',
             'icon': 'fa fa-file-text',
             'url': '/admin/pages/staticpage/'
         },

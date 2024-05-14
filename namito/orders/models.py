@@ -13,16 +13,24 @@ class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='carts')
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = _("Корзина")
+        verbose_name_plural = _("Корзины")
+
     def __str__(self):
-        return f"Cart for {self.user}"
+        return f"Корзина {self.user}"
 
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
-    product_variant = models.ForeignKey(Variant, on_delete=models.CASCADE, related_name='cart_items')
-    quantity = models.PositiveIntegerField(default=1)
-    to_purchase = models.BooleanField(default=True)
-    order = models.ForeignKey('Order', on_delete=models.SET_NULL, null=True, blank=True, related_name='items')
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items', verbose_name=_('Корзина'))
+    product_variant = models.ForeignKey(Variant, on_delete=models.CASCADE, related_name='cart_items', verbose_name=_('Варинат'))
+    quantity = models.PositiveIntegerField(default=1, verbose_name=_('Количество'))
+    to_purchase = models.BooleanField(default=True, verbose_name=_('К покупке'))
+    order = models.ForeignKey('Order', on_delete=models.SET_NULL, null=True, blank=True, related_name='items', verbose_name=_('Заказ'))
+
+    class Meta:
+        verbose_name = _("Пердмет в корзине")
+        verbose_name_plural = _("Предметы в корзинах")
 
     def subtotal(self):
         return self.product_variant.price * self.quantity
@@ -32,18 +40,26 @@ class CartItem(models.Model):
 
 
 class OrderHistory(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='order_history')
-    order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name='order_history')
-    order_date = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='order_history', verbose_name=_('Покупатель'))
+    order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name='order_history', verbose_name=_('Заказ'))
+    order_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Время заказа'))
+
+    class Meta:
+        verbose_name = _("История отзывов")
+        verbose_name_plural = _("История отзывов")
 
     def __str__(self):
         return f"Order history for {self.user} on {self.order_date}"
 
 
 class OrderedItem(models.Model):
-    order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name='ordered_items')
-    product_variant = models.ForeignKey(Variant, on_delete=models.PROTECT, related_name='ordered_items')
-    quantity = models.PositiveIntegerField(default=1)
+    order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name='ordered_items', verbose_name=_('Заказ'))
+    product_variant = models.ForeignKey(Variant, on_delete=models.PROTECT, related_name='ordered_items', verbose_name=_('Вариант'))
+    quantity = models.PositiveIntegerField(default=1, verbose_name=_('Количество'))
+
+    class Meta:
+        verbose_name = _("Предмет в заказе")
+        verbose_name_plural = _("Предметы в заказах")
 
     def subtotal(self):
         return self.product_variant.price * self.quantity
@@ -75,17 +91,22 @@ class Order(models.Model):
         ('картой', _("Картой")),
     ]
 
-    payment_status = models.IntegerField(choices=PAYMENT_STATUSES, default=1)
-    status = models.IntegerField(choices=STATUSES, default=0)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
-    cart = models.ForeignKey(Cart, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    created_at = models.DateTimeField(auto_now_add=True)
-    finished_at = models.DateTimeField(null=True, default=None, blank=True)
-    delivery_method = models.CharField(max_length=20, choices=DELIVERY_CHOICES, default='курьером')
-    user_address = models.ForeignKey(UserAddress, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
-    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, default='картой')
-    order_number = models.CharField(max_length=20, unique=True, blank=True, null=True)
+    payment_status = models.IntegerField(choices=PAYMENT_STATUSES, default=1, verbose_name=_('Статус оплаты'))
+    status = models.IntegerField(choices=STATUSES, default=0, verbose_name=_('Статус заказа'))
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders', verbose_name=_('Покупатель'))
+    cart = models.ForeignKey(Cart, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders', verbose_name=_('Корзина'))
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_('Общая стоимость'))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('Время создания'))
+    finished_at = models.DateTimeField(null=True, default=None, blank=True, verbose_name=_('Время окончания'))
+    delivery_method = models.CharField(max_length=20, choices=DELIVERY_CHOICES, default='курьером', verbose_name=_('Способ доставки'))
+    user_address = models.ForeignKey(UserAddress, on_delete=models.SET_NULL, null=True, blank=True,
+                                     related_name='orders', verbose_name=_('Адрес покупателя'))
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, default='картой', verbose_name=_('Способ оплаты'))
+    order_number = models.CharField(max_length=20, unique=True, blank=True, null=True, verbose_name=_('Номер заказа'))
+
+    class Meta:
+        verbose_name = _("Заказ")
+        verbose_name_plural = _("Заказы")
 
     def __str__(self):
         return f"Order {self.id} by {self.user}"
