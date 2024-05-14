@@ -62,7 +62,7 @@ class ImageInline(nested_admin.NestedTabularInline):
     readonly_fields = ("get_image",)
 
     def get_image(self, obj):
-        return mark_safe(f'<img src = {obj.image.url} width = "300"')
+        return mark_safe(f'<img src = {obj.media.url} width = "300"')
 
     get_image.short_description = "Изображение"
 
