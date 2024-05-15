@@ -27,7 +27,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(max_length=13, unique=True)
     code = models.CharField(max_length=4, blank=True, null=True)
     is_staff = models.BooleanField(default=False)
-    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True, max_length=255)
     full_name = models.CharField(max_length=255, blank=True)
     date_of_birth = models.DateField(blank=True, null=True)
     email = models.EmailField(blank=True)
@@ -58,3 +58,6 @@ class UserAddress(models.Model):
         verbose_name = _("Адрес пользователя")
         verbose_name_plural = _("Адреса пользователей")
         ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.city} - {self.street} - {self.apartment_number} - {self.entrance} - {self.floor} - {self.intercom}'
