@@ -7,6 +7,7 @@ from django.db import models
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django.core.files.base import ContentFile
+from django.conf import settings
 
 from mptt.models import MPTTModel, TreeForeignKey
 from colorfield.fields import ColorField
@@ -115,6 +116,14 @@ class Product(models.Model):
     sku = models.CharField(max_length=50, unique=True, blank=True, null=True)
     active = models.BooleanField(default=True)
 
+    def get_images(self):
+        base_url = settings.DEFAULT_PRODUCT_URL
+        images = Image.objects.filter(product=self)
+        image_urls = [image.image.url for image in images if image.image]
+        if not image_urls:
+            image_urls = [base_url]
+        return image_urls
+
     def save(self, *args, **kwargs):
         if not self.sku:
             self.sku = self.generate_sku()
@@ -202,7 +211,8 @@ class Image(ProcessedImageModel):
     image = models.ImageField(upload_to='product_images/')
     small_image = models.ImageField(upload_to='product_images/', blank=True, null=True)
     main_image = models.BooleanField(default=False)
-    variant = models.ForeignKey(Variant, related_name='images', on_delete=models.CASCADE, null=True, blank=True)
+    product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE, null=True, blank=True)
+    color = models.ForeignKey(Color, related_name='images', on_delete=models.PROTECT, null=True, blank=True, verbose_name=_('Цвет'))
 
     def save(self, *args, **kwargs):
         self.process_image()
