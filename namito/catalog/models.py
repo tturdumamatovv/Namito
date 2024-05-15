@@ -4,6 +4,7 @@ import io
 import uuid
 
 from django.db import models
+from django.utils.encoding import force_str
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django.core.files.base import ContentFile
@@ -201,20 +202,20 @@ class Size(models.Model):
 
 
 class Variant(models.Model):
-    product = models.ForeignKey(Product, related_name='variants', on_delete=models.CASCADE, verbose_name=_(''))
-    color = models.ForeignKey(Color, on_delete=models.PROTECT, related_name='variants', verbose_name=_(''))
-    size = models.ForeignKey(Size, on_delete=models.PROTECT, related_name='variants', verbose_name=_(''))
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_(''))
-    stock = models.PositiveIntegerField(blank=True, null=True, verbose_name=_(''))
-    main = models.BooleanField(default=False, verbose_name=_(''))
+    product = models.ForeignKey(Product, related_name='variants', on_delete=models.CASCADE, verbose_name=_('Продукт'))
+    color = models.ForeignKey(Color, on_delete=models.PROTECT, related_name='variants', verbose_name=_('Цвет'))
+    size = models.ForeignKey(Size, on_delete=models.PROTECT, related_name='variants', verbose_name=_('Размер'))
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_('Цена'))
+    stock = models.PositiveIntegerField(blank=True, null=True, verbose_name=_('Количество'))
+    main = models.BooleanField(default=False, verbose_name=_('Главный'))
     DISCOUNT_TYPE_CHOICES = [
         ('percent', _("Percent")),
         ('unit', _("Unit")),
     ]
     discount_value = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text=_(
-        "Discount amount, either in percentage or fixed unit based on the discount type."), verbose_name=_(''))
+        "Discount amount, either in percentage or fixed unit based on the discount type."), verbose_name=_('Значение скидки'))
     discount_type = models.CharField(default=0, max_length=7, choices=DISCOUNT_TYPE_CHOICES, blank=True, null=True,
-                                     help_text=_("Type of the discount - either a percent or a fixed unit."), verbose_name=_(''))
+                                     help_text=_("Type of the discount - either a percent or a fixed unit."), verbose_name=_('Тмп скидки'))
 
     class Meta:
         verbose_name = 'Вариант'
