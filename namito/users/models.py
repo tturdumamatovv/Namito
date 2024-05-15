@@ -58,3 +58,6 @@ class UserAddress(models.Model):
         verbose_name = _("Адрес пользователя")
         verbose_name_plural = _("Адреса пользователей")
         ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.city} - {self.street} - {self.apartment_number} - {self.entrance} - {self.floor} - {self.intercom}'
