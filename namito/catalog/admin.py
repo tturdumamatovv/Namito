@@ -168,7 +168,6 @@ class VariantAdmin(admin.ModelAdmin):
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
     list_display = ['image_preview', 'color']
-    readonly_fields = ['small_image']
     def image_preview(self, obj):
         if obj.image:
             return format_html('<img src="{}" width="100" style="border-radius: 5px;"/>', obj.image.url)
