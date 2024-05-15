@@ -1,3 +1,4 @@
+import nested_admin
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
@@ -5,6 +6,11 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from namito.catalog.admin import ReviewInline
 from namito.orders.admin import OrderHistoryInline
 from namito.users.models import User, UserAddress
+
+
+class AddressInline(admin.StackedInline):
+    model = UserAddress
+    extra = 0
 
 
 class UserAdmin(BaseUserAdmin):
@@ -24,7 +30,7 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ('phone_number', 'name', 'email')
     ordering = ('phone_number',)
     filter_horizontal = ('groups', 'user_permissions',)
-    inlines = [ReviewInline, OrderHistoryInline]
+    inlines = [ReviewInline, OrderHistoryInline, AddressInline]
 
 
 admin.site.register(User, UserAdmin)
