@@ -71,7 +71,6 @@ class VariantInline(nested_admin.NestedTabularInline):
     model = Variant
     extra = 0
     show_change_link = True
-    inlines = [ImageInline]
 
 
 class ReviewImageInline(nested_admin.NestedTabularInline):
