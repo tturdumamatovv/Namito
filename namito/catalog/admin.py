@@ -97,7 +97,7 @@ class CharacteristicsInline(nested_admin.NestedTabularInline):
     model = Characteristic
     extra = 0
     show_change_link = True
-    fields = ['key', 'value']
+    fields = ['key_ru', 'key_en', 'value_ru', 'value_en']
 
 
 class ImageInlineWithColor(nested_admin.NestedTabularInline):
