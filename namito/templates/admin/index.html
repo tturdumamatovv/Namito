@@ -7,7 +7,7 @@
    source code：
    https://github.com/newpanjing/simpleui
 -->
-<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<html lang="{{ LANGUAGE_CODE|default:"ru" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
 <head>
     <meta charset="UTF-8">
     <meta name="renderer" content="webkit">
@@ -65,7 +65,7 @@
     <!-- mobile -->
     <el-drawer
             class="lite-menus"
-            title="{{ site_header }}"
+            title="Namito"
             :visible.sync="drawer"
             :show-close="false"
             size="50%"
@@ -104,7 +104,7 @@
                     <div class="float-wrap">
                         <div class="left">
 
-                <img src="{% static 'admin/logo/logo.png' %}">
+                <img src="{% static 'admin/logo/logo.svg' %}">
 
                         </div>
                         <div class="left">
