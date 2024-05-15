@@ -127,8 +127,8 @@ class ProductAdmin(nested_admin.NestedModelAdmin):
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
-    list_display = ('name_en', 'name_ru', 'logo_preview')
-    search_fields = ('name_en', 'name_ru',)
+    list_display = ('name', 'logo_preview')
+    search_fields = ('name',)
     readonly_fields = ('logo_preview',)
 
     def logo_preview(self, obj):
@@ -155,8 +155,8 @@ class ColorAdmin(admin.ModelAdmin):
 
 @admin.register(Size)
 class SizeAdmin(admin.ModelAdmin):
-    list_display = ['name_en', 'name_ru', 'description']
-    search_fields = ['name_en', 'name_ru',]
+    list_display = ['name', 'description']
+    search_fields = ['name']
 
 
 @admin.register(Variant)
