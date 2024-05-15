@@ -90,27 +90,14 @@ class VariantSerializer(serializers.ModelSerializer):
     product = serializers.CharField(source='product.name', read_only=True)
     color = ColorSerializer(read_only=True)
     size = SizeSerializer(read_only=True)
-    images = serializers.SerializerMethodField()
     price = serializers.IntegerField()
     discounted_price = serializers.SerializerMethodField()
     discount_value = serializers.IntegerField()
 
     class Meta:
         model = Variant
-        fields = ['id', 'color', 'size', 'price', 'discounted_price', 'images', 'stock',
+        fields = ['id', 'color', 'size', 'price', 'discounted_price', 'stock',
                   'discount_value', 'discount_type', 'main', 'product']
-
-    def get_images(self, variant):
-        images_qs = Image.objects.filter(variant=variant).order_by('-main_image')
-        images_data = ImageSerializer(images_qs, many=True, context=self.context).data
-
-        # Check if images_data is empty, indicating no images found
-        if not images_data:
-            # Add default image URL to images_data
-            default_image_url = settings.DEFAULT_PRODUCT_URL
-            images_data.append({'image': default_image_url})
-
-        return images_data
 
     @staticmethod
     def get_discounted_price(variant):
@@ -125,14 +112,13 @@ class ProductListSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField()
     is_favorite = serializers.SerializerMethodField()
     cart_quantity = serializers.SerializerMethodField()
-    image = serializers.SerializerMethodField()
+    images = serializers.SerializerMethodField()
     brand = BrandSerializer(many=False, read_only=True)
     characteristics = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'price', 'brand', 'average_rating',
-                  'tags', 'is_favorite', 'cart_quantity', 'image', 'characteristics']
+        fields = ['id', 'name', 'description', 'category', 'price', 'brand', 'average_rating', 'tags', 'is_favorite', 'cart_quantity', 'images', 'characteristics']
 
     def get_price(self, product):
         main_variant = Variant.objects.filter(product=product, main=True).first()
@@ -174,27 +160,12 @@ class ProductListSerializer(serializers.ModelSerializer):
             return quantity if quantity else 0
         return 0
 
-    def get_image(self, product):
-        base_url = self.context.get('request').build_absolute_uri('/')
-        images_data = []
-        variants = Variant.objects.filter(product=product, stock__gt=0).order_by('-main', 'id')
-        for variant in variants:
-            image = Image.objects.filter(variant=variant, main_image=True).first()
-            if not image:
-                image = Image.objects.filter(variant=variant).first()
-            if image:
-                image_url = base_url + image.image.url if image.image else None
-                images_data.append({
-                    'variant_id': variant.id,
-                    'image_url': image_url
-                })
-            else:
-                images_data.append({
-                    'variant_id': variant.id,
-                    'image_url': settings.DEFAULT_PRODUCT_URL
-                })
-
-        return images_data
+    def get_images(self, product):
+        request = self.context.get('request')
+        images = Image.objects.filter(product=product)
+        if request is not None:
+            return [request.build_absolute_uri(image.image.url) for image in images if image.image]
+        return [image.image.url for image in images if image.image]
 
     def get_characteristics(self, product):
         characteristics = Characteristic.objects.filter(product=product)
@@ -223,11 +194,11 @@ class ProductSerializer(serializers.ModelSerializer):
     reviews = serializers.SerializerMethodField()
     review_count = serializers.SerializerMethodField()
     review_allowed = serializers.SerializerMethodField()
+    images = ImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags', 'brand', 'is_favorite',
-                  'cart_quantity', 'review_count', 'characteristics', 'reviews', 'review_allowed']
+        fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags', 'brand', 'is_favorite', 'cart_quantity', 'review_count', 'characteristics', 'reviews', 'review_allowed', 'images']
 
     def get_variants(self, product):
         variants_qs = Variant.objects.filter(product=product, stock__gt=0, product__active=True).order_by('-main')
@@ -260,7 +231,6 @@ class ProductSerializer(serializers.ModelSerializer):
             return quantity if quantity else 0
         return 0
 
-
     def get_characteristics(self, product):
         characteristics = Characteristic.objects.filter(product=product)
         return CharacteristicsSerializer(characteristics, many=True).data
@@ -270,25 +240,27 @@ class ProductSerializer(serializers.ModelSerializer):
         return ReviewSerializer(reviews_qs, many=True, context=self.context).data
 
     def get_review_count(self, product):
-        # Подсчитайте количество отзывов для продукта
         review_count = Review.objects.filter(product=product).count()
         return review_count
 
     def get_review_allowed(self, product):
         user = self.context.get('request').user
         if user.is_authenticated:
-            # Получите все варианты данного продукта
             variants = Variant.objects.filter(product=product)
-
-            # Проверьте, покупал ли пользователь любой из вариантов данного продукта
             has_purchased_product = OrderedItem.objects.filter(
                 order__user=user,
                 product_variant__in=variants,
-                order__status=1  # Убедитесь, что заказ завершен (status=1)
+                order__status=1
             ).exists()
-
             return has_purchased_product
         return False
+
+    def get_images(self, product):
+        request = self.context.get('request')
+        images = Image.objects.filter(product=product)
+        if request is not None:
+            return [request.build_absolute_uri(image.image.url) for image in images if image.image]
+        return [image.image.url for image in images if image.image]
 
     def to_representation(self, instance):
         if not instance.active:

@@ -71,7 +71,6 @@ class VariantInline(nested_admin.NestedTabularInline):
     model = Variant
     extra = 0
     show_change_link = True
-    inlines = [ImageInline]
 
 
 class ReviewImageInline(nested_admin.NestedTabularInline):
@@ -101,12 +100,24 @@ class CharacteristicsInline(nested_admin.NestedTabularInline):
     fields = ['key', 'value']
 
 
+class ImageInlineWithColor(nested_admin.NestedTabularInline):
+    model = Image
+    extra = 0
+    fields = ['image', 'color']  # Добавляем поле 'color' в список полей для отображения и редактирования
+    readonly_fields = ("get_image",)
+
+    def get_image(self, obj):
+        return mark_safe(f'<img src="{obj.image.url}" width="300" />')
+
+    get_image.short_description = "Image Preview"
+
+
 @admin.register(Product)
 class ProductAdmin(nested_admin.NestedModelAdmin):
     form = ProductForm
     list_display = ['name_ru', 'name_en', 'category', 'active']
     search_fields = ['name', 'category__name']
-    inlines = [CharacteristicsInline, VariantInline, ReviewInline]
+    inlines = [CharacteristicsInline, VariantInline, ReviewInline, ImageInlineWithColor]
 
     class Media:
         css = {
@@ -152,13 +163,11 @@ class SizeAdmin(admin.ModelAdmin):
 class VariantAdmin(admin.ModelAdmin):
     list_display = ['product', 'color', 'size', 'price']
     search_fields = ['product__name', 'color__name', 'size__name']
-    inlines = [ImageInline]
 
 
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
-    list_display = ['variant', 'image_preview']
-
+    list_display = ['image_preview', 'color']
     def image_preview(self, obj):
         if obj.image:
             return format_html('<img src="{}" width="100" style="border-radius: 5px;"/>', obj.image.url)
