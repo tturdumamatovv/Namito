@@ -19,16 +19,21 @@ class VerifyCodeSerializer(serializers.Serializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(read_only=True)
     profile_picture = serializers.ImageField(required=False, allow_null=True)
+    has_profile_picture = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('id', 'phone_number', 'profile_picture', 'full_name', 'date_of_birth', 'email', 'first_visit')
+        fields = ('id', 'phone_number', 'profile_picture', 'full_name', 'date_of_birth',
+                  'email', 'first_visit', 'has_profile_picture')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         if not ret['profile_picture']:
             ret['profile_picture'] = settings.DEFAULT_PROFILE_PICTURE_URL
         return ret
+
+    def get_has_profile_picture(self, instance):
+        return bool(instance.profile_picture)
 
 
 class UserAddressSerializer(serializers.ModelSerializer):
