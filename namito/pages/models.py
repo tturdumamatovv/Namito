@@ -22,6 +22,7 @@ class SingletonModel(models.Model):
 
 # class AdminPage(SingletonModel):
 #     logo = models.ImageField(upload_to='banners/', blank=True, null=True)
+#     name = models.CharField(max_length=255, blank=True, null=True)
 #
 #     class Meta:
 #         verbose_name = _('Главная страница')
