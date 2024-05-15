@@ -1,22 +1,22 @@
 from django.contrib import admin
 
 from .models import (
-    Cart, 
-    CartItem, 
-    Order, 
-    OrderHistory
-    )
+    Cart,
+    CartItem,
+    Order,
+    OrderHistory, OrderedItem
+)
 
 
 class CartItemInline(admin.TabularInline):
     model = CartItem
-    extra = 1
+    extra = 0
     show_change_link = True
 
 
-class OrderHistoryInline(admin.TabularInline):
-    model = OrderHistory
-    extra = 1
+class OrderedItemInline(admin.TabularInline):
+    model = OrderedItem
+    extra = 0
     show_change_link = True
 
 
@@ -29,5 +29,5 @@ class CartAdmin(admin.ModelAdmin):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['id', 'user', 'status', 'payment_status', 'total_amount', 'created_at']
-    inlines = [CartItemInline]
+    inlines = [OrderedItemInline]
 
