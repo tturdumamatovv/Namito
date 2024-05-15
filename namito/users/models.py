@@ -27,7 +27,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(max_length=13, unique=True)
     code = models.CharField(max_length=4, blank=True, null=True)
     is_staff = models.BooleanField(default=False)
-    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True, max_length=255)
     full_name = models.CharField(max_length=255, blank=True)
     date_of_birth = models.DateField(blank=True, null=True)
     email = models.EmailField(blank=True)
