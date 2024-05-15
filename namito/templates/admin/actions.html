@@ -9,7 +9,7 @@
 
         <el-button size="small" type="primary" icon="el-icon-plus" data-name="add_item"
                    url="{% add_preserved_filters add_url is_popup to_field %}">
-            {% trans 'Add' %}
+            {% trans 'Добавить' %}
         </el-button>
     {% endif %}
 
@@ -18,7 +18,7 @@
 
             {% if field.0 == 'delete_selected' %}
                 <el-button size="small" type="danger" data-name="{{ field.0 }}" class="stop-submit"
-                           icon="el-icon-delete" @click="delSelected('{{ field.0 }}')">{% trans 'Delete' %}</el-button>
+                           icon="el-icon-delete" @click="delSelected('{{ field.0 }}')">{% trans 'Удалить' %}</el-button>
                 <input type="hidden" name="select_across" v-model="select_across" value="0" class="select-across">
             {% else %}
                 <input type="hidden" name="select_across" v-model="select_across" value="0" class="select-across">
@@ -51,9 +51,9 @@
     {% endfor %}
 
     {% if cl.formset and cl.result_count %}
-        <input type="hidden" name="_save" value="{% trans 'Save' %}"/>
+        <input type="hidden" name="_save" value="{% trans 'Сохранить' %}"/>
         <el-button size="small" icon="el-icon-circle-check" type="success"
-                   @click="formSubmit()">{% trans 'Save' %}</el-button>
+                   @click="formSubmit()">{% trans 'Сохранить' %}</el-button>
     {% endif %}
 
     <el-button size="small" data-name="import_admin_action" v-for="item in exts" :key="item.name"
@@ -70,10 +70,10 @@
                 <span class="question">
             <a href="#"
                onclick="selectAll()"
-               title="{% trans "Click here to select the objects across all pages" %}">{% blocktrans with cl.result_count as total_count %}Select all {{ total_count }} {{ module_name }}{% endblocktrans %}</a>
+               title="{% trans "Нажмите здесь, чтобы выбрать объекты на всех страницах" %}">{% blocktrans with cl.result_count as total_count %}Выбрать все {{ total_count }} {{ module_name }}{% endblocktrans %}</a>
         </span>
                 <span class="clear">
-            <a href="#" onclick="unSelect()">{% trans "Clear selection" %}</a>
+            <a href="#" onclick="unSelect()">{% trans "Очистить выбор" %}</a>
         </span>
             {% endif %}
         {% endif %}

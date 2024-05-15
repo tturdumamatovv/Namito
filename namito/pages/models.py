@@ -20,6 +20,14 @@ class SingletonModel(models.Model):
         return cls.objects.get()
 
 
+# class AdminPage(SingletonModel):
+#     logo = models.ImageField(upload_to='banners/', blank=True, null=True)
+#
+#     class Meta:
+#         verbose_name = _('Главная страница')
+#         verbose_name_plural = _("Главная страница")
+
+
 class MainPage(SingletonModel):
     banner1 = models.ImageField(upload_to='banners/', blank=True, null=True)
     banner1_link = models.URLField(blank=True, null=True)

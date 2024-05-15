@@ -23,7 +23,7 @@
 <div id="content-main" class="form-main">
     {% if '_popup' not in request.GET %}
     <div class="page-header">
-        <el-page-header title="{% trans 'Back' %}" @back="goBack" content="{{title}}"/>
+        <el-page-header title="{% trans 'Назад' %}" @back="goBack" content="{{title}}"/>
     </div>
     {% endif %}
     {% block object-tools %}
@@ -31,18 +31,18 @@
     <ul class="object-tools">
         {% block object-tools-items %}
         <li>
-            <el-dialog title="{% trans 'History' %}" :visible.sync="dialogTableVisible">
+            <el-dialog title="{% trans 'История' %}" :visible.sync="dialogTableVisible">
             <iframe frameborder="0" :src="url" width="100%" height="300"></iframe>
             </el-dialog>
             {% url opts|admin_urlname:'history' original.pk|admin_urlquote as history_url %}
 
             <el-button @click="go_url('{% add_preserved_filters history_url %}')" class="historylink el-button--small"
-                       icon="fas fa-history">{% trans "History" %}
+                       icon="fas fa-history">{% trans "История" %}
             </el-button>
         </li>
         {% if has_absolute_url %}
         <li>
-            <el-button size="small" @click="window.open('{{ absolute_url }}')" class="viewsitelink" icon="fas fa-globe-asia">{% trans "View on site" %}</el-button>
+            <el-button size="small" @click="window.open('{{ absolute_url }}')" class="viewsitelink" icon="fas fa-globe-asia">{% trans "Посмотреть на сайте" %}</el-button>
         </li>
         {% endif %}
         {% endblock %}
@@ -59,9 +59,9 @@
             <div id="alert">
                 <el-alert
                         title="{% if errors|length == 1 %}
-                            {% trans 'Please correct the error below.' %}
+                            {% trans 'Пожалуйста, исправьте ошибку ниже.' %}
                 {% else %}
-                {% trans 'Please correct the errors below.' %}
+                {% trans 'Пожалуйста, исправьте ошибки, указанные ниже.' %}
                 {% endif %}"
                 type="error">
                 </el-alert>

@@ -69,9 +69,9 @@
         {% if form.errors and not form.non_field_errors %}
             <p class="errornote">
                 {% if form.errors.items|length == 1 %}
-                    <el-alert title="{% trans "Please correct the error below." %}" type="error"></el-alert>
+                    <el-alert title="{% trans "Пожалуйста, исправьте ошибку ниже." %}" type="error"></el-alert>
                 {% else %}
-                    <el-alert title="{% trans "Please correct the errors below." %}" type="error"></el-alert>
+                    <el-alert title="{% trans "Пожалуйста, исправьте приведенные ниже ошибки." %}" type="error"></el-alert>
                 {% endif %}
             </p>
         {% endif %}
@@ -92,12 +92,12 @@
               {% if password_reset_url %}
 
              <div class="password-reset-link">
-                <a class="forgot-password" href="{{ password_reset_url }}">{% trans 'Forgotten your password or username?' %}</a>
+                <a class="forgot-password" href="{{ password_reset_url }}">{% trans 'Забыли пароль или имя пользователя?' %}</a>
               </div>
               {% endif %}
             <div class="simpleui-input-inline login-btn">
                 <el-button :icon="loading?'el-icon-loading':''" @click="login()"
-                           type="primary">{% trans 'Log in' %}</el-button>
+                           type="primary">{% trans 'Войти' %}</el-button>
             </div>
 
             <input type="hidden" name="next" value="{{ next }}"/>
