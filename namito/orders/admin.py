@@ -10,7 +10,13 @@ from .models import (
 
 class CartItemInline(admin.TabularInline):
     model = CartItem
-    extra = 0
+    extra = 1
+    show_change_link = True
+
+
+class OrderHistoryInline(admin.TabularInline):
+    model = OrderHistory
+    extra = 1
     show_change_link = True
 
 
@@ -18,6 +24,7 @@ class OrderedItemInline(admin.TabularInline):
     model = OrderedItem
     extra = 0
     show_change_link = True
+
 
 
 @admin.register(Cart)
