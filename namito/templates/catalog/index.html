@@ -4,10 +4,23 @@
 <head>
   <meta charset="UTF-8">
   <title>Namito</title>
+  <style>
+    .logo-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .logo-container img {
+      max-height: 150px;
+    }
+  </style>
 </head>
 <body>
 
-<img src="{% static 'admin/logo/logo.svg' %}" style="max-height: 500px; margin: 0 auto " alt="">
+<div class="logo-container">
+  <img src="{% static 'admin/logo/logo.svg' %}" alt="Logo">
+</div>
 
 </body>
 </html>
