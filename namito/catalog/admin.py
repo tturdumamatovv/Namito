@@ -103,7 +103,7 @@ class CharacteristicsInline(nested_admin.NestedTabularInline):
 class ImageInlineWithColor(nested_admin.NestedTabularInline):
     model = Image
     extra = 0
-    fields = ['image', 'color']  # Добавляем поле 'color' в список полей для отображения и редактирования
+    fields = ['image', 'color', 'main_image']  # Добавляем поле 'color' в список полей для отображения и редактирования
     readonly_fields = ("get_image",)
 
     def get_image(self, obj):
@@ -167,7 +167,7 @@ class VariantAdmin(admin.ModelAdmin):
 
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
-    list_display = ['image_preview', 'color']
+    list_display = ['image_preview', 'color', 'main_image']
     def image_preview(self, obj):
         if obj.image:
             return format_html('<img src="{}" width="100" style="border-radius: 5px;"/>', obj.image.url)

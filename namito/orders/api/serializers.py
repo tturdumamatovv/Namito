@@ -1,4 +1,5 @@
 from namito.catalog.api.serializers import VariantSerializer
+from namito.catalog.models import Image
 from namito.orders.models import (
     Cart,
     CartItem,
@@ -30,10 +31,29 @@ class CartItemCreateUpdateSerializer(serializers.ModelSerializer):
 class CartItemSerializer(serializers.ModelSerializer):
     product_variant = VariantSerializer(required=False)
     product_name = serializers.CharField(source='product_variant.product.name', read_only=True)
+    product_image = serializers.SerializerMethodField()  # Добавляем изображение продукта
 
     class Meta:
         model = CartItem
-        fields = ['id', 'product_variant', 'quantity', 'to_purchase', 'product_name']
+        fields = ['id', 'product_variant', 'quantity', 'to_purchase', 'product_name', 'product_image']
+
+    def get_product_image(self, obj):
+        variant = obj.product_variant
+        product = variant.product
+
+        main_image = product.images.filter(main_image=True).first()
+        if main_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(main_image.image.url)
+
+        first_image = product.images.first()
+        if first_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(first_image.image.url)
+
+        return None
 
 
 class CartSerializer(ModelSerializer):
@@ -54,10 +74,29 @@ class CartSerializer(ModelSerializer):
 class OrderedItemSerializer(ModelSerializer):
     product_variant = VariantSerializer()
     product_name = serializers.CharField(source='product_variant.product.name', read_only=True)
+    product_image = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderedItem
-        fields = ['id', 'product_variant', 'quantity', 'product_name']
+        fields = ['id', 'product_variant', 'quantity', 'product_name', 'product_image']
+
+    def get_product_image(self, obj):
+        variant = obj.product_variant
+        product = variant.product
+
+        main_image = product.images.filter(main_image=True).first()
+        if main_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(main_image.image.url)
+
+        first_image = product.images.first()
+        if first_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(first_image.image.url)
+
+        return None
 
 
 class OrderSerializer(serializers.ModelSerializer):
