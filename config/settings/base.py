@@ -338,9 +338,11 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
 }
 
-DEFAULT_PROFILE_PICTURE_URL = "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"
+IMAGES_DIR = os.path.join(BASE_DIR, '../../assets/images')
 
-DEFAULT_PRODUCT_URL = "https://www.lg.com/lg5-common-gp/images/common/product-default-list-350.jpg"
+DEFAULT_PROFILE_PICTURE_URL = os.path.join(IMAGES_DIR, 'default-product.png')
+
+DEFAULT_PRODUCT_URL = os.path.join(IMAGES_DIR, 'default-user.jpg')
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=14),
