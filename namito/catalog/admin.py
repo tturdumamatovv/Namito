@@ -102,13 +102,24 @@ class CharacteristicsInline(nested_admin.NestedTabularInline):
 class ImageInlineWithColor(nested_admin.NestedTabularInline):
     model = Image
     extra = 0
-    fields = ['image', 'color', 'main_image']  # Добавляем поле 'color' в список полей для отображения и редактирования
+    fields = ['image', 'color', 'main_image', "get_image",]
     readonly_fields = ("get_image",)
 
     def get_image(self, obj):
-        return mark_safe(f'<img src="{obj.image.url}" width="300" />')
+        if obj.image and obj.small_image:
+            return mark_safe(f'<img src="{obj.small_image.url}" width="150" />')
+        return "No Image"
 
-    get_image.short_description = "Image Preview"
+    get_image.short_description = "Текушее  изображение"
+
+    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        if db_field.name == "color":
+            if request:
+                obj_id = request.resolver_match.kwargs.get('object_id')
+                if obj_id:
+                    product = Product.objects.get(pk=obj_id)
+                    kwargs["queryset"] = Color.objects.filter(variants__product=product).distinct()
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 @admin.register(Product)
@@ -116,7 +127,7 @@ class ProductAdmin(nested_admin.NestedModelAdmin):
     form = ProductForm
     list_display = ['name_ru', 'name_en', 'category', 'active']
     search_fields = ['name', 'category__name']
-    inlines = [CharacteristicsInline, VariantInline, ReviewInline, ImageInlineWithColor]
+    inlines = [CharacteristicsInline, VariantInline, ImageInlineWithColor, ReviewInline, ]
 
     class Media:
         css = {

@@ -83,6 +83,7 @@ class Brand(models.Model):
     name = models.CharField(max_length=255, unique=True, help_text="The name of the brand", verbose_name=_('Название'))
     logo = models.ImageField(upload_to='brand_logos/', blank=True, null=True,
                              help_text="The logo of the brand", verbose_name=_('Логотип'))
+    categories = models.ManyToManyField(Category, related_name='brands', verbose_name=_('Категории'))
 
     def __str__(self):
         return f'{self.name}'
@@ -235,9 +236,9 @@ class Variant(models.Model):
 
 
 class Image(ProcessedImageModel):
-    image = models.ImageField(upload_to='product_images/')
-    small_image = models.ImageField(upload_to='product_images/', blank=True, null=True)
-    main_image = models.BooleanField(default=False)
+    image = models.ImageField(upload_to='product_images/', verbose_name=_("Изображение"))
+    small_image = models.ImageField(upload_to='product_images/', blank=True, null=True, verbose_name=_("Мини изображение"))
+    main_image = models.BooleanField(default=False, verbose_name=_("Главная картинка"))
     product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE, null=True, blank=True)
     color = models.ForeignKey(Color, related_name='images', on_delete=models.PROTECT, null=True, blank=True, verbose_name=_('Цвет'))
 
@@ -252,22 +253,26 @@ class Image(ProcessedImageModel):
     def process_image(self):
         if self.image:
             pil_image = PILImage.open(self.image)
+            output_io_stream = io.BytesIO()
+            pil_image.save(output_io_stream, format='WEBP', quality=90)
+            output_io_stream.seek(0)
+            self.image.save(f"{self.image.name.split('.')[0]}.webp", ContentFile(output_io_stream.read()), save=False)
+
             small_image = pil_image.copy()
             small_image.thumbnail((150, 150))
-            output_io_stream = io.BytesIO()
-            small_image.save(output_io_stream, format='WEBP', quality=90)
-            output_io_stream.seek(0)
-            self.small_image.save(f"{self.image.name.split('.')[0]}_small.webp", ContentFile(output_io_stream.read()),
-                                  save=False)
+            small_output_io_stream = io.BytesIO()
+            small_image.save(small_output_io_stream, format='WEBP', quality=90)
+            small_output_io_stream.seek(0)
+            self.small_image.save(f"{self.image.name.split('.')[0]}_small.webp", ContentFile(small_output_io_stream.read()), save=False)
 
 
 class Review(models.Model):
     product = models.ForeignKey(Product, related_name='reviews', on_delete=models.CASCADE, verbose_name=_("Product"))
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("User"))
-    text = models.TextField(verbose_name=_("Text"))
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Created at"))
-    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("Updated at"))
-    rating = models.IntegerField(default=0, choices=[(i, str(i)) for i in range(1, 6)])
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("Позьователь"))
+    text = models.TextField(verbose_name=_("Текст"))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Время создания"))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("Время обновления"))
+    rating = models.IntegerField(default=0, choices=[(i, str(i)) for i in range(1, 6)], verbose_name=_("Рейтинг"))
 
     def __str__(self):
         return f"{self.created_at} by {self.user}"
@@ -303,8 +308,8 @@ class Favorite(models.Model):
 
 
 class SizeChart(models.Model):
-    categories = models.ManyToManyField(Category, related_name='size_charts')
-    name = models.CharField(max_length=100)
+    categories = models.ManyToManyField(Category, related_name='size_charts', verbose_name=_("Категории"))
+    name = models.CharField(max_length=100, verbose_name=_("Название"))
 
     class Meta:
         verbose_name = _("Карта размеров")
@@ -315,8 +320,8 @@ class SizeChart(models.Model):
 
 
 class SizeChartItem(models.Model):
-    size_cart = models.ForeignKey(SizeChart, on_delete=models.CASCADE)
-    size = models.CharField(max_length=10)
+    size_cart = models.ForeignKey(SizeChart, on_delete=models.CASCADE, verbose_name=_('Элемент карты размеров'))
+    size = models.CharField(max_length=10, verbose_name=_('Размер'))
 
     class Meta:
         verbose_name = _("Элемент карты размеров")
