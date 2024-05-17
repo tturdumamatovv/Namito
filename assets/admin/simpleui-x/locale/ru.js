@@ -41,7 +41,8 @@ var Lanuages = {
     'Are you sure you want to delete the selected?': 'Вы действительно хотите удалить выбранные элементы?',
     "Please select at least one option!": "Выберите хотя бы один вариант!",
     "Please enter your username or password!": "Введите ваш email и пароль",
+
+
     'confirm': 'подтвердить',
     'cancel': 'отменить'
-
 }

@@ -19,7 +19,7 @@ from namito.catalog.models import (
     Characteristic
 )
 
-fake_ru = Faker('ru_RU')
+fake_ru = Faker('ru')
 fake_en = Faker()
 
 
