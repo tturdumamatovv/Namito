@@ -6,7 +6,7 @@ from namito.catalog.models import (
     Color,
     SizeChart,
     Tag,
-    Product
+    Product, Brand
 )
 
 
@@ -50,3 +50,18 @@ class SizeChartForm(forms.ModelForm):
         widgets = {
             'categories': FilteredSelectMultiple("Categories", is_stacked=False),
         }
+
+
+class BrandForm(forms.ModelForm):
+    categories = forms.ModelMultipleChoiceField(
+        queryset=Category.objects.all(),
+        required=False,
+        widget=FilteredSelectMultiple(
+            verbose_name='Категории',
+            is_stacked=False
+        )
+    )
+
+    class Meta:
+        model = Brand
+        fields = '__all__'

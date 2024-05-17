@@ -11,7 +11,7 @@ from .forms import (
     ColorAdminForm,
     SizeChartForm,
     TagAdminForm,
-    ProductForm
+    ProductForm, BrandForm
 )
 from .models import (
     Category,
@@ -140,6 +140,7 @@ class BrandAdmin(admin.ModelAdmin):
     list_display = ('name', 'logo_preview')
     search_fields = ('name',)
     readonly_fields = ('logo_preview',)
+    form = BrandForm
 
     def logo_preview(self, obj):
         if obj.logo:
@@ -178,6 +179,7 @@ class VariantAdmin(admin.ModelAdmin):
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
     list_display = ['image_preview', 'color', 'main_image']
+
     def image_preview(self, obj):
         if obj.image:
             return format_html('<img src="{}" width="100" style="border-radius: 5px;"/>', obj.image.url)
