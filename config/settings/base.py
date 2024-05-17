@@ -338,11 +338,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
 }
 
-IMAGES_DIR = os.path.join(BASE_DIR, '../../assets/images')
-
-DEFAULT_PROFILE_PICTURE_URL = os.path.join(IMAGES_DIR, 'default-product.png')
-
-DEFAULT_PRODUCT_URL = os.path.join(IMAGES_DIR, 'default-user.jpg')
+DEFAULT_PROFILE_PICTURE_URL = str(BASE_DIR / 'assets' / 'images' / 'default-user.jpg')
+DEFAULT_PRODUCT_URL = str(BASE_DIR / 'assets' / 'images' / 'default-product.png')
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=14),
