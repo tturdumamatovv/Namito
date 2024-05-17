@@ -89,7 +89,6 @@ class ReviewInline(nested_admin.NestedTabularInline):
     extra = 0
     show_change_link = False
     fields = ['user', 'text', 'rating']
-    can_delete = False
     inlines = [ReviewImageInline]
 
 
