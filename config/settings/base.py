@@ -338,8 +338,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
 }
 
-DEFAULT_PROFILE_PICTURE_URL = str(BASE_DIR / 'media' / 'profile_images' / 'default-user.jpg')
-DEFAULT_PRODUCT_URL = str(BASE_DIR / 'media' / 'product_images' / 'default-product.png')
+DEFAULT_PROFILE_PICTURE_URL = "https://github.com/tturdumamatovv/Namito/blob/main/assets/admin/logo/logo.png"
+
+DEFAULT_PRODUCT_URL = "https://www.lg.com/lg5-common-gp/images/common/product-default-list-350.jpg"
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=14),
