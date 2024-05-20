@@ -116,7 +116,7 @@ class Product(models.Model):
     meta_description = models.TextField(blank=True, null=True, verbose_name=_('Мета описание'))
     meta_image = models.ImageField(upload_to='product_meta_images/', blank=True, null=True,
                                    verbose_name=_('Мета картинка'))
-    keywords = models.JSONField(null=True, blank=True, verbose_name=_('Ключевые слова'))
+    keywords = models.TextField(null=True, blank=True, help_text=_('Запишите ключевые слова через запятую'), verbose_name=_('Ключевые слова'))
     min_price = models.PositiveIntegerField(default=0, verbose_name=_('Минимальная цена'))
     tags = models.ManyToManyField(Tag, blank=True, verbose_name=_('Теги'))
     is_top = models.BooleanField(default=False, verbose_name=_('Топ продукт'))
