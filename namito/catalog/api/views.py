@@ -41,7 +41,7 @@ from .serializers import (
 
 )
 from .pagination import CustomPageNumberPagination
-from .filters import ProductFilter
+from .filters import ProductFilter, ProductFilterInSearch
 from ...orders.models import OrderedItem
 
 
@@ -80,8 +80,8 @@ class ProductListView(generics.ListCreateAPIView):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = ProductFilter
     pagination_class = CustomPageNumberPagination
-    ordering_fields = ['name', 'price', 'created_at']  
-    ordering = ['name']  
+    ordering_fields = ['name', 'min_price']
+    ordering = ['name']
 
     def get_queryset(self):
         products_with_stock_variants = Product.objects.filter(
@@ -304,6 +304,10 @@ class CategoryByNameStartsWithAPIView(generics.ListAPIView):
 class ProductSearchByNameAndBrandAPIView(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductListSerializer
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_class = ProductFilterInSearch
+    ordering_fields = ['name']
+    ordering = ['name']
 
     def get_queryset(self):
         language_code = self.request.LANGUAGE_CODE
