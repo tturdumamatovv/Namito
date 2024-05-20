@@ -310,13 +310,15 @@ class ProductSearchByNameAndBrandAPIView(generics.ListAPIView):
     ordering = ['name']
 
     def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = self.filter_queryset(queryset)  # Применяем фильтры из filterset_class
         language_code = self.request.LANGUAGE_CODE
 
         search_query = self.request.query_params.get('name')
         brand_query = self.request.query_params.get('brand')
 
         if search_query is None and brand_query is None:
-            return Product.objects.none()
+            return queryset.none()
 
         filters = Q()
 
@@ -332,7 +334,7 @@ class ProductSearchByNameAndBrandAPIView(generics.ListAPIView):
                 translated_field = f"brand__{field}_{language_code}"
                 filters |= Q(**{f"{translated_field}__icontains": brand_query})
 
-        queryset = self.queryset.filter(filters).filter(variants__stock__gt=0).distinct()
+        queryset = queryset.filter(filters).filter(variants__stock__gt=0).distinct()
         return queryset
 
 
