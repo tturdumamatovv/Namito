@@ -6,6 +6,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.filters import OrderingFilter
 
 from drf_yasg.utils import swagger_auto_schema
 from modeltranslation.translator import translator
@@ -76,10 +77,11 @@ class BrandDetailView(generics.RetrieveUpdateDestroyAPIView):
 class ProductListView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductListSerializer
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = ProductFilter
     pagination_class = CustomPageNumberPagination
-
+    ordering_fields = ['name', 'price', 'created_at']  
+    ordering = ['name']  
 
     def get_queryset(self):
         products_with_stock_variants = Product.objects.filter(
