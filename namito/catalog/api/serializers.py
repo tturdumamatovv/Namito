@@ -51,8 +51,9 @@ class CategorySerializer(serializers.ModelSerializer):
         return Brand.objects.filter(categories=obj)
 
     def get_sizes(self, obj):
-        return Size.objects.filter(categories=obj)
-
+        sizes = Size.objects.filter(categories=obj)
+        size_data = [{'id': size.id, 'name': size.name} for size in sizes]
+        return size_data
 
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
