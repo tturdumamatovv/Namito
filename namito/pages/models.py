@@ -72,7 +72,7 @@ class StaticPage(ProcessedImageModel):
     image = models.ImageField(upload_to='static_pages/', blank=True, null=True, verbose_name=_('Изображение'))
     meta_title = models.CharField(max_length=60, blank=True, null=True, verbose_name=_('Мета заголовок'))
     meta_description = models.CharField(max_length=160, blank=True, null=True, verbose_name=_('Мета описание'))
-    meta_image = models.ImageField(upload_to='static_pages_meta/', blank=True, null=True, verbose_name=_('Мета описание'))
+    meta_image = models.ImageField(upload_to='static_pages_meta/', blank=True, null=True, verbose_name=_('Мета изображение'))
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('Время создания'))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_('Время обновления'))
 

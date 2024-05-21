@@ -11,7 +11,7 @@ from .forms import (
     ColorAdminForm,
     SizeChartForm,
     TagAdminForm,
-    ProductForm, BrandForm
+    ProductForm, BrandForm, SizeForm
 )
 from .models import (
     Category,
@@ -166,6 +166,7 @@ class ColorAdmin(admin.ModelAdmin):
 
 @admin.register(Size)
 class SizeAdmin(admin.ModelAdmin):
+    form = SizeForm
     list_display = ['name', 'description']
     search_fields = ['name']
 

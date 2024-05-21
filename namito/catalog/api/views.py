@@ -45,7 +45,7 @@ from .filters import ProductFilter, ProductFilterInSearch
 from ...orders.models import OrderedItem
 
 
-class CategoryListView(generics.ListCreateAPIView):
+class CategoryListView(generics.ListAPIView):
     serializer_class = CategorySerializer
 
     def get_queryset(self):
@@ -59,22 +59,17 @@ class CategoryPromotionListView(generics.ListAPIView):
         return Category.objects.filter(parent=None, promotion=True)
 
 
-class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-
-
-class BrandListView(generics.ListCreateAPIView):
+class BrandListView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = BrandSerializer
 
 
-class BrandDetailView(generics.RetrieveUpdateDestroyAPIView):
+class BrandDetailView(generics.RetrieveAPIView):
     queryset = Category.objects.all()
     serializer_class = BrandSerializer
 
 
-class ProductListView(generics.ListCreateAPIView):
+class ProductListView(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductListSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]
@@ -121,7 +116,7 @@ class SimilarProductsView(generics.ListAPIView):
         return queryset
 
 
-class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
+class ProductDetailView(generics.RetrieveAPIView):
     queryset = Product.objects.filter(variants__stock__gt=0).distinct()
     serializer_class = ProductSerializer
 
@@ -136,22 +131,22 @@ class ColorCreateView(generics.CreateAPIView):
     serializer_class = ColorSerializer
 
 
-class ColorDetailView(generics.RetrieveUpdateDestroyAPIView):
+class ColorDetailView(generics.RetrieveAPIView):
     queryset = Color.objects.all()
     serializer_class = ColorSerializer
 
 
-class SizeCreateView(generics.ListCreateAPIView):
+class SizeCreateView(generics.ListAPIView):
     queryset = Size.objects.all()
     serializer_class = SizeSerializer
 
 
-class SizeDetailView(generics.RetrieveUpdateDestroyAPIView):
+class SizeDetailView(generics.RetrieveAPIView):
     queryset = Size.objects.all()
     serializer_class = SizeSerializer
 
 
-class VariantListView(generics.ListCreateAPIView):
+class VariantListView(generics.ListAPIView):
     serializer_class = VariantSerializer
 
     def get_queryset(self):
@@ -159,7 +154,7 @@ class VariantListView(generics.ListCreateAPIView):
         return queryset
 
 
-class VariantDetailView(generics.RetrieveUpdateDestroyAPIView):
+class VariantDetailView(generics.RetrieveAPIView):
     serializer_class = VariantSerializer
 
     def get_queryset(self):
@@ -167,12 +162,12 @@ class VariantDetailView(generics.RetrieveUpdateDestroyAPIView):
         return queryset
 
 
-class ImageCreateView(generics.ListCreateAPIView):
+class ImageCreateView(generics.ListAPIView):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
 
 
-class ImageDetailView(generics.RetrieveUpdateDestroyAPIView):
+class ImageDetailView(generics.RetrieveAPIView):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
 

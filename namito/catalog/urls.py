@@ -3,7 +3,6 @@ from django.views.generic import TemplateView
 
 from namito.catalog.api.views import (
     CategoryListView,
-    CategoryDetailView,
     ProductListView,
     ProductDetailView,
     ColorCreateView,
@@ -34,13 +33,11 @@ from namito.catalog.api.views import (
     )
 
 
-
 category_patterns = [
     path('', TemplateView.as_view(template_name='catalog/index.html')),
 
     path('categories/', CategoryListView.as_view()),
     path('categories/promotion/', CategoryPromotionListView.as_view()),
-    path('categories/<int:pk>/', CategoryDetailView.as_view()),
     path('brands/', BrandListView.as_view()),
     path('brands/<int:pk>/', BrandDetailView.as_view()),
     path('category/<slug:slug>/', CategoryBySlugAPIView.as_view(), name='category-detail'),

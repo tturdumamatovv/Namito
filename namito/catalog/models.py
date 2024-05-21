@@ -193,6 +193,7 @@ class Color(models.Model):
 class Size(models.Model):
     name = models.CharField(max_length=50, verbose_name=_('Название'))
     description = models.CharField(max_length=100, blank=True, verbose_name=_('Описание'))
+    categories = models.ManyToManyField(Category, related_name='sizes', verbose_name=_('Категории'))
 
     class Meta:
         verbose_name = "Размер"

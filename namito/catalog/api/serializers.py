@@ -26,11 +26,13 @@ from namito.users.models import User
 
 class CategorySerializer(serializers.ModelSerializer):
     children = serializers.SerializerMethodField()
+    brands = serializers.SerializerMethodField()
+    sizes = serializers.SerializerMethodField()
 
     class Meta:
         model = Category
         fields = ['id', 'name', 'type', 'slug', 'image', 'parent', 'order', 'meta_title',
-                  'meta_description', 'promotion', 'children', 'background_color']
+                  'meta_description', 'promotion', 'children', 'background_color', 'brands', 'sizes']
 
     def get_fields(self):
         fields = super().get_fields()
@@ -44,6 +46,12 @@ class CategorySerializer(serializers.ModelSerializer):
         self.context['serialized_categories'].add(obj.id)
         serializer = CategorySerializer(obj.children.all(), many=True, context=self.context)
         return serializer.data
+
+    def get_brands(self, obj):
+        return Brand.objects.filter(categories=obj)
+
+    def get_sizes(self, obj):
+        return Size.objects.filter(categories=obj)
 
 
 class BrandSerializer(serializers.ModelSerializer):
