@@ -49,7 +49,8 @@ class MainPageSerializer(serializers.ModelSerializer):
 
     def get_top_products(self, page):
         products = Product.objects.filter(is_top=True, variants__stock__gt=0).distinct().order_by('?')[:15]
-        return products
+        serializer = ProductSerializer(products, many=True)
+        return serializer.data
 
 
 class StaticPageSerializer(serializers.ModelSerializer):
