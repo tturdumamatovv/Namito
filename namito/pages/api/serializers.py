@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from namito.catalog.api.serializers import ProductSerializer
 from namito.catalog.models import Product
 from namito.pages.models import (
     MainPageSlider,
@@ -47,8 +48,8 @@ class MainPageSerializer(serializers.ModelSerializer):
         return MainPageSliderSerializer(slider_qs, many=True, context=self.context).data
 
     def get_top_products(self, page):
-        return Product.objects.filter(is_top=True, variants__stock__gt=0).distinct().order_by('?')[:15]
-
+        products = Product.objects.filter(is_top=True, variants__stock__gt=0).distinct().order_by('?')[:15]
+        serializer = ProductSerializer(products, many=True)
 
 class StaticPageSerializer(serializers.ModelSerializer):
     class Meta:
