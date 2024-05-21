@@ -9,6 +9,11 @@ from namito.pages.api import pages_default_texts
 class MainPageView(generics.RetrieveAPIView):
     serializer_class = MainPageSerializer
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
     def get_object(self):
         instance = None
         try:
