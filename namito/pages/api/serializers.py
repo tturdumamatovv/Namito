@@ -31,13 +31,13 @@ class MainPageSliderSerializer(serializers.ModelSerializer):
 class MainPageSerializer(serializers.ModelSerializer):
     slider = serializers.SerializerMethodField()
     advertisement = serializers.SerializerMethodField()
-    # top_products = serializers.SerializerMethodField()
+    top_products = serializers.SerializerMethodField()
 
     class Meta:
         model = MainPage
         fields = ['banner1', 'banner2', 'banner3', 'title', 'description', 'counter1_title',
                   'counter1_value', 'counter2_title', 'counter2_value', 'counter3_title',
-                  'counter3_value', 'button_link', 'button', 'slider', 'advertisement',]
+                  'counter3_value', 'button_link', 'button', 'slider', 'advertisement', 'top_products']
 
     def get_advertisement(self, page):
         slider_qs = Advertisement.objects.filter(page=page)
@@ -47,10 +47,10 @@ class MainPageSerializer(serializers.ModelSerializer):
         slider_qs = MainPageSlider.objects.filter(page=page)
         return MainPageSliderSerializer(slider_qs, many=True, context=self.context).data
 
-    # def get_top_products(self, page):
-    #     products = Product.objects.filter(is_top=True, variants__stock__gt=0).distinct().order_by('?')[:15]
-    #     serializer = ProductSerializer(products, many=True)
-    #     return serializer.data
+    def get_top_products(self, page):
+        products = Product.objects.filter(is_top=True, variants__stock__gt=0).distinct().order_by('?')[:15]
+        serializer = ProductSerializer(products, many=True, read_only=True, context={'request': self.context['request']})
+        return serializer.data
 
 
 class StaticPageSerializer(serializers.ModelSerializer):
