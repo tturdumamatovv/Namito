@@ -14,11 +14,11 @@ from drf_yasg.views import get_schema_view
 urlpatterns = [
 
     path(settings.ADMIN_URL, admin.site.urls),
-    path("users/", include("namito.users.urls")),
-    path("accounts/", include("allauth.urls")),
-    path('carts/', include('namito.orders.urls')),
+    path("api/users/", include("namito.users.urls")),
+    path("api/accounts/", include("allauth.urls")),
+    path('api/carts/', include('namito.orders.urls')),
     path("api/", include("namito.pages.urls")),
-    path('', include("namito.catalog.urls")),
+    path('api/', include("namito.catalog.urls")),
 
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]
