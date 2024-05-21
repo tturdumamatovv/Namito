@@ -31,7 +31,7 @@ class MainPageSliderSerializer(serializers.ModelSerializer):
 class MainPageSerializer(serializers.ModelSerializer):
     slider = serializers.SerializerMethodField()
     advertisement = serializers.SerializerMethodField()
-    top_products = serializers.SerializerMethodField()
+    # top_products = serializers.SerializerMethodField()
 
     class Meta:
         model = MainPage
