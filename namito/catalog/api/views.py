@@ -6,6 +6,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.filters import OrderingFilter
 
 from drf_yasg.utils import swagger_auto_schema
 from modeltranslation.translator import translator
@@ -40,7 +41,7 @@ from .serializers import (
 
 )
 from .pagination import CustomPageNumberPagination
-from .filters import ProductFilter
+from .filters import ProductFilter, ProductFilterInSearch
 from ...orders.models import OrderedItem
 
 
@@ -76,10 +77,11 @@ class BrandDetailView(generics.RetrieveUpdateDestroyAPIView):
 class ProductListView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductListSerializer
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = ProductFilter
     pagination_class = CustomPageNumberPagination
-
+    ordering_fields = ['name', 'min_price']
+    ordering = ['name']
 
     def get_queryset(self):
         products_with_stock_variants = Product.objects.filter(
@@ -302,15 +304,21 @@ class CategoryByNameStartsWithAPIView(generics.ListAPIView):
 class ProductSearchByNameAndBrandAPIView(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductListSerializer
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_class = ProductFilterInSearch
+    ordering_fields = ['name']
+    ordering = ['name']
 
     def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = self.filter_queryset(queryset)  # Применяем фильтры из filterset_class
         language_code = self.request.LANGUAGE_CODE
 
         search_query = self.request.query_params.get('name')
         brand_query = self.request.query_params.get('brand')
 
         if search_query is None and brand_query is None:
-            return Product.objects.none()
+            return queryset.none()
 
         filters = Q()
 
@@ -326,7 +334,7 @@ class ProductSearchByNameAndBrandAPIView(generics.ListAPIView):
                 translated_field = f"brand__{field}_{language_code}"
                 filters |= Q(**{f"{translated_field}__icontains": brand_query})
 
-        queryset = self.queryset.filter(filters).filter(variants__stock__gt=0).distinct()
+        queryset = queryset.filter(filters).filter(variants__stock__gt=0).distinct()
         return queryset
 
 
