@@ -150,3 +150,17 @@ class Address(models.Model):
     class Meta:
         verbose_name = 'Адрес'
         verbose_name_plural = 'Адреса'
+
+
+class PaymentMethod(models.Model):
+    contacts = models.ForeignKey(Contacts, on_delete=models.CASCADE)
+    link = models.CharField(max_length=100)
+    icon = models.FileField(upload_to='payment_icons')
+
+    def __str__(self):
+        return f'{self.link}'
+
+    class Meta:
+        verbose_name = 'Ссылка оплаты'
+        verbose_name_plural = 'Ссылки оплаты'
+
