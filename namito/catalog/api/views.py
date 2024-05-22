@@ -97,7 +97,7 @@ class ProductListView(generics.ListAPIView):
         elif ordering_param == 'max_discount':
             queryset = queryset.order_by('max_discount')
         elif ordering_param == 'created_at':
-            queryset = queryset.order_by('created_at')
+            queryset = queryset.order_by('-created_at')
         else:
             queryset = queryset.order_by('name')
 
