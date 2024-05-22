@@ -141,7 +141,7 @@ class ProductListSerializer(serializers.ModelSerializer):
             discount = main_variant.get_price()
             return {
                 'price': price,
-                'reduced_price': discount
+                'reduced_price': discount if discount != price else None
             }
         return {'price': 0, 'discount': 0}
 
@@ -210,7 +210,8 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags', 'brand', 'is_favorite', 'cart_quantity', 'review_count', 'characteristics', 'reviews', 'review_allowed', 'images']
+        fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags', 'brand', 'is_favorite',
+                  'cart_quantity', 'review_count', 'characteristics', 'reviews', 'review_allowed', 'images']
 
     def get_variants(self, product):
         variants_qs = Variant.objects.filter(product=product, stock__gt=0, product__active=True).order_by('-main')
