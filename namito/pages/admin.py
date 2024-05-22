@@ -2,7 +2,8 @@ from django.contrib import admin
 
 # Register your models here.
 from namito.advertisement.admin import AdvertisementInline
-from namito.pages.models import StaticPage, MainPageSlider, MainPage, Phone, Email, SocialLink, Contacts, Address
+from namito.pages.models import (StaticPage, MainPageSlider, MainPage, Phone, Email, SocialLink,
+                                 Contacts, Address, PaymentMethod)
 
 
 class MainPageSliderInline(admin.TabularInline):
@@ -77,6 +78,11 @@ class SocialLinkInline(admin.TabularInline):
     extra = 1
 
 
+class PaymentMethodLinkInline(admin.TabularInline):
+    model = PaymentMethod
+    extra = 1
+
+
 class AddressInline(admin.TabularInline):
     model = Address
     extra = 1
@@ -84,4 +90,4 @@ class AddressInline(admin.TabularInline):
 
 @admin.register(Contacts)
 class ContactsAdmin(admin.ModelAdmin):
-    inlines = [PhoneInline, EmailInline, SocialLinkInline, AddressInline]
+    inlines = [PhoneInline, EmailInline, SocialLinkInline, PaymentMethodLinkInline, AddressInline]
