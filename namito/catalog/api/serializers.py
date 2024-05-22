@@ -49,7 +49,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     def get_brands(self, obj):
         brands = Brand.objects.filter(categories=obj)
-        data = [{'name': brand.name, 'logo': brand.logo} for brand in brands]
+        data = [{'name': brand.name, 'logo': brand.logo.url if brand.logo else None} for brand in brands]
         return data
 
     def get_sizes(self, obj):
