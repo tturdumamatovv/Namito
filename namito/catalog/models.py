@@ -122,6 +122,7 @@ class Product(models.Model):
     is_new = models.BooleanField(default=False, verbose_name=_('Новый продукт'))
     sku = models.CharField(max_length=50, unique=True, blank=True, null=True, verbose_name=_('Артикул'))
     active = models.BooleanField(default=True, verbose_name=_('Активность'))
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = "Продукт"

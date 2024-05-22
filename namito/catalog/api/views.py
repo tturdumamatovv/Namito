@@ -70,12 +70,14 @@ class BrandDetailView(generics.RetrieveAPIView):
     serializer_class = BrandSerializer
 
 
+from django.db.models import Max, Count
+
 class ProductListView(generics.ListAPIView):
     serializer_class = ProductListSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = ProductFilter
     pagination_class = CustomPageNumberPagination
-    ordering_fields = ['name', 'min_price', 'max_discount', 'price', 'popularity']
+    ordering_fields = ['name', 'min_price', 'max_discount', 'price', 'popularity', 'created_at']
     ordering = ['name']
 
     def get_queryset(self):
@@ -94,8 +96,10 @@ class ProductListView(generics.ListAPIView):
             queryset = queryset.order_by('-popularity')
         elif ordering_param == 'max_discount':
             queryset = queryset.order_by('-max_discount')
+        elif ordering_param == 'created_at':
+            queryset = queryset.order_by('-created_at')
         else:
-            queryset = queryset.order_by('-id')
+            queryset = queryset.order_by('name')
 
         return queryset
 
