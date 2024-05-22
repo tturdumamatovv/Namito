@@ -38,7 +38,7 @@ from .serializers import (
     SizeChartSerializer,
     ProductListSerializer,
     ColorSizeBrandSerializer,
-    FavoriteToggleSerializer
+    FavoriteToggleSerializer, CategoryBySlugSerializer
 
 )
 from .pagination import CustomPageNumberPagination
@@ -299,7 +299,7 @@ class SizeChartListView(generics.ListAPIView):
 
 class CategoryBySlugAPIView(generics.ListAPIView):
     queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+    serializer_class = CategoryBySlugSerializer
     lookup_field = 'slug'
 
     def get_queryset(self):

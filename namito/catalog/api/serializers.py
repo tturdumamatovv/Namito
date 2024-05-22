@@ -19,7 +19,7 @@ from namito.catalog.models import (
     Tag,
     Characteristic,
     ReviewImage
-    )
+)
 from namito.orders.models import CartItem, OrderedItem
 from namito.users.models import User
 
@@ -32,7 +32,7 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'name', 'type', 'slug', 'image', 'parent', 'order', 'meta_title',
-                  'meta_description', 'promotion', 'children', 'background_color', 'brands', 'sizes']
+                  'meta_description', 'promotion', 'children', 'background_color', 'brands', 'sizes', ]
 
     def get_fields(self):
         fields = super().get_fields()
@@ -56,6 +56,24 @@ class CategorySerializer(serializers.ModelSerializer):
         sizes = Size.objects.filter(categories=obj)
         size_data = [{'id': size.id, 'name': size.name} for size in sizes]
         return size_data
+
+
+class CategoryBySlugSerializer(CategorySerializer):
+    products = serializers.SerializerMethodField()
+
+    class Meta(CategorySerializer.Meta):
+        fields = CategorySerializer.Meta.fields + ['products']
+
+    def get_products(self, obj):
+        def get_all_products(category):
+            products = list(category.products.all())
+            for child in category.children.all():
+                products.extend(get_all_products(child))
+            return products
+
+        products = get_all_products(obj)
+        serializer = ProductListSerializer(products, many=True)
+        return serializer.data
 
 
 class BrandSerializer(serializers.ModelSerializer):
@@ -130,7 +148,8 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'price', 'brand', 'average_rating', 'tags', 'is_favorite', 'cart_quantity', 'images', 'characteristics']
+        fields = ['id', 'name', 'description', 'category', 'price', 'brand', 'average_rating', 'tags', 'is_favorite',
+                  'cart_quantity', 'images', 'characteristics']
 
     def get_price(self, product):
         main_variant = Variant.objects.filter(product=product, main=True).first()
