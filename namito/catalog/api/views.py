@@ -1,6 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
-from django.db.models import Q, Max, Count
+from django.db.models import Q, Max, Count, Min
 
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
@@ -75,14 +75,15 @@ class ProductListView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = ProductFilter
     pagination_class = CustomPageNumberPagination
-    ordering_fields = ['name', 'min_price', 'max_discount', 'price', 'popularity', 'created_at']
+    ordering_fields = ['name', 'min_price', 'max_discount', 'popularity', 'created_at']
     ordering = ['name']
 
     def get_queryset(self):
         products_with_stock_variants = Product.objects.filter(variants__stock__gt=0).distinct()
         queryset = products_with_stock_variants.annotate(
             max_discount=Max('variants__discount_value'),
-            popularity=Count('views')
+            popularity=Count('views'),
+            min_price=Min('variants__price')  # Добавляем аннотацию для минимальной цены продукта
         )
 
         ordering_param = self.request.query_params.get('ordering')
@@ -94,6 +95,10 @@ class ProductListView(generics.ListAPIView):
             queryset = queryset.order_by('popularity')
         elif ordering_param == 'max_discount':
             queryset = queryset.order_by('max_discount')
+        elif ordering_param == '-price':
+            queryset = queryset.order_by('-min_price')  # Используем аннотацию min_price для сортировки
+        elif ordering_param == 'price':
+            queryset = queryset.order_by('min_price')   # Используем аннотацию min_price для сортировки
         elif ordering_param == 'created_at':
             queryset = queryset.order_by('created_at')
         else:
