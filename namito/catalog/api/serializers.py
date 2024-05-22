@@ -82,7 +82,7 @@ class CategoryBySlugSerializer(CategorySerializer):
             return products
 
         products = get_all_products(obj)
-        serializer = ProductListSerializer(products, many=True)
+        serializer = ProductListSerializer(products, many=True, context=self.context)
         return serializer.data
 
 
