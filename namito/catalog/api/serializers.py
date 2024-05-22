@@ -29,11 +29,12 @@ class CategorySerializer(serializers.ModelSerializer):
     brands = serializers.SerializerMethodField()
     sizes = serializers.SerializerMethodField()
     parent = serializers.SerializerMethodField()
+    colors = serializers.SerializerMethodField()
 
     class Meta:
         model = Category
         fields = ['id', 'name', 'type', 'slug', 'image', 'parent', 'order', 'meta_title',
-                  'meta_description', 'promotion', 'children', 'background_color', 'brands', 'sizes', ]
+                  'meta_description', 'promotion', 'children', 'background_color', 'brands', 'sizes', 'colors']
 
     def get_fields(self):
         fields = super().get_fields()
@@ -57,6 +58,11 @@ class CategorySerializer(serializers.ModelSerializer):
         sizes = Size.objects.filter(categories=obj)
         size_data = [{'id': size.id, 'name': size.name} for size in sizes]
         return size_data
+
+    def get_colors(self, obj):
+        colors = Color.objects.all()
+        data = [{'id': color.id, 'name': color.name, 'color': color.color} for color in colors]
+        return data
 
     def get_parent(self, obj):
         if obj.parent:
