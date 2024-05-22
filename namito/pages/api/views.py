@@ -97,7 +97,6 @@ class StaticPageDetailView(generics.RetrieveAPIView):
 
 
 class LayoutView(generics.RetrieveAPIView):
-    queryset = Contacts.objects.all().first()
     serializer_class = ContactsSerializer
     def get_object(self):
         instance = None
