@@ -1,6 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
-from django.db.models import Q, Max
+from django.db.models import Q, Max, Count
 
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
@@ -75,13 +75,14 @@ class ProductListView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = ProductFilter
     pagination_class = CustomPageNumberPagination
-    ordering_fields = ['name', 'min_price', 'popularity', 'max_discount', 'price_asc', 'price_desc']
+    ordering_fields = ['name', 'min_price', 'max_discount', 'price_asc', 'price_desc', 'new', 'popularity']
     ordering = ['name']
 
     def get_queryset(self):
         products_with_stock_variants = Product.objects.filter(variants__stock__gt=0).distinct()
         queryset = products_with_stock_variants.annotate(
-            max_discount=Max('variants__discount_value')
+            max_discount=Max('variants__discount_value'),
+            popularity=Count('views')
         )
 
         ordering_param = self.request.query_params.get('ordering')
@@ -89,6 +90,10 @@ class ProductListView(generics.ListAPIView):
             queryset = queryset.order_by('min_price')
         elif ordering_param == 'price_desc':
             queryset = queryset.order_by('-min_price')
+        elif ordering_param == 'new':
+            queryset = queryset.order_by('-id')
+        elif ordering_param == 'popularity':
+            queryset = queryset.order_by('-popularity')
         else:
             queryset = queryset.order_by('-popularity', '-max_discount')
 
