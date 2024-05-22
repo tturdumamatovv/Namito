@@ -75,7 +75,7 @@ class ProductListView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = ProductFilter
     pagination_class = CustomPageNumberPagination
-    ordering_fields = ['name', 'min_price', 'max_discount', 'price', 'new', 'popularity']
+    ordering_fields = ['name', 'min_price', 'max_discount', 'price', 'popularity']
     ordering = ['name']
 
     def get_queryset(self):
@@ -91,7 +91,7 @@ class ProductListView(generics.ListAPIView):
         elif ordering_param == 'price_desc':
             queryset = queryset.order_by('-min_price')
         elif ordering_param == 'new':
-            queryset = queryset.order_by('-is_new', '-id')  # Сначала новые продукты, затем по ID
+            queryset = queryset.order_by('-id')  # Сортировка по убыванию ID, то есть новые продукты в начале списка
         elif ordering_param == 'popularity':
             queryset = queryset.order_by('-popularity')
         elif ordering_param == 'max_discount':
