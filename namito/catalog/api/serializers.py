@@ -28,6 +28,7 @@ class CategorySerializer(serializers.ModelSerializer):
     children = serializers.SerializerMethodField()
     brands = serializers.SerializerMethodField()
     sizes = serializers.SerializerMethodField()
+    parent = serializers.SerializerMethodField()
 
     class Meta:
         model = Category
@@ -56,6 +57,15 @@ class CategorySerializer(serializers.ModelSerializer):
         sizes = Size.objects.filter(categories=obj)
         size_data = [{'id': size.id, 'name': size.name} for size in sizes]
         return size_data
+
+    def get_parent(self, obj):
+        if obj.parent:
+            return {
+                'id': obj.parent.id,
+                'name': obj.parent.name,
+                'slug': obj.parent.slug
+            }
+        return None
 
 
 class CategoryBySlugSerializer(CategorySerializer):
