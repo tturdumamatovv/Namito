@@ -89,15 +89,15 @@ class ProductListView(generics.ListAPIView):
 
         ordering_param = self.request.query_params.get('ordering')
         if ordering_param == 'price_asc':
-            queryset = queryset.order_by('min_price')
-        elif ordering_param == 'price_desc':
             queryset = queryset.order_by('-min_price')
+        elif ordering_param == 'price_desc':
+            queryset = queryset.order_by('min_price')
         elif ordering_param == 'popularity':
-            queryset = queryset.order_by('-popularity')
+            queryset = queryset.order_by('popularity')
         elif ordering_param == 'max_discount':
-            queryset = queryset.order_by('-max_discount')
-        elif ordering_param == 'created_at':
-            queryset = queryset.order_by('-created_at')
+            queryset = queryset.order_by('max_discount')
+        elif ordering_param == 'new':
+            queryset = queryset.order_by('created_at')
         else:
             queryset = queryset.order_by('name')
 
