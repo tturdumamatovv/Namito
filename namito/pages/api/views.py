@@ -1,8 +1,9 @@
 from rest_framework import generics
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from namito.pages.api.serializers import MainPageSerializer, StaticPageSerializer
-from namito.pages.models import MainPage, StaticPage
+from namito.pages.api.serializers import MainPageSerializer, StaticPageSerializer, ContactsSerializer
+from namito.pages.models import MainPage, StaticPage, Contacts
 from namito.pages.api import pages_default_texts
 
 
@@ -93,3 +94,18 @@ class StaticPageDetailView(generics.RetrieveAPIView):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+
+
+class LayoutView(generics.RetrieveAPIView):
+    queryset = Contacts.objects.all().first()
+    serializer_class = ContactsSerializer
+    def get_object(self):
+        instance = None
+        try:
+            instance = Contacts.objects.get(pk=1)
+        except:
+            instance = Contacts.objects.create(
+
+            )
+
+        return instance

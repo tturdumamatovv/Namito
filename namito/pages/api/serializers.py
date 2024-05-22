@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-from namito.catalog.api.serializers import ProductSerializer
-from namito.catalog.models import Product
+from namito.catalog.api.serializers import ProductSerializer, ProductListSerializer
+from namito.catalog.models import Product, Category
 from namito.pages.models import (
     MainPageSlider,
     MainPage,
-    StaticPage
+    StaticPage, Phone, Email, SocialLink, Contacts
 )
 from namito.advertisement.api.serializers import AdvertisementSerializer
 from namito.advertisement.models import Advertisement
@@ -49,7 +49,8 @@ class MainPageSerializer(serializers.ModelSerializer):
 
     def get_top_products(self, page):
         products = Product.objects.filter(is_top=True, variants__stock__gt=0).distinct().order_by('?')[:15]
-        serializer = ProductSerializer(products, many=True, read_only=True, context={'request': self.context['request']})
+        serializer = ProductListSerializer(products, many=True, read_only=True,
+                                           context={'request': self.context['request']})
         return serializer.data
 
 
@@ -58,3 +59,34 @@ class StaticPageSerializer(serializers.ModelSerializer):
         model = StaticPage
         fields = ['title', 'slug', 'content', 'image', 'meta_title',
                   'meta_description', 'created_at', 'updated_at']
+
+
+class ContactsSerializer(serializers.ModelSerializer):
+    phones = serializers.SerializerMethodField()
+    emails = serializers.SerializerMethodField()
+    social_links = serializers.SerializerMethodField()
+    promoted_categories = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Contacts
+        fields = ['id', 'phones', 'emails', 'social_links', 'promoted_categories']
+
+    def get_phones(self, obj):
+        phones = Phone.objects.all()
+        data = [{'phone': phone.phone} for phone in phones]
+        return data
+
+    def get_emails(self, obj):
+        emails = Email.objects.all()
+        data = [{'email': email.email} for email in emails]
+        return data
+
+    def get_social_links(self, obj):
+        social_links = SocialLink.objects.all()
+        data = [{'link': social_link.link, 'icon': social_link.icon} for social_link in social_links]
+        return data
+
+    def get_promoted_categories(self, obj):
+        categories = Category.objects.filter(promotion=True)
+        data = [{'name': category.name, 'slug': category.slug} for category in categories]
+        return data

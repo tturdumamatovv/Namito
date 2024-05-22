@@ -461,6 +461,11 @@ SIMPLEUI_CONFIG = {
             'icon': 'fa fa-file-text',
             'url': '/admin/pages/staticpage/'
         },
+        {
+            'name': 'Контактная информация',
+            'icon': 'fa fa-phone',
+            'url': '/admin/pages/contacts/'
+        },
     ]
 }
 

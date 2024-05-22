@@ -91,7 +91,7 @@ class StaticPage(ProcessedImageModel):
         ordering = ['title']
 
 
-class Contacts(models.Model):
+class Contacts(SingletonModel):
     pass
 
     def __str__(self):
