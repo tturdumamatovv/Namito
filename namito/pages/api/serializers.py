@@ -83,7 +83,11 @@ class ContactsSerializer(serializers.ModelSerializer):
 
     def get_social_links(self, obj):
         social_links = SocialLink.objects.all()
-        data = [{'link': social_link.link, 'icon': social_link.icon} for social_link in social_links]
+        request = self.context.get('request')
+        data = [{
+            'link': social_link.link,
+            'icon': request.build_absolute_uri(social_link.icon.url) if social_link.icon else None
+        } for social_link in social_links]
         return data
 
     def get_promoted_categories(self, obj):
