@@ -72,7 +72,8 @@ class StaticPage(ProcessedImageModel):
     image = models.ImageField(upload_to='static_pages/', blank=True, null=True, verbose_name=_('Изображение'))
     meta_title = models.CharField(max_length=60, blank=True, null=True, verbose_name=_('Мета заголовок'))
     meta_description = models.CharField(max_length=160, blank=True, null=True, verbose_name=_('Мета описание'))
-    meta_image = models.ImageField(upload_to='static_pages_meta/', blank=True, null=True, verbose_name=_('Мета изображение'))
+    meta_image = models.ImageField(upload_to='static_pages_meta/', blank=True, null=True,
+                                   verbose_name=_('Мета изображение'))
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('Время создания'))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_('Время обновления'))
 
@@ -88,3 +89,51 @@ class StaticPage(ProcessedImageModel):
         verbose_name = 'Статичные страницы'
         verbose_name_plural = 'Статичные страницы'
         ordering = ['title']
+
+
+class Contacts(models.Model):
+    pass
+
+    def __str__(self):
+        return 'Контактная информация'
+
+    class Meta:
+        verbose_name = 'Контакты'
+        verbose_name_plural = 'Контакты'
+
+
+class Phone(models.Model):
+    contacts = models.ForeignKey(Contacts, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f'{self.phone}'
+
+    class Meta:
+        verbose_name = 'Телефон'
+        verbose_name_plural = 'Телефоны'
+
+
+class Email(models.Model):
+    contacts = models.ForeignKey(Contacts, on_delete=models.CASCADE)
+    email = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f'{self.email}'
+
+    class Meta:
+        verbose_name = 'Имейл'
+        verbose_name_plural = 'Имейлы'
+
+
+class SocialLink(models.Model):
+    contacts = models.ForeignKey(Contacts, on_delete=models.CASCADE)
+    link = models.CharField(max_length=100)
+    icon = models.FileField(upload_to='social_icons')
+
+    def __str__(self):
+        return f'{self.link}'
+
+    class Meta:
+        verbose_name = 'Ссылка соцсети'
+        verbose_name_plural = 'Ссылки соцсетей'
