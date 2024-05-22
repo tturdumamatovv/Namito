@@ -98,16 +98,16 @@ class StaticPageDetailView(generics.RetrieveAPIView):
 
 class LayoutView(generics.RetrieveAPIView):
     serializer_class = ContactsSerializer
+
     def get_object(self):
         instance = None
         try:
             instance = Contacts.objects.get(pk=1)
         except:
-            instance = Contacts.objects.create(
-
-            )
+            instance = Contacts.objects.create()
 
         return instance
+
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context['request'] = self.request

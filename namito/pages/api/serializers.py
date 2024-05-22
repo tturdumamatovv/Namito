@@ -66,10 +66,11 @@ class ContactsSerializer(serializers.ModelSerializer):
     emails = serializers.SerializerMethodField()
     social_links = serializers.SerializerMethodField()
     promoted_categories = serializers.SerializerMethodField()
+    categories = serializers.SerializerMethodField()
 
     class Meta:
         model = Contacts
-        fields = ['id', 'phones', 'emails', 'social_links', 'promoted_categories']
+        fields = ['id', 'phones', 'emails', 'social_links', 'promoted_categories', 'categories']
 
     def get_phones(self, obj):
         phones = Phone.objects.all()
@@ -94,3 +95,23 @@ class ContactsSerializer(serializers.ModelSerializer):
         categories = Category.objects.filter(promotion=True)
         data = [{'name': category.name, 'slug': category.slug} for category in categories]
         return data
+
+    def get_categories(self, obj):
+        def get_nested_categories_data(category):
+            category_data = {
+                'name': category.name,
+                'slug': category.slug,
+                'children': []
+            }
+            children_categories = category.children.all()
+            for child_category in children_categories:
+                child_data = get_nested_categories_data(child_category)
+                category_data['children'].append(child_data)
+            return category_data
+
+        root_categories = Category.objects.filter(parent__isnull=True)
+        categories_data = []
+        for root_category in root_categories:
+            root_category_data = get_nested_categories_data(root_category)
+            categories_data.append(root_category_data)
+        return categories_data
