@@ -8,7 +8,7 @@ from drf_spectacular.views import (
 
 
 urlpatterns = [
-    path("", SpectacularAPIView.as_view(), name="schema"),
+    path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "swagger/",
         SpectacularSwaggerView.as_view(url_name="schema"),

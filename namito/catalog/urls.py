@@ -34,8 +34,6 @@ from namito.catalog.api.views import (
 
 
 category_patterns = [
-    path('', TemplateView.as_view(template_name='catalog/index.html')),
-
     path('categories/', CategoryListView.as_view()),
     path('categories/promotion/', CategoryPromotionListView.as_view()),
     path('brands/', BrandListView.as_view()),
