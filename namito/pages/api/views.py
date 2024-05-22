@@ -101,7 +101,9 @@ class LayoutView(generics.RetrieveAPIView):
     serializer_class = ContactsSerializer
 
     def get_object(self):
-        instance = get_object_or_404(Contacts, pk=1)
+        # Получаем первый объект Contacts или вызываем 404 ошибку, если объект не найден
+        instance = get_object_or_404(Contacts.objects.all())
+
         return instance
 
     def get_serializer_context(self):
