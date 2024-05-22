@@ -84,6 +84,20 @@ class Brand(models.Model):
                              help_text="The logo of the brand", verbose_name=_('Логотип'))
     categories = models.ManyToManyField(Category, related_name='brands', verbose_name=_('Категории'))
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self._update_child_categories()
+
+    def _update_child_categories(self):
+        for category in self.categories.all():
+            self._add_brand_to_children(category)
+
+    def _add_brand_to_children(self, category):
+        for child in category.children.all():
+            if self not in child.brands.all():
+                child.brands.add(self)
+            self._add_brand_to_children(child)
+
     def __str__(self):
         return f'{self.name}'
 
