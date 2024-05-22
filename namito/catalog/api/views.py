@@ -91,7 +91,7 @@ class ProductListView(generics.ListAPIView):
         elif ordering_param == 'price_desc':
             queryset = queryset.order_by('-min_price')
         elif ordering_param == 'new':
-            queryset = queryset.order_by('-id')  # Сортировка по убыванию ID, то есть новые продукты в начале списка
+            queryset = queryset.order_by('-id')
         elif ordering_param == 'popularity':
             queryset = queryset.order_by('-popularity')
         elif ordering_param == 'max_discount':
