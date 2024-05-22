@@ -83,7 +83,7 @@ class ProductListView(generics.ListAPIView):
         queryset = products_with_stock_variants.annotate(
             max_discount=Max('variants__discount_value'),
             popularity=Count('views'),
-            min_variant_price=Min('variants__price')  # Изменяем имя аннотации
+            min_variant_price=Min('variants__price')
         )
 
         ordering_param = self.request.query_params.get('ordering')

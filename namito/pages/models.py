@@ -137,3 +137,16 @@ class SocialLink(models.Model):
     class Meta:
         verbose_name = 'Ссылка соцсети'
         verbose_name_plural = 'Ссылки соцсетей'
+
+
+
+class Address(models.Model):
+    contacts = models.ForeignKey(Contacts, on_delete=models.CASCADE)
+    address = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.address
+
+    class Meta:
+        verbose_name = 'Адрес'
+        verbose_name_plural = 'Адреса'
