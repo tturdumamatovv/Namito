@@ -86,9 +86,9 @@ class ProductListView(generics.ListAPIView):
         )
 
         ordering_param = self.request.query_params.get('ordering')
-        if ordering_param == 'price_asc':
+        if ordering_param == 'min_price':
             queryset = queryset.order_by('min_price')
-        elif ordering_param == 'price_desc':
+        elif ordering_param == '-min_price':
             queryset = queryset.order_by('-min_price')
         elif ordering_param == 'popularity':
             queryset = queryset.order_by('popularity')
