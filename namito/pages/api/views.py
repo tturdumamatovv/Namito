@@ -1,6 +1,7 @@
 from rest_framework import generics
 from rest_framework.response import Response
-from rest_framework.views import APIView
+
+from django.shortcuts import get_object_or_404
 
 from namito.pages.api.serializers import MainPageSerializer, StaticPageSerializer, ContactsSerializer
 from namito.pages.models import MainPage, StaticPage, Contacts
@@ -100,12 +101,7 @@ class LayoutView(generics.RetrieveAPIView):
     serializer_class = ContactsSerializer
 
     def get_object(self):
-        instance = None
-        try:
-            instance = Contacts.objects.get(pk=1)
-        except:
-            instance = Contacts.objects.create()
-
+        instance = get_object_or_404(Contacts, pk=1)
         return instance
 
     def get_serializer_context(self):
