@@ -42,7 +42,7 @@ from .serializers import (
 
 )
 from .pagination import CustomPageNumberPagination
-from .filters import ProductFilter, ProductFilterInSearch
+from .filters import ProductFilter
 from ...orders.models import OrderedItem
 
 
@@ -327,14 +327,9 @@ class CategoryByNameStartsWithAPIView(generics.ListAPIView):
 class ProductSearchByNameAndBrandAPIView(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductListSerializer
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_class = ProductFilterInSearch
-    ordering_fields = ['name']
-    ordering = ['name']
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = self.filter_queryset(queryset)  # Применяем фильтры из filterset_class
         language_code = self.request.LANGUAGE_CODE
 
         search_query = self.request.query_params.get('name')

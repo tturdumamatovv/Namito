@@ -93,15 +93,3 @@ class ProductFilter(django_filters.FilterSet):
                 queryset = self.filter_by_discount_presence(queryset, 'has_discount', has_discount)
 
         return queryset
-
-
-class ProductFilterInSearch(django_filters.FilterSet):
-    is_top = django_filters.BooleanFilter(field_name='is_top')
-    is_new = django_filters.BooleanFilter(field_name='is_new')
-    min_price = django_filters.NumberFilter(field_name='variants__price', lookup_expr='gte')
-    max_price = django_filters.NumberFilter(field_name='variants__price', lookup_expr='lte')
-    has_discount = django_filters.BooleanFilter(field_name='variants__discount_value', lookup_expr='isnull', exclude=True)
-
-    class Meta:
-        model = Product
-        fields = ['is_top', 'is_new', 'min_price', 'max_price', 'has_discount']
