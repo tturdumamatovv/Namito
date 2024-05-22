@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-from namito.catalog.api.serializers import ProductSerializer, ProductListSerializer
+from namito.catalog.api.serializers import ProductListSerializer
 from namito.catalog.models import Product, Category
 from namito.pages.models import (
     MainPageSlider,
     MainPage,
-    StaticPage, Phone, Email, SocialLink, Contacts
+    StaticPage, Phone, Email, SocialLink, Contacts, PaymentMethod
 )
 from namito.advertisement.api.serializers import AdvertisementSerializer
 from namito.advertisement.models import Advertisement
@@ -65,12 +65,13 @@ class ContactsSerializer(serializers.ModelSerializer):
     phones = serializers.SerializerMethodField()
     emails = serializers.SerializerMethodField()
     social_links = serializers.SerializerMethodField()
+    payment_methods = serializers.SerializerMethodField()
     promoted_categories = serializers.SerializerMethodField()
     categories = serializers.SerializerMethodField()
 
     class Meta:
         model = Contacts
-        fields = ['id', 'phones', 'emails', 'social_links', 'promoted_categories', 'categories']
+        fields = ['id', 'phones', 'emails', 'social_links', 'payment_methods', 'promoted_categories', 'categories']
 
     def get_phones(self, obj):
         phones = Phone.objects.all()
@@ -89,6 +90,15 @@ class ContactsSerializer(serializers.ModelSerializer):
             'link': social_link.link,
             'icon': request.build_absolute_uri(social_link.icon.url) if social_link.icon else None
         } for social_link in social_links]
+        return data
+
+    def get_payment_methods(self, obj):
+        payment_methods = PaymentMethod.objects.all()
+        request = self.context.get('request')
+        data = [{
+            'link': payment_method.link,
+            'icon': request.build_absolute_uri(payment_method.icon.url) if payment_method.icon else None
+        } for payment_method in payment_methods]
         return data
 
     def get_promoted_categories(self, obj):
