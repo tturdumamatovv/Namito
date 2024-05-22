@@ -75,7 +75,7 @@ class ProductListView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = ProductFilter
     pagination_class = CustomPageNumberPagination
-    ordering_fields = ['name', 'min_price', 'max_discount', 'price', 'popularity']
+    ordering_fields = ['name', 'min_price', 'new', 'max_discount', 'price', 'popularity']
     ordering = ['name']
 
     def get_queryset(self):
