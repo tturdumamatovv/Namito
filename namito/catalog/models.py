@@ -4,7 +4,6 @@ import io
 import uuid
 
 from django.db import models
-from django.utils.encoding import force_str
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django.core.files.base import ContentFile
@@ -163,6 +162,23 @@ class Product(models.Model):
 
     def __str__(self):
         return f'{self.name}'
+
+    def get_popularity_score(self):
+        return self.views.count()
+
+
+class ProductView(models.Model):
+    product = models.ForeignKey(Product, related_name='views', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    viewed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('product', 'user')
+        verbose_name = "Просмотр продукта"
+        verbose_name_plural = "Просмотры продуктов"
+
+    def __str__(self):
+        return f"{self.user} просмотрел(а) {self.product} в {self.viewed_at}"
 
 
 class Characteristic(models.Model):

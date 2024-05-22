@@ -1,6 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
+from django.db.models import Q, Max
 
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
@@ -21,7 +21,8 @@ from namito.catalog.models import (
     Review,
     Favorite,
     SizeChart,
-    Brand
+    Brand,
+    ProductView
 )
 from .serializers import (
     CategorySerializer,
@@ -70,19 +71,28 @@ class BrandDetailView(generics.RetrieveAPIView):
 
 
 class ProductListView(generics.ListAPIView):
-    queryset = Product.objects.all()
     serializer_class = ProductListSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = ProductFilter
     pagination_class = CustomPageNumberPagination
-    ordering_fields = ['name', 'min_price']
+    ordering_fields = ['name', 'min_price', 'popularity', 'max_discount', 'price_asc', 'price_desc']
     ordering = ['name']
 
     def get_queryset(self):
-        products_with_stock_variants = Product.objects.filter(
-            variants__stock__gt=0
-        ).distinct()
-        return products_with_stock_variants
+        products_with_stock_variants = Product.objects.filter(variants__stock__gt=0).distinct()
+        queryset = products_with_stock_variants.annotate(
+            max_discount=Max('variants__discount_value')
+        )
+
+        ordering_param = self.request.query_params.get('ordering')
+        if ordering_param == 'price_asc':
+            queryset = queryset.order_by('min_price')
+        elif ordering_param == 'price_desc':
+            queryset = queryset.order_by('-min_price')
+        else:
+            queryset = queryset.order_by('-popularity', '-max_discount')
+
+        return queryset
 
 
 class TopProductListView(generics.ListAPIView):
@@ -124,6 +134,16 @@ class ProductDetailView(generics.RetrieveAPIView):
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user = request.user
+
+        if user.is_authenticated:
+            ProductView.objects.get_or_create(product=instance, user=user)
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
 
 class ColorCreateView(generics.CreateAPIView):
