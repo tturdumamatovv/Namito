@@ -54,7 +54,7 @@ class SizeChartForm(forms.ModelForm):
 
 class BrandForm(forms.ModelForm):
     categories = forms.ModelMultipleChoiceField(
-        queryset=Category.objects.filter(parent=None),
+        queryset=Category.objects.filter(parent__isnull=True),  # Только родительские категории
         required=False,
         widget=FilteredSelectMultiple(
             verbose_name='Категории',
