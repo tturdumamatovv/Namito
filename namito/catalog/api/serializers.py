@@ -249,7 +249,7 @@ class ProductSerializer(serializers.ModelSerializer):
                   'cart_quantity', 'sku', 'review_count', 'characteristics', 'reviews', 'review_allowed', 'images']
 
     def get_variants(self, product):
-        variants_qs = Variant.objects.filter(product=product, stock__gt=0, product__active=True).order_by('-main')
+        variants_qs = Variant.objects.filter(product=product, stock__gt=0, product__active=True).order_by('-main', 'price')
         return VariantSerializer(variants_qs, many=True, context=self.context).data
 
     def get_average_rating(self, product):
