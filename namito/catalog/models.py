@@ -86,17 +86,15 @@ class Brand(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        self._update_child_categories()
+        self.update_child_category_brands()
 
-    def _update_child_categories(self):
+    def update_child_category_brands(self):
         for category in self.categories.all():
-            self._add_brand_to_children(category)
-
-    def _add_brand_to_children(self, category):
-        for child in category.children.all():
-            if self not in child.brands.all():
+            print(category.brands.all())
+            for child in category.children.all():
                 child.brands.add(self)
-            self._add_brand_to_children(child)
+                child.save()
+                print(child.brands.all())
 
     def __str__(self):
         return f'{self.name}'

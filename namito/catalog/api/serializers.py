@@ -107,7 +107,7 @@ class ColorSerializer(serializers.ModelSerializer):
 class SizeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Size
-        fields = ['name', 'description']
+        fields = ['id', 'name', 'description']
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -148,7 +148,7 @@ class VariantSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_discounted_price(variant):
         discounted_price = variant.get_price()
-        return discounted_price
+        return discounted_price if discounted_price != variant.price else None
 
 
 class ProductListSerializer(serializers.ModelSerializer):
@@ -246,7 +246,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags', 'brand', 'is_favorite',
-                  'cart_quantity', 'review_count', 'characteristics', 'reviews', 'review_allowed', 'images']
+                  'cart_quantity', 'sku', 'review_count', 'characteristics', 'reviews', 'review_allowed', 'images']
 
     def get_variants(self, product):
         variants_qs = Variant.objects.filter(product=product, stock__gt=0, product__active=True).order_by('-main')
