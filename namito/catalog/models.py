@@ -54,6 +54,7 @@ class Category(MPTTModel, models.Model):
     meta_title = models.CharField(max_length=59, blank=True, verbose_name=_('Мета заголовок'))
     meta_description = models.CharField(max_length=160, blank=True, verbose_name=_('Мета описание'))
     promotion = models.BooleanField(default=False, verbose_name=_('Продвижение'))
+    icon = models.ImageField(upload_to='category_icons/', null=True, blank=True, verbose_name=_('Иконки'))
 
     class Meta:
         verbose_name = _("Категория")

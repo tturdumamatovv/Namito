@@ -34,7 +34,7 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'name', 'type', 'slug', 'image', 'parent', 'order', 'meta_title',
-                  'meta_description', 'promotion', 'children', 'background_color', 'brands', 'sizes', 'colors']
+                  'meta_description', 'promotion', 'children', 'background_color', 'brands', 'sizes', 'colors', 'icon']
 
     def get_fields(self):
         fields = super().get_fields()
