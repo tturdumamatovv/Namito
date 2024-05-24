@@ -75,7 +75,7 @@ class Category(MPTTModel, models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.name}-{self.name_ru}'
+        return f'{self.name}'
 
 
 class Brand(models.Model):
@@ -258,7 +258,7 @@ class Image(ProcessedImageModel):
     small_image = models.ImageField(upload_to='product_images/', blank=True, null=True, verbose_name=_("Мини изображение"))
     main_image = models.BooleanField(default=False, verbose_name=_("Главная картинка"))
     product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE, null=True, blank=True)
-    color = models.ForeignKey(Color, related_name='images', on_delete=models.PROTECT, null=True, blank=True, verbose_name=_('Цвет'))
+    color = models.ForeignKey(Color, related_name='images', on_delete=models.PROTECT, verbose_name=_('Цвет'))
 
     class Meta:
         verbose_name = 'Изображение'

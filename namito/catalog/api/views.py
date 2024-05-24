@@ -75,12 +75,11 @@ class ProductListView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = ProductFilter
     pagination_class = CustomPageNumberPagination
-    ordering_fields = ['name', 'max_discount', 'popularity', 'created_at', 'min_variant_price']  # Добавляем min_variant_price
+    ordering_fields = ['name', 'max_discount', 'popularity', 'created_at', 'min_variant_price']
     ordering = ['name']
 
     def get_queryset(self):
-        products_with_stock_variants = Product.objects.filter(variants__stock__gt=0).distinct()
-        queryset = products_with_stock_variants.annotate(
+        queryset = Product.objects.annotate(
             max_discount=Max('variants__discount_value'),
             popularity=Count('views'),
             min_variant_price=Min('variants__price')
@@ -108,7 +107,7 @@ class TopProductListView(generics.ListAPIView):
 
     def get_queryset(self):
         return Product.objects.filter(
-            is_top=True, variants__stock__gt=0
+            is_top=True
         ).distinct().order_by('?')[:15]
 
 
@@ -117,7 +116,7 @@ class NewProductListView(generics.ListAPIView):
 
     def get_queryset(self):
         return Product.objects.filter(
-            is_new=True, variants__stock__gt=0
+            is_new=True
         ).distinct().order_by('-id')[:15]
 
 
@@ -129,13 +128,12 @@ class SimilarProductsView(generics.ListAPIView):
         product = get_object_or_404(Product, pk=product_id)
         queryset = Product.objects.filter(
             category=product.category,
-            variants__stock__gt=0
         ).exclude(pk=product_id).distinct()[:10]
         return queryset
 
 
 class ProductDetailView(generics.RetrieveAPIView):
-    queryset = Product.objects.filter(variants__stock__gt=0).distinct()
+    queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
     def get_serializer_context(self):
@@ -178,7 +176,7 @@ class VariantListView(generics.ListAPIView):
     serializer_class = VariantSerializer
 
     def get_queryset(self):
-        queryset = Variant.objects.filter(stock__gt=0)
+        queryset = Variant.objects.all()
         return queryset
 
 
@@ -186,7 +184,7 @@ class VariantDetailView(generics.RetrieveAPIView):
     serializer_class = VariantSerializer
 
     def get_queryset(self):
-        queryset = Variant.objects.filter(stock__gt=0)
+        queryset = Variant.objects.all()
         return queryset
 
 
