@@ -219,7 +219,7 @@ class ProductListSerializer(serializers.ModelSerializer):
         return CharacteristicsSerializer(characteristics, many=True).data
 
     def to_representation(self, instance):
-        if not instance.active:
+        if not instance.active or not Variant.objects.filter(product=instance).exists():
             return None
         return super().to_representation(instance)
 
