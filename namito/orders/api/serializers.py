@@ -113,9 +113,9 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = [
             'id', 'cart', 'total_amount', 'payment_status', 'status', 'created_at', 'finished_at',
-            'items', 'delivery_method', 'user_address', 'payment_method'
+            'items', 'delivery_method', 'user_address', 'payment_method', 'order_number'
         ]
-        read_only_fields = ['cart', 'total_amount', 'created_at', 'finished_at']
+        read_only_fields = ['cart', 'total_amount', 'created_at', 'finished_at', 'order_number']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
