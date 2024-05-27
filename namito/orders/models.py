@@ -72,14 +72,12 @@ class Order(models.Model):
     STATUSES = [
         (0, _("В процессе")),
         (1, _("Доставлено")),
-        (2, _("Доставка отменена")),
-        (3, _("Новый")),
-        (4, _("Отправлено"))
+        (2, _("Отменен")),
+        (3, _("Отправлено"))
     ]
 
     PAYMENT_STATUSES = [
         (0, _("Не оплачено")),
-        (1, _("Платеж в процессе")),
         (2, _("Оплачено")),
     ]
 
@@ -93,7 +91,7 @@ class Order(models.Model):
         ('картой', _("Картой")),
     ]
 
-    payment_status = models.IntegerField(choices=PAYMENT_STATUSES, default=1, verbose_name=_('Статус оплаты'))
+    payment_status = models.IntegerField(choices=PAYMENT_STATUSES, default=0, verbose_name=_('Статус оплаты'))
     status = models.IntegerField(choices=STATUSES, default=0, verbose_name=_('Статус заказа'))
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders', verbose_name=_('Покупатель'))
     cart = models.ForeignKey(Cart, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders', verbose_name=_('Корзина'))
@@ -131,7 +129,7 @@ class Order(models.Model):
         if self.status == 2 and not OrderHistory.objects.filter(order=self).exists():
             OrderHistory.objects.create(user=self.user, order=self)
 
-        if self.status == 1:  # Если статус заказа "Complete"
+        if self.status == 1:  # Если статус заказа "Доставлено"
             with transaction.atomic():  # Обертка для обеспечения атомарности операций
                 ordered_items = self.ordered_items.all()  # Получаем все заказанные товары
                 for ordered_item in ordered_items:
@@ -139,19 +137,19 @@ class Order(models.Model):
                     variant.stock -= ordered_item.quantity  # Уменьшаем количество товара на складе
                     variant.save()
 
-        def cancel_order(self):
-            # Проверяем, можно ли отменить заказ (например, статус должен быть "В процессе")
-            if self.status != 0:  # 0 - "В процессе"
-                raise ValidationError(_("Order cannot be canceled in its current state."))
+    def cancel_order(self):
+        # Проверяем, можно ли отменить заказ (например, статус должен быть "В процессе")
+        if self.status != 0:  # 0 - "В процессе"
+            raise ValidationError(_("Order cannot be canceled in its current state."))
 
-            with transaction.atomic():
-                # Меняем статус заказа на "Доставка отменена"
-                self.status = 2  # 2 - "Доставка отменена"
-                self.save()
+        with transaction.atomic():
+            # Меняем статус заказа на "Отменен"
+            self.status = 2  # 2 - "Отменен"
+            self.save()
 
-                for ordered_item in self.ordered_items.all():
-                    variant = ordered_item.product_variant
-                    variant.stock += ordered_item.quantity
-                    variant.save()
+            for ordered_item in self.ordered_items.all():
+                variant = ordered_item.product_variant
+                variant.stock += ordered_item.quantity
+                variant.save()
 
-            return True
+        return True

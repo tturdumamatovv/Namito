@@ -189,15 +189,9 @@ class OrderCancelAPIView(generics.RetrieveUpdateAPIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
         # Отменяем заказ
-        instance.status = 2  # Устанавливаем статус "доставка отменена"
-        instance.save()
-
-        # Возвращаем товары на склад
-        for ordered_item in instance.ordered_items.all():
-            variant = ordered_item.product_variant
-            variant.stock += ordered_item.quantity
-            variant.save()
+        instance.cancel_order()
 
         # Возвращаем сериализованные данные обновленного заказа
         serializer = self.get_serializer(instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
