@@ -20,6 +20,10 @@ class Cart(models.Model):
     def __str__(self):
         return f"Корзина {self.user}"
 
+    def total_amount(self):
+        total = sum(item.subtotal() for item in self.items.all())
+        return total
+
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items', verbose_name=_('Корзина'))

@@ -57,10 +57,11 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 class CartSerializer(ModelSerializer):
     items = CartItemSerializer(many=True)
+    total_amount = serializers.SerializerMethodField()
 
     class Meta:
         model = Cart
-        fields = ['id', 'user', 'created_at', 'items']
+        fields = ['id', 'user', 'created_at', 'items', 'total_amount']
 
     def create(self, validated_data):
         items_data = validated_data.pop('items', [])
@@ -68,6 +69,9 @@ class CartSerializer(ModelSerializer):
         for item_data in items_data:
             CartItem.objects.create(cart=cart, **item_data)
         return cart
+
+    def get_total_amount(self, obj):
+        return obj.total_amount()
 
 
 class OrderedItemSerializer(ModelSerializer):
