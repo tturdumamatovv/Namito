@@ -82,7 +82,7 @@ class CategoryBySlugSerializer(CategorySerializer):
 
     def get_products(self, obj):
         def get_all_products(category):
-            products = list(category.products.all())
+            products = list(category.products.filter(variants__isnull=False).distinct())
             for child in category.children.all():
                 products.extend(get_all_products(child))
             return products
