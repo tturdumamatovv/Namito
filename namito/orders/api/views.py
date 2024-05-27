@@ -25,8 +25,18 @@ class CartItemCreateAPIView(generics.CreateAPIView):
     def perform_create(self, serializer):
         user = self.request.user
         cart, created = Cart.objects.get_or_create(user=user)
-        variant_id = self.request.data.get('product_variant')  # Получаем идентификатор варианта из запроса
-        serializer.save(cart=cart, product_variant_id=variant_id)  # Сохраняем товар в корзине
+        variant_id = self.request.data.get('product_variant')
+
+        # Check if the CartItem with the same product_variant already exists in the cart
+        cart_item = CartItem.objects.filter(cart=cart, product_variant_id=variant_id).first()
+
+        if cart_item:
+            # If it exists, increase the quantity
+            cart_item.quantity += self.request.data.get('quantity', 1)
+            cart_item.save()
+        else:
+            # If it does not exist, create a new CartItem
+            serializer.save(cart=cart, product_variant_id=variant_id)
 
 
 class CartItemDeleteAPIView(generics.RetrieveDestroyAPIView):

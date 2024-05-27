@@ -24,7 +24,6 @@ class CartItemCreateUpdateSerializer(serializers.ModelSerializer):
     def validate_product_variant(self, value):
         if value.stock <= 0:
             raise serializers.ValidationError("Товар не доступен для добавления в корзину.")
-
         return value
 
 
