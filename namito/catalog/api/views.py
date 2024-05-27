@@ -220,6 +220,38 @@ class ProductReviewListView(generics.ListAPIView):
         queryset = Review.objects.filter(product_id=product_id)
         return queryset
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        response_data = serializer.data
+
+        # Add review_allowed field to the response
+        product_id = self.kwargs.get('pk')
+        product = Product.objects.get(id=product_id)
+        review_allowed = self.get_review_allowed(product)
+
+        return Response({
+            'reviews': response_data,
+            'review_allowed': review_allowed
+        })
+
+    def get_review_allowed(self, product):
+        request = self.request
+        if request.user.is_authenticated:
+            user = request.user
+            variants = Variant.objects.filter(product=product)
+            has_purchased_product = OrderedItem.objects.filter(
+                order__user=user,
+                product_variant__in=variants,
+                order__status=1
+            ).exists()
+            return has_purchased_product
+        return False
 
 
 class ReviewCreate(generics.CreateAPIView):

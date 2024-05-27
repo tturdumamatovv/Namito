@@ -333,10 +333,25 @@ class ReviewSerializer(serializers.ModelSerializer):
     images = ReviewImageSerializer(many=True, required=False)
     created_at = serializers.DateTimeField(format='%d.%m.%Y', read_only=True)
     updated_at = serializers.DateTimeField(format='%d.%m.%Y', read_only=True)
+    review_allowed = serializers.SerializerMethodField()
 
     class Meta:
         model = Review
-        fields = ['id', 'product', 'user', 'text', 'created_at', 'updated_at', 'rating', 'images']
+        fields = ['id', 'product', 'user', 'text', 'created_at', 'updated_at', 'rating', 'images', 'review_allowed']
+
+    def get_review_allowed(self, obj):
+        request = self.context.get('request', None)
+        if request and request.user.is_authenticated:
+            user = request.user
+            product = obj.product
+            variants = Variant.objects.filter(product=product)
+            has_purchased_product = OrderedItem.objects.filter(
+                order__user=user,
+                product_variant__in=variants,
+                order__status=1
+            ).exists()
+            return has_purchased_product
+        return False
 
     def create(self, validated_data):
         review = Review.objects.create(**validated_data)
