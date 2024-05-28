@@ -108,7 +108,7 @@ class FAQ(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.question - self.answer}' or 'Вопрос - Ответ'
+        return f'{self.question} - {self.answer}' or 'Вопрос - Ответ'
 
     class Meta:
         verbose_name = 'Вопрос'
