@@ -3,7 +3,7 @@ from django.contrib import admin
 # Register your models here.
 from namito.advertisement.admin import AdvertisementInline
 from namito.pages.models import (StaticPage, MainPageSlider, MainPage, Phone, Email, SocialLink,
-                                 Contacts, Address, PaymentMethod)
+                                 Contacts, Address, PaymentMethod, FAQ)
 
 
 class MainPageSliderInline(admin.TabularInline):
@@ -45,6 +45,11 @@ class MainPageAdmin(admin.ModelAdmin):
     )
 
 
+class FAQInline(admin.TabularInline):
+    model = FAQ
+    extra = 1
+
+
 @admin.register(StaticPage)
 class StaticPageAdmin(admin.ModelAdmin):
     list_display = ('title', 'slug', 'created_at', 'updated_at')
@@ -56,11 +61,11 @@ class StaticPageAdmin(admin.ModelAdmin):
         (None, {
             'fields': ('title', 'title_ru', 'title_en', 'content', 'content_ru', 'content_en', 'image')
         }),
-        ('Advanced options', {
-            'classes': ('collapse',),
+        ('Расширенные параметры', {
             'fields': ('slug', 'meta_title', 'meta_description', 'meta_image'),
         }),
     )
+    inlines = [FAQInline]
 
 
 class PhoneInline(admin.TabularInline):

@@ -91,6 +91,19 @@ class StaticPage(ProcessedImageModel):
         ordering = ['title']
 
 
+class FAQ(models.Model):
+    question = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Вопросы'))
+    answer = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Ответы'))
+    static_page = models.ForeignKey(StaticPage, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.question - self.answer}'
+
+    class Meta:
+        verbose_name = 'Вопрос'
+        verbose_name_plural = 'Вопросы'
+
+
 class Contacts(SingletonModel):
     pass
 

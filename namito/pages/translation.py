@@ -1,5 +1,5 @@
 from modeltranslation.translator import register, TranslationOptions
-from .models import MainPage, MainPageSlider, StaticPage
+from .models import MainPage, MainPageSlider, StaticPage, FAQ
 
 
 @register(MainPage)
@@ -17,3 +17,8 @@ class MainPageSliderTranslationOptions(TranslationOptions):
 @register(StaticPage)
 class StaticPageTranslationOptions(TranslationOptions):
     fields = ('title', 'content', 'meta_title', 'meta_description')
+
+
+@register(FAQ)
+class FAQTranslationOptions(TranslationOptions):
+    fields = ('question', 'answer')
