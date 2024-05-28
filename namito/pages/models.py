@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
 
 from namito.catalog.models import ProcessedImageModel
 
@@ -95,6 +96,16 @@ class FAQ(models.Model):
     question = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Вопросы'))
     answer = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Ответы'))
     static_page = models.ForeignKey(StaticPage, on_delete=models.CASCADE, related_name='faqs')
+
+    def clean(self):
+        if not self.question and self.answer:
+            raise ValidationError(_('Если указан ответ, вопрос обязателен.'))
+        if not self.answer and self.question:
+            raise ValidationError(_('Если указан вопрос, ответ обязателен.'))
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'{self.question - self.answer}'
