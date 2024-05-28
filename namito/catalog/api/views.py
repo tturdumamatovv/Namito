@@ -101,6 +101,13 @@ class ProductListView(generics.ListAPIView):
 
         return queryset
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        serializer = self.get_serializer(queryset, many=True)
+        data = [item for item in serializer.data if item is not None]
+        return Response(data)
+
 
 class TopProductListView(generics.ListAPIView):
     serializer_class = ProductListSerializer
