@@ -131,6 +131,13 @@ class SimilarProductsView(generics.ListAPIView):
         ).exclude(pk=product_id).distinct()[:10]
         return queryset
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        serializer = self.get_serializer(queryset, many=True)
+        data = [item for item in serializer.data if item is not None]
+        return Response(data)
+
 
 class ProductDetailView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
