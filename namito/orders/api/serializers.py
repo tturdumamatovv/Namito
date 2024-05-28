@@ -77,11 +77,12 @@ class CartSerializer(ModelSerializer):
 class OrderedItemSerializer(ModelSerializer):
     product_variant = VariantSerializer()
     product_name = serializers.CharField(source='product_variant.product.name', read_only=True)
+    product_id = serializers.CharField(source='product_variant.product.id', read_only=True)
     product_image = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderedItem
-        fields = ['id', 'product_variant', 'quantity', 'product_name', 'product_image']
+        fields = ['id', 'product_variant', 'quantity', 'product_name', 'product_id', 'product_image']
 
     def get_product_image(self, obj):
         variant = obj.product_variant
