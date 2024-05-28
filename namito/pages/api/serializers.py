@@ -5,7 +5,7 @@ from namito.catalog.models import Product, Category
 from namito.pages.models import (
     MainPageSlider,
     MainPage,
-    StaticPage, Phone, Email, SocialLink, Contacts, PaymentMethod
+    StaticPage, Phone, Email, SocialLink, Contacts, PaymentMethod, FAQ
 )
 from namito.advertisement.api.serializers import AdvertisementSerializer
 from namito.advertisement.models import Advertisement
@@ -54,11 +54,19 @@ class MainPageSerializer(serializers.ModelSerializer):
         return serializer.data
 
 
+class FAQSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FAQ
+        fields = ['question', 'answer']
+
+
 class StaticPageSerializer(serializers.ModelSerializer):
+    faqs = FAQSerializer(many=True, read_only=True)
+
     class Meta:
         model = StaticPage
         fields = ['title', 'slug', 'content', 'image', 'meta_title',
-                  'meta_description', 'created_at', 'updated_at']
+                  'meta_description', 'created_at', 'updated_at', 'faqs']
 
 
 class ContactsSerializer(serializers.ModelSerializer):

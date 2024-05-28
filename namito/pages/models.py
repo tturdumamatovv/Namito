@@ -94,7 +94,7 @@ class StaticPage(ProcessedImageModel):
 class FAQ(models.Model):
     question = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Вопросы'))
     answer = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Ответы'))
-    static_page = models.ForeignKey(StaticPage, on_delete=models.CASCADE)
+    static_page = models.ForeignKey(StaticPage, on_delete=models.CASCADE, related_name='faqs')
 
     def __str__(self):
         return f'{self.question - self.answer}'

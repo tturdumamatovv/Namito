@@ -45,7 +45,7 @@ class MainPageAdmin(admin.ModelAdmin):
     )
 
 
-class FAQInline(admin.TabularInline):
+class FAQInline(admin.StackedInline):
     model = FAQ
     extra = 1
 

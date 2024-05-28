@@ -127,6 +127,7 @@ class ProductAdmin(nested_admin.NestedModelAdmin):
     form = ProductForm
     list_display = ['name_ru', 'name_en', 'category', 'active']
     search_fields = ['name', 'category__name']
+    list_filter = ['category', 'brand']
     inlines = [CharacteristicsInline, VariantInline, ImageInlineWithColor, ReviewInline, ]
 
     class Media:
