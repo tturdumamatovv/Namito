@@ -83,19 +83,22 @@ class ProductListView(generics.ListAPIView):
             max_discount=Max('variants__discount_value'),
             popularity=Count('views'),
             min_variant_price=Min('variants__price')
-        )
+        ).filter(
+            active=True,
+            variants__isnull=False
+        ).distinct()
 
         ordering_param = self.request.query_params.get('ordering')
         if ordering_param == 'popularity':
-            queryset = queryset.order_by('popularity')
+            queryset = queryset.order_by('-popularity')
         elif ordering_param == 'max_discount':
-            queryset = queryset.order_by('max_discount')
+            queryset = queryset.order_by('-max_discount')
         elif ordering_param == '-price':
             queryset = queryset.order_by('-min_variant_price')
         elif ordering_param == 'price':
             queryset = queryset.order_by('min_variant_price')
         elif ordering_param == 'created_at':
-            queryset = queryset.order_by('created_at')
+            queryset = queryset.order_by('-created_at')
         else:
             queryset = queryset.order_by('name')
 
@@ -103,6 +106,13 @@ class ProductListView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            # Убедитесь, что None значения фильтруются
+            data = [item for item in serializer.data if item is not None]
+            return self.get_paginated_response(data)
 
         serializer = self.get_serializer(queryset, many=True)
         data = [item for item in serializer.data if item is not None]
