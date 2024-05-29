@@ -285,7 +285,7 @@ class ProductSerializer(serializers.ModelSerializer):
         return CharacteristicsSerializer(characteristics, many=True).data
 
     def get_reviews(self, product):
-        reviews_qs = Review.objects.filter(product=product).order_by('-created_at')[:3]
+        reviews_qs = Review.objects.filter(product=product).order_by('-created_at')[:5]
         return ReviewSerializer(reviews_qs, many=True, context=self.context).data
 
     def get_review_count(self, product):
