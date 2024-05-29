@@ -337,7 +337,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
 }
 
-DEFAULT_PROFILE_PICTURE_URL = MEDIA_URL + 'images/default-user.jpg'
+DEFAULT_PROFILE_PICTURE_URL = MEDIA_URL + 'profile_picture/images/default-user.jpg'
 DEFAULT_PRODUCT_URL = "https://raw.githubusercontent.com/tturdumamatovv/Namito/main/assets/images/default-product.png"
 
 SIMPLE_JWT = {
