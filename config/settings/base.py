@@ -189,9 +189,8 @@ MIDDLEWARE = [
 # STATIC_URL = 'static/'
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 #
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'assets'),
-]
+STATICFILES_DIRS = [BASE_DIR / "assets"]
+
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = "/static/"
 LOCALE_PATHS = [str(BASE_DIR / "locale")]
@@ -338,7 +337,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
 }
 
-DEFAULT_PROFILE_PICTURE_URL = "https://raw.githubusercontent.com/tturdumamatovv/Namito/main/assets/images/default-user.jpg"
+DEFAULT_PROFILE_PICTURE_URL = MEDIA_URL + 'images/default-user.jpg'
 DEFAULT_PRODUCT_URL = "https://raw.githubusercontent.com/tturdumamatovv/Namito/main/assets/images/default-product.png"
 
 SIMPLE_JWT = {

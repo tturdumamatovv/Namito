@@ -28,8 +28,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
+        request = self.context.get('request')
         if not ret['profile_picture']:
-            ret['profile_picture'] = settings.DEFAULT_PROFILE_PICTURE_URL
+            if request is not None:
+                ret['profile_picture'] = request.build_absolute_uri(settings.MEDIA_URL + 'images/default-user.jpg')
+            else:
+                ret['profile_picture'] = settings.MEDIA_URL + 'images/default-user.jpg'
         return ret
 
     def get_has_profile_picture(self, instance):
