@@ -111,14 +111,18 @@ class ContactsSerializer(serializers.ModelSerializer):
 
     def get_promoted_categories(self, obj):
         categories = Category.objects.filter(promotion=True)
-        data = [{'name': category.name, 'slug': category.slug} for category in categories]
+        request = self.context.get('request')
+        data = [{'name': category.name, 'slug': category.slug, 'icon': request.build_absolute_uri(category.icon.url) if category.icon else None} for category in categories]
         return data
 
     def get_categories(self, obj):
+
         def get_nested_categories_data(category):
+            request = self.context.get('request')
             category_data = {
                 'name': category.name,
                 'slug': category.slug,
+                'icon': request.build_absolute_uri(category.icon.url) if category.icon else None,
                 'children': []
             }
             children_categories = category.children.all()
