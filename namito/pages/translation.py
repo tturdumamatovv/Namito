@@ -9,11 +9,6 @@ class MainPageTranslationOptions(TranslationOptions):
         'counter3_title', 'button')
 
 
-@register(MainPageSlider)
-class MainPageSliderTranslationOptions(TranslationOptions):
-    fields = ('title', 'description')
-
-
 @register(StaticPage)
 class StaticPageTranslationOptions(TranslationOptions):
     fields = ('title', 'content', 'meta_title', 'meta_description')

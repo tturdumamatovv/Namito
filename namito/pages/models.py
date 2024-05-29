@@ -55,8 +55,6 @@ class MainPage(SingletonModel):
 
 
 class MainPageSlider(models.Model):
-    title = models.CharField(max_length=100, verbose_name=_('Загловок'), blank=True, null=True)
-    description = models.CharField(max_length=100, verbose_name=_('Описание'), blank=True, null=True)
     image = models.ImageField(upload_to='slider/', blank=True, null=True)
     link = models.URLField(blank=True, null=True)
     page = models.ForeignKey(MainPage, on_delete=models.PROTECT, blank=True, null=True)
