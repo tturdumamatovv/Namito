@@ -288,10 +288,10 @@ class Image(ProcessedImageModel):
 class Review(models.Model):
     product = models.ForeignKey(Product, related_name='reviews', on_delete=models.CASCADE, verbose_name=_("Product"))
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("Позьователь"))
-    text = models.TextField(verbose_name=_("Текст"))
+    text = models.TextField(verbose_name=_("Текст"), blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Время создания"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("Время обновления"))
-    rating = models.IntegerField(default=0, choices=[(i, str(i)) for i in range(1, 6)], verbose_name=_("Рейтинг"))
+    rating = models.IntegerField(default=1, choices=[(i, str(i)) for i in range(1, 6)], verbose_name=_("Рейтинг"))
 
     def __str__(self):
         return f"{self.created_at} by {self.user}"

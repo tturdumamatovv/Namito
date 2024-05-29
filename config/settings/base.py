@@ -338,7 +338,7 @@ REST_FRAMEWORK = {
 }
 
 DEFAULT_PROFILE_PICTURE_URL = MEDIA_URL + 'profile_pictures/default-user.jpg'
-DEFAULT_PRODUCT_URL = "https://raw.githubusercontent.com/tturdumamatovv/Namito/main/assets/images/default-product.png"
+DEFAULT_PRODUCT_URL = MEDIA_URL + 'product_images/default-product.png'
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=14),

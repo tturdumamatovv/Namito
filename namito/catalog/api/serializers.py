@@ -210,9 +210,10 @@ class ProductListSerializer(serializers.ModelSerializer):
     def get_images(self, product):
         request = self.context.get('request')
         images = Image.objects.filter(product=product)
-        if request is not None:
-            return [request.build_absolute_uri(image.image.url) for image in images if image.image]
-        return [image.image.url for image in images if image.image]
+        image_urls = [request.build_absolute_uri(image.image.url) for image in images if image.image] if request else [image.image.url for image in images if image.image]
+        if not image_urls:
+            image_urls.append(request.build_absolute_uri(settings.MEDIA_URL + 'product_images/default-product.png') if request else settings.MEDIA_URL + 'product_images/default-product.png')
+        return image_urls
 
     def get_characteristics(self, product):
         characteristics = Characteristic.objects.filter(product=product)
@@ -241,7 +242,7 @@ class ProductSerializer(serializers.ModelSerializer):
     reviews = serializers.SerializerMethodField()
     review_count = serializers.SerializerMethodField()
     review_allowed = serializers.SerializerMethodField()
-    images = ImageSerializer(many=True, read_only=True)
+    images = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -306,9 +307,10 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_images(self, product):
         request = self.context.get('request')
         images = Image.objects.filter(product=product)
-        if request is not None:
-            return [request.build_absolute_uri(image.image.url) for image in images if image.image]
-        return [image.image.url for image in images if image.image]
+        image_urls = [request.build_absolute_uri(image.image.url) for image in images if image.image] if request else [image.image.url for image in images if image.image]
+        if not image_urls:
+            image_urls.append(request.build_absolute_uri(settings.MEDIA_URL + 'product_images/default-product.png') if request else settings.MEDIA_URL + 'product_images/default-product.png')
+        return image_urls
 
     def to_representation(self, instance):
         if not instance.active:
