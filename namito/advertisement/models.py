@@ -5,7 +5,7 @@ from namito.pages.models import MainPage
 
 
 class Advertisement(models.Model):
-    image = models.ImageField(upload_to='banners/', verbose_name='Картинка', blank=True, null=True)
+    image = models.FileField(upload_to='banners/', verbose_name='Картинка', blank=True, null=True)
     title = models.CharField(max_length=30, verbose_name='Заголовок', blank=True, null=True)
     description = models.CharField(max_length=100, verbose_name='Описание', blank=True, null=True)
     button_link = models.URLField(verbose_name='Ссылка', blank=True, null=True)
