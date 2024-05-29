@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Avg
+from django.conf import settings
 
 from rest_framework import serializers
 
@@ -316,9 +317,25 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.ImageField(required=False, allow_null=True)
+    has_profile_picture = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ['id', 'full_name', 'profile_picture']
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        request = self.context.get('request')
+        if not ret['profile_picture']:
+            if request is not None:
+                ret['profile_picture'] = request.build_absolute_uri(settings.MEDIA_URL + 'profile_pictures/default-user.jpg')
+            else:
+                ret['profile_picture'] = settings.MEDIA_URL + 'profile_pictures/default-user.jpg'
+        return ret
+
+    def get_has_profile_picture(self, instance):
+        return bool(instance.profile_picture)
 
 
 class ReviewImageSerializer(serializers.ModelSerializer):
