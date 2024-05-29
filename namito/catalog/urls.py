@@ -14,6 +14,7 @@ from namito.catalog.api.views import (
     ImageCreateView,
     ImageDetailView,
     ReviewCreate,
+    ReviewDeleteView,
     FavoriteToggleAPIView,
     FavoriteListView,
     BrandListView,
@@ -65,6 +66,7 @@ entity_patterns = [
     path('images/<int:pk>/', ImageDetailView.as_view()),
     path('reviews/', ReviewCreate.as_view()),
     path('reviews-list/', UserReviewListView.as_view(), name='user_reviews'),
+    path('reviews/<int:pk>/delete/', ReviewDeleteView.as_view(), name='review-delete'),
 ]
 
 utility_patterns = [

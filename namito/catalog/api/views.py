@@ -304,6 +304,18 @@ class ReviewCreate(generics.CreateAPIView):
         ).exists()
 
 
+class ReviewDeleteView(generics.DestroyAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_destroy(self, instance):
+        user = self.request.user
+        if instance.user != user:
+            raise PermissionDenied("You do not have permission to delete this review.")
+        instance.delete()
+
+
 class FavoriteToggleAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
