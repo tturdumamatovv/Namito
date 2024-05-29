@@ -21,6 +21,7 @@ from namito.catalog.models import (
     ReviewImage
 )
 from namito.orders.models import CartItem, OrderedItem
+from namito.users.api.serializers import UserProfileSerializer
 from namito.users.models import User
 
 
@@ -316,28 +317,6 @@ class ProductSerializer(serializers.ModelSerializer):
         return super().to_representation(instance)
 
 
-class UserSerializer(serializers.ModelSerializer):
-    profile_picture = serializers.ImageField(required=False, allow_null=True)
-    has_profile_picture = serializers.SerializerMethodField()
-
-    class Meta:
-        model = User
-        fields = ['id', 'full_name', 'profile_picture', 'has_profile_picture']
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        request = self.context.get('request')
-        if not ret['profile_picture']:
-            if request is not None:
-                ret['profile_picture'] = request.build_absolute_uri(settings.MEDIA_URL + 'profile_pictures/default-user.jpg')
-            else:
-                ret['profile_picture'] = settings.MEDIA_URL + 'profile_pictures/default-user.jpg'
-        return ret
-
-    def get_has_profile_picture(self, instance):
-        return bool(instance.profile_picture)
-
-
 class ReviewImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReviewImage
@@ -345,7 +324,7 @@ class ReviewImageSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    user = UserProfileSerializer(read_only=True)
     images = ReviewImageSerializer(many=True, required=False)
     created_at = serializers.DateTimeField(format='%d.%m.%Y', read_only=True)
     updated_at = serializers.DateTimeField(format='%d.%m.%Y', read_only=True)
