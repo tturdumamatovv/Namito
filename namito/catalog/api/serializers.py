@@ -338,7 +338,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def get_product_image(self, obj):
         product = obj.product
-        main_image = product.images.filter(main=True).first()
+        main_image = product.images.filter(main_image=True).first()
         if main_image:
             request = self.context.get('request')
             if request is not None:
