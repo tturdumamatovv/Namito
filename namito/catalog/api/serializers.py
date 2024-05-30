@@ -325,6 +325,8 @@ class ReviewImageSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     user = UserProfileSerializer(read_only=True)
+    product_name = serializers.CharField(source='product.name', read_only=True)
+    product_image = serializers.SerializerMethodField()
     images = ReviewImageSerializer(many=True, required=False)
     created_at = serializers.DateTimeField(format='%d.%m.%Y', read_only=True)
     updated_at = serializers.DateTimeField(format='%d.%m.%Y', read_only=True)
@@ -332,7 +334,17 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ['id', 'product', 'user', 'text', 'created_at', 'updated_at', 'rating', 'images', 'review_allowed']
+        fields = ['id', 'product', 'product_name', 'product_image', 'user', 'text', 'created_at', 'updated_at', 'rating', 'images', 'review_allowed']
+
+    def get_product_image(self, obj):
+        product = obj.product
+        main_image = product.images.filter(main=True).first()
+        if main_image:
+            request = self.context.get('request')
+            if request is not None:
+                return request.build_absolute_uri(main_image.image.url)
+            return main_image.image.url
+        return None
 
     def get_review_allowed(self, obj):
         request = self.context.get('request', None)
