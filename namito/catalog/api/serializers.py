@@ -344,6 +344,13 @@ class ReviewSerializer(serializers.ModelSerializer):
             if request is not None:
                 return request.build_absolute_uri(main_image.image.url)
             return main_image.image.url
+        else:
+            first_image = product.images.first()
+            if first_image:
+                request = self.context.get('request')
+                if request is not None:
+                    return request.build_absolute_uri(first_image.image.url)
+                return first_image.image.url
         return None
 
     def get_review_allowed(self, obj):
