@@ -160,7 +160,7 @@ class ProductSeoSerializer(serializers.ModelSerializer):
 class CategorySeoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('id', 'slug', 'meta_title', 'meta_image')
+        fields = ('id', 'slug', 'meta_title', 'meta_description', 'meta_image')
 
 
 class ProductListSerializer(serializers.ModelSerializer):
