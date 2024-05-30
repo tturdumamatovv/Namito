@@ -3,7 +3,7 @@ from rest_framework.response import Response
 
 from django.shortcuts import get_object_or_404
 
-from namito.pages.api.serializers import MainPageSerializer, StaticPageSerializer, ContactsSerializer
+from namito.pages.api.serializers import MainPageSerializer, StaticPageSerializer, ContactsSerializer, LayoutSeoSerializer
 from namito.pages.models import MainPage, StaticPage, Contacts
 from namito.pages.api import pages_default_texts
 
@@ -110,3 +110,8 @@ class LayoutView(generics.RetrieveAPIView):
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
+
+
+class LayoutSeoAPIView(generics.ListAPIView):
+    queryset = Contacts.objects.all()
+    serializer_class = LayoutSeoSerializer

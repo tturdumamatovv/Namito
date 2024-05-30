@@ -30,8 +30,8 @@ from namito.catalog.api.views import (
     ColorSizeBrandAPIView,
     ProductReviewListView,
     SimilarProductsView,
-    DiscountAPIView
-    )
+    DiscountAPIView, ProductSeoAPIView, CategorySeoAPIView
+)
 
 
 category_patterns = [
@@ -74,13 +74,19 @@ utility_patterns = [
     path('favorites/', FavoriteListView.as_view(), name='favorite-list'),
     path('size-charts/', SizeChartListView.as_view(), name='size-chart-list'),
     path('size-charts/<int:category_id>/', SizeChartListView.as_view(), name='size-chart-list-by-category'),
-
 ]
+
+seo_patterns = [
+    path('product-seo/', ProductSeoAPIView.as_view(), name='products-seo'),
+    path('category-seo/', CategorySeoAPIView.as_view(), name='category-seo')
+]
+
 
 urlpatterns = [
     *category_patterns,
     *product_patterns,
     *entity_patterns,
     *utility_patterns,
+    *seo_patterns
 ]
 

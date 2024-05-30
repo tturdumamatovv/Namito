@@ -114,7 +114,9 @@ class FAQ(models.Model):
 
 
 class Contacts(SingletonModel):
-    pass
+    meta_title = models.CharField(max_length=255, verbose_name=_('Мета Заголовок'), blank=True, null=True)
+    meta_description = models.TextField(verbose_name=_('Мета Описание'), blank=True, null=True)
+    meta_image = models.ImageField(upload_to='layout/meta_image', verbose_name=_('Мета Картинки'), blank=True, null=True)
 
     def __str__(self):
         return 'Контактная информация'

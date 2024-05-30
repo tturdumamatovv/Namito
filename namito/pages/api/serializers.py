@@ -137,3 +137,9 @@ class ContactsSerializer(serializers.ModelSerializer):
             root_category_data = get_nested_categories_data(root_category)
             categories_data.append(root_category_data)
         return categories_data
+
+
+class LayoutSeoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contacts
+        fields = ('meta_title', 'meta_description', 'meta_image')

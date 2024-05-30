@@ -126,7 +126,8 @@ LOCAL_APPS = [
     "namito.catalog",
     "namito.orders",
     "namito.advertisement",
-    "namito.pages"
+    "namito.pages",
+    "namito.notification"
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

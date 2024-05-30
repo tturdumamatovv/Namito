@@ -151,6 +151,18 @@ class VariantSerializer(serializers.ModelSerializer):
         return discounted_price if discounted_price != variant.price else None
 
 
+class ProductSeoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ('id', 'meta_title', 'meta_description', 'meta_image', 'keywords')
+
+
+class CategorySeoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ('id', 'slug', 'meta_title', 'meta_image')
+
+
 class ProductListSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
@@ -165,7 +177,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'category', 'price', 'brand', 'average_rating', 'tags', 'is_favorite',
-                  'cart_quantity', 'images', 'characteristics', 'meta_title', 'meta_description', 'meta_image']
+                  'cart_quantity', 'images', 'characteristics']
 
     def get_price(self, product):
         main_variant = Variant.objects.filter(product=product, main=True).first()
@@ -246,8 +258,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags', 'brand', 'is_favorite',
-                  'cart_quantity', 'sku', 'review_count', 'characteristics', 'reviews', 'review_allowed', 'images',
-                  'meta_title', 'meta_description', 'meta_image']
+                  'cart_quantity', 'sku', 'review_count', 'characteristics', 'reviews', 'review_allowed', 'images']
 
     def get_variants(self, product):
         variants_qs = Variant.objects.filter(product=product, product__active=True).order_by('-main', 'price')

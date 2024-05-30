@@ -38,7 +38,10 @@ from .serializers import (
     SizeChartSerializer,
     ProductListSerializer,
     ColorSizeBrandSerializer,
-    FavoriteToggleSerializer, CategoryBySlugSerializer
+    FavoriteToggleSerializer,
+    CategoryBySlugSerializer,
+    ProductSeoSerializer,
+    CategorySeoSerializer
 
 )
 from .pagination import CustomPageNumberPagination
@@ -442,3 +445,14 @@ class DiscountAPIView(generics.ListAPIView):
     queryset = Product.objects.filter(variants__discount_value__isnull=False,
                                       variants__discount_type__isnull=False).distinct()
     serializer_class = ProductListSerializer
+
+
+class ProductSeoAPIView(generics.ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSeoSerializer
+
+
+class CategorySeoAPIView(generics.ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySeoSerializer
+
