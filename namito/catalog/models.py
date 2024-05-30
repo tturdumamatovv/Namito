@@ -160,10 +160,10 @@ class Product(models.Model):
         if not self.meta_image:
             main_image = self.images.filter(main_image=True).first()
             if main_image:
-                self.meta_image = main_image.image
+                self.meta_image = main_image.image.url
             elif self.images.exists():
                 first_image = self.images.first()
-                self.meta_image = first_image.image
+                self.meta_image = first_image.image.url
 
         super().save(*args, **kwargs)
 
