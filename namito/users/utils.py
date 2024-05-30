@@ -1,11 +1,16 @@
 import requests
 import uuid
 import random
+import telegram
 
 from django.conf import settings
+from asgiref.sync import sync_to_async
 
 from xml.etree import ElementTree as ET
 from decouple import config
+
+
+# TELEGRAM_BOT_TOKEN = '7441310771:AAHicm83gxd6F5E9hpIXjwNQ7551ZeA6PnU'
 
 
 def generate_confirmation_code():
@@ -45,4 +50,22 @@ def send_sms(phone_number, confirmation_code):
         print('SMS sent successfully')
     else:
         print('Failed to send SMS')
-        
+
+
+# async def get_chat_id_for_phone(phone_number):
+#     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/getUpdates"
+#     response = requests.get(url)
+#     if response.status_code == 200:
+#         data = response.json()
+#         for update in data['result']:
+#             if 'message' in update and 'contact' in update['message']:
+#                 if update['message']['contact']['phone_number'] == phone_number:
+#                     return update['message']['chat']['id']
+#     return None
+
+
+
+# async def send_telegram_message(chat_id, otp_code):
+#     bot = telegram.Bot(token=TELEGRAM_BOT_TOKEN)
+#     message = f"Ваш код подтверждения: {otp_code}"
+#     await bot.send_message(chat_id=chat_id, text=message)

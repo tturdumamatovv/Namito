@@ -22,7 +22,6 @@ from namito.catalog.models import (
 )
 from namito.orders.models import CartItem, OrderedItem
 from namito.users.api.serializers import UserProfileSerializer
-from namito.users.models import User
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -166,7 +165,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'category', 'price', 'brand', 'average_rating', 'tags', 'is_favorite',
-                  'cart_quantity', 'images', 'characteristics']
+                  'cart_quantity', 'images', 'characteristics', 'meta_title', 'meta_description', 'meta_image']
 
     def get_price(self, product):
         main_variant = Variant.objects.filter(product=product, main=True).first()
@@ -247,7 +246,8 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags', 'brand', 'is_favorite',
-                  'cart_quantity', 'sku', 'review_count', 'characteristics', 'reviews', 'review_allowed', 'images']
+                  'cart_quantity', 'sku', 'review_count', 'characteristics', 'reviews', 'review_allowed', 'images',
+                  'meta_title', 'meta_description', 'meta_image']
 
     def get_variants(self, product):
         variants_qs = Variant.objects.filter(product=product, product__active=True).order_by('-main', 'price')

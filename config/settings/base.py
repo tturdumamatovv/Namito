@@ -107,8 +107,19 @@ THIRD_PARTY_APPS = [
     'mptt',
     'drf_yasg',
     'django_filters',
-
+    'channels'
 ]
+
+ASGI_APPLICATION = 'config.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 LOCAL_APPS = [
     "namito.users",

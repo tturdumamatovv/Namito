@@ -52,7 +52,7 @@ class Category(MPTTModel, models.Model):
                             related_name="children", verbose_name=_("Родительская категория"))
     order = models.PositiveIntegerField(default=0, editable=False, db_index=True, verbose_name=_('Порядок'))
     meta_title = models.CharField(max_length=59, blank=True, verbose_name=_('Мета заголовок'))
-    meta_description = models.CharField(max_length=160, blank=True, verbose_name=_('Мета описание'))
+    meta_image = models.ImageField(null=True, blank=True, verbose_name=_('Мета изображение'))
     promotion = models.BooleanField(default=False, verbose_name=_('Продвижение'))
     icon = models.ImageField(upload_to='category_icons/', null=True, blank=True, verbose_name=_('Иконки'))
 
@@ -73,6 +73,15 @@ class Category(MPTTModel, models.Model):
                 unique_slug = f"{base_slug}-{counter}"
                 counter += 1
             self.slug = unique_slug
+        super().save(*args, **kwargs)
+
+        if not self.meta_title:
+            self.meta_title = self.name
+
+        # Automatically set meta image if not provided
+        if not self.meta_image and self.image:
+            self.meta_image = self.image
+
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -144,6 +153,11 @@ class Product(models.Model):
             self.meta_description = self.generate_meta_description()
         if not self.meta_title:
             self.meta_title = self.generate_meta_title()
+        if not self.meta_image:
+            images = Image.objects.filter(product=self)
+            if images.exists():
+                self.meta_image = images.first().image
+
         super().save(*args, **kwargs)
 
     def generate_sku(self):

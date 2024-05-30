@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from asgiref.sync import async_to_sync
 
 from firebase_admin import auth as firebase_auth
 import firebase_admin
@@ -25,6 +26,7 @@ from .serializers import (
 from namito.users.utils import (
     send_sms,
     generate_confirmation_code,
+    # send_telegram_message
 )
 
 
@@ -49,6 +51,9 @@ class UserLoginView(generics.CreateAPIView):
 
         confirmation_code = generate_confirmation_code()
         send_sms(phone_number, confirmation_code)
+
+        # chat_id = 1105812455
+        # async_to_sync(send_telegram_message)(chat_id, confirmation_code)
 
         User.objects.update_or_create(
             phone_number=phone_number,
