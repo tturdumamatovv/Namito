@@ -77,8 +77,8 @@ utility_patterns = [
 ]
 
 seo_patterns = [
-    path('product-seo/', ProductSeoAPIView.as_view(), name='products-seo'),
-    path('category-seo/', CategorySeoAPIView.as_view(), name='category-seo')
+    path('product-seo/<int:pk>/', ProductSeoAPIView.as_view(), name='products-seo'),
+    path('category-seo/<slug:slug>/', CategorySeoAPIView.as_view(), name='category-seo')
 ]
 
 

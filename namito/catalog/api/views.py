@@ -447,12 +447,23 @@ class DiscountAPIView(generics.ListAPIView):
     serializer_class = ProductListSerializer
 
 
-class ProductSeoAPIView(generics.ListAPIView):
+class ProductSeoAPIView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSeoSerializer
+    lookup_field = 'pk'
+
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        return self.get_queryset().get(pk=pk)
 
 
-class CategorySeoAPIView(generics.ListAPIView):
+
+class CategorySeoAPIView(generics.RetrieveAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySeoSerializer
+    lookup_field = 'slug'
+
+    def get_object(self):
+        slug = self.kwargs.get('slug')
+        return self.get_queryset().get(slug=slug)
 
