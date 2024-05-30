@@ -466,4 +466,3 @@ class CategorySeoAPIView(generics.RetrieveAPIView):
     def get_object(self):
         slug = self.kwargs.get('slug')
         return self.get_queryset().get(slug=slug)
-
