@@ -127,12 +127,14 @@ class TopProductListView(generics.ListAPIView):
     serializer_class = ProductListSerializer
 
     def get_queryset(self):
-        queryset = Product.objects.filter(
-            is_top=True
-        ).distinct().order_by('?')[:15]
+        # Сначала фильтруем продукты с изображениями
+        queryset = Product.objects.annotate(image_count=models.Count('images')).filter(
+            is_top=True,
+            image_count__gt=0
+        ).distinct()
 
-        # Фильтруем продукты без изображений
-        queryset = queryset.annotate(image_count=models.Count('images')).filter(image_count__gt=0)
+        # Применяем случайный порядок и срезку
+        queryset = queryset.order_by('?')[:15]
 
         return queryset
 
