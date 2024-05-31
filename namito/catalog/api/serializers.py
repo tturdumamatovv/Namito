@@ -231,12 +231,12 @@ class ProductListSerializer(serializers.ModelSerializer):
         return CharacteristicsSerializer(characteristics, many=True).data
 
     def to_representation(self, instance):
-        if not Image.objects.filter(product=instance).exists():  # Проверка наличия изображений
-            return None
         representation = super().to_representation(instance)
-        variants = Variant.objects.filter(product=instance)
-        representation['variants'] = VariantSerializer(variants, many=True).data
-        return representation
+        if Image.objects.filter(product=instance).exists():  # Проверка наличия изображений
+            variants = Variant.objects.filter(product=instance)
+            representation['variants'] = VariantSerializer(variants, many=True).data
+            return representation
+        return None
 
 
 class CharacteristicsSerializer(serializers.ModelSerializer):
