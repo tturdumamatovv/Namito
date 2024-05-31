@@ -221,7 +221,7 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     def get_images(self, product):
         request = self.context.get('request')
-        images = Image.objects.filter(product=product)
+        images = Image.objects.filter(product=product)[:3]  # Ограничение до трех изображений
         if request is not None:
             return [request.build_absolute_uri(image.image.url) for image in images if image.image]
         return [image.image.url for image in images if image.image]
@@ -231,9 +231,12 @@ class ProductListSerializer(serializers.ModelSerializer):
         return CharacteristicsSerializer(characteristics, many=True).data
 
     def to_representation(self, instance):
-        if not instance.active or not Variant.objects.filter(product=instance).exists():
+        if not Image.objects.filter(product=instance).exists():  # Проверка наличия изображений
             return None
-        return super().to_representation(instance)
+        representation = super().to_representation(instance)
+        variants = Variant.objects.filter(product=instance)
+        representation['variants'] = VariantSerializer(variants, many=True).data
+        return representation
 
 
 class CharacteristicsSerializer(serializers.ModelSerializer):

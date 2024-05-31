@@ -151,6 +151,8 @@ class Product(models.Model):
         return image_urls
 
     def save(self, *args, **kwargs):
+        if not self.pk:  # Check if the instance is not yet saved
+            super().save(*args, **kwargs)  # Save the instance to generate a primary key
         if not self.sku:
             self.sku = self.generate_sku()
         if not self.meta_description:
