@@ -41,6 +41,7 @@ django-model-utils==4.4.0
 django-modeltranslation==0.18.11
 django-mptt==0.16.0
 django-nested-admin==4.0.2
+django-push-notifications==3.1.0
 django-redis==5.4.0
 -e git+https://github.com/BCSDev8/simpleui.git@6804f669dbf21a8454ed1fd9dc0899f045a733bd#egg=django_simpleui
 django-storages==1.14.2
