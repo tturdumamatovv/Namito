@@ -88,7 +88,8 @@ class CategoryBySlugSerializer(CategorySerializer):
             return products
 
         products = get_all_products(obj)
-        serializer = ProductListSerializer(products, many=True, context=self.context)
+        products_with_images = [product for product in products if Image.objects.filter(product=product).exists()]
+        serializer = ProductListSerializer(products_with_images, many=True, context=self.context)
         return serializer.data
 
 
@@ -231,12 +232,12 @@ class ProductListSerializer(serializers.ModelSerializer):
         return CharacteristicsSerializer(characteristics, many=True).data
 
     def to_representation(self, instance):
+        if not Image.objects.filter(product=instance).exists():  # Проверка наличия изображений
+            return None
         representation = super().to_representation(instance)
-        if Image.objects.filter(product=instance).exists():  # Проверка наличия изображений
-            variants = Variant.objects.filter(product=instance)
-            representation['variants'] = VariantSerializer(variants, many=True).data
-            return representation
-        return None
+        variants = Variant.objects.filter(product=instance)
+        representation['variants'] = VariantSerializer(variants, many=True).data
+        return representation
 
 
 class CharacteristicsSerializer(serializers.ModelSerializer):
