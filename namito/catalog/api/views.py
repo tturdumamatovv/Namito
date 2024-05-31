@@ -1,6 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Max, Count, Min
+from django.db import models
 
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
@@ -126,9 +127,14 @@ class TopProductListView(generics.ListAPIView):
     serializer_class = ProductListSerializer
 
     def get_queryset(self):
-        return Product.objects.filter(
+        queryset = Product.objects.filter(
             is_top=True
         ).distinct().order_by('?')[:15]
+
+        # Фильтруем продукты без изображений
+        queryset = queryset.annotate(image_count=models.Count('images')).filter(image_count__gt=0)
+
+        return queryset
 
 
 class NewProductListView(generics.ListAPIView):
