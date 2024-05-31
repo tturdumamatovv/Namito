@@ -24,7 +24,7 @@ class ProductFilter(django_filters.FilterSet):
 
     def filter_by_colors(self, queryset, name, value):
         colors = value.split(',')
-        return queryset.filter(variants__color__name__in=colors)
+        return queryset.filter(variants__color__id__in=colors)
 
     def filter_by_sizes(self, queryset, name, value):
         sizes = value.split(',')
@@ -78,8 +78,8 @@ class ProductFilter(django_filters.FilterSet):
                 queryset = queryset.filter(variants__price__gte=self.request.GET['min_price'])
             if 'max_price' in self.request.GET:
                 queryset = queryset.filter(variants__price__lte=self.request.GET['max_price'])
-            if 'color' in self.request.GET:
-                queryset = self.filter_by_colors(queryset, 'color', self.request.GET.get('color'))
+            if 'color_id' in self.request.GET:
+                queryset = self.filter_by_colors(queryset, 'color_id', self.request.GET.getlist('color_id'))
             if 'size' in self.request.GET:
                 queryset = self.filter_by_sizes(queryset, 'size', self.request.GET.get('size'))
             if 'brand' in self.request.GET:

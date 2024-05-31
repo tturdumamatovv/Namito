@@ -107,19 +107,10 @@ THIRD_PARTY_APPS = [
     'mptt',
     'drf_yasg',
     'django_filters',
-    'channels'
 ]
 
-ASGI_APPLICATION = 'config.asgi.application'
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
-        },
-    },
-}
+FCM_SERVER_KEY = 'BF28aeT8EKZ8JxdURa7jBTp5C6bB2poELWiOg36gp3MTmv9H3QfXobGyElQCwkVh_3w6dqVWk4Cde2Tv1TBTyQU'
 
 LOCAL_APPS = [
     "namito.users",
@@ -127,7 +118,6 @@ LOCAL_APPS = [
     "namito.orders",
     "namito.advertisement",
     "namito.pages",
-    "namito.notification"
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

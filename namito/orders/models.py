@@ -49,8 +49,8 @@ class OrderHistory(models.Model):
     order_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Время заказа'))
 
     class Meta:
-        verbose_name = _("История отзывов")
-        verbose_name_plural = _("История отзывов")
+        verbose_name = _("История заказов")
+        verbose_name_plural = _("История заказов")
 
     def __str__(self):
         return f"Order history for {self.user} on {self.order_date}"
@@ -133,12 +133,12 @@ class Order(models.Model):
         if self.status == 2 and not OrderHistory.objects.filter(order=self).exists():
             OrderHistory.objects.create(user=self.user, order=self)
 
-        if self.status == 1:  # Если статус заказа "Доставлено"
-            with transaction.atomic():  # Обертка для обеспечения атомарности операций
-                ordered_items = self.ordered_items.all()  # Получаем все заказанные товары
+        if self.status == 1:
+            with transaction.atomic():
+                ordered_items = self.ordered_items.all()
                 for ordered_item in ordered_items:
-                    variant = ordered_item.product_variant  # Получаем соответствующий вариант товара
-                    variant.stock -= ordered_item.quantity  # Уменьшаем количество товара на складе
+                    variant = ordered_item.product_variant
+                    variant.stock -= ordered_item.quantity
                     variant.save()
 
     def cancel_order(self):
