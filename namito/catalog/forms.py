@@ -69,7 +69,7 @@ class BrandForm(forms.ModelForm):
 
 class SizeForm(forms.ModelForm):
     categories = forms.ModelMultipleChoiceField(
-        queryset=Category.objects.all(),
+        queryset=Category.objects.filter(parent__isnull=True),
         required=False,
         widget=FilteredSelectMultiple(
             verbose_name='Категории',
