@@ -111,10 +111,11 @@ THIRD_PARTY_APPS = [
 ]
 
 PUSH_NOTIFICATIONS_SETTINGS = {
-        "FCM_API_KEY": "[your api key]",
-        "GCM_API_KEY": "[your api key]",
-        "APNS_CERTIFICATE": "/path/to/your/certificate.pem",
+        "FCM_API_KEY": "BMDPs_I8k47lT9TGlZJAwfQrRSm-zp8DdlsvtJHHdoqh6gt06CXIoyBuk5yPt1OU4JHfQAZzbrE7rM9Z1TN8JDQ",
+        # "GCM_API_KEY": "BMDPs_I8k47lT9TGlZJAwfQrRSm-zp8DdlsvtJHHdoqh6gt06CXIoyBuk5yPt1OU4JHfQAZzbrE7rM9Z1TN8JDQ",
+        # "APNS_CERTIFICATE": "/path/to/your/certificate.pem",
 }
+
 
 LOCAL_APPS = [
     "namito.users",

@@ -5,7 +5,7 @@ from namito.catalog.models import Brand, Size
 
 
 @receiver(m2m_changed, sender=Brand.categories.through)
-def update_child_categories(sender, instance, action, **kwargs):
+def update_brand_child_categories(sender, instance, action, **kwargs):
     if action == 'post_add' or action == 'post_remove':
         categories_to_update = set()
         for category in instance.categories.all():
@@ -14,7 +14,7 @@ def update_child_categories(sender, instance, action, **kwargs):
 
 
 @receiver(m2m_changed, sender=Size.categories.through)
-def update_child_categories(sender, instance, action, **kwargs):
+def update_size_child_categories(sender, instance, action, **kwargs):
     if action == 'post_add' or action == 'post_remove':
         categories_to_update = set()
         for category in instance.categories.all():
