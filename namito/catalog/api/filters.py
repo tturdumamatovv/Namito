@@ -1,6 +1,6 @@
 import django_filters
 from django.db.models import Avg, Q
-from namito.catalog.models import Product
+from namito.catalog.models import Product, Category
 
 
 class ProductFilter(django_filters.FilterSet):
@@ -8,7 +8,7 @@ class ProductFilter(django_filters.FilterSet):
     min_price = django_filters.NumberFilter(field_name="variants__price", lookup_expr='gte')
     max_price = django_filters.NumberFilter(field_name="variants__price", lookup_expr='lte')
     brand = django_filters.CharFilter(method='filter_by_brands')
-    category = django_filters.CharFilter(field_name="category__name", lookup_expr='iexact')
+    category_slug = django_filters.CharFilter(method='filter_by_category_slug')
     min_rating = django_filters.NumberFilter(method='filter_by_min_rating')
     has_discount = django_filters.BooleanFilter(method='filter_by_discount_presence')
     color = django_filters.CharFilter(method='filter_by_colors')
@@ -16,7 +16,15 @@ class ProductFilter(django_filters.FilterSet):
 
     class Meta:
         model = Product
-        fields = ['name', 'min_price', 'max_price', 'brand', 'category', 'min_rating', 'has_discount', 'color', 'size']
+        fields = ['name', 'min_price', 'max_price', 'brand', 'category_slug',
+                  'min_rating', 'has_discount', 'color', 'size']
+
+    def filter_by_category_slug(self, queryset, name, value):
+        category = Category.objects.filter(slug=value).first()
+        if category:
+            descendant_categories = category.get_descendants(include_self=True)
+            return queryset.filter(category__in=descendant_categories)
+        return queryset.none()
 
     def filter_by_brands(self, queryset, name, value):
         brands = value.split(',')
@@ -84,8 +92,9 @@ class ProductFilter(django_filters.FilterSet):
                 queryset = self.filter_by_sizes(queryset, 'size', self.request.GET.get('size'))
             if 'brand' in self.request.GET:
                 queryset = self.filter_by_brands(queryset, 'brand', self.request.GET.get('brand'))
-            if 'category' in self.request.GET:
-                queryset = queryset.filter(category__name__iexact=self.request.GET['category'])
+            if 'category_slug' in self.request.GET:  # измененная часть
+                queryset = self.filter_by_category_slug(queryset, 'category_slug',
+                                                        self.request.GET.get('category_slug'))
             if 'min_rating' in self.request.GET:
                 queryset = self.filter_by_min_rating(queryset, 'min_rating', float(self.request.GET['min_rating']))
             if 'has_discount' in self.request.GET:

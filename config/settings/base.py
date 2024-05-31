@@ -107,10 +107,14 @@ THIRD_PARTY_APPS = [
     'mptt',
     'drf_yasg',
     'django_filters',
+    "push_notifications",
 ]
 
-
-FCM_SERVER_KEY = 'BF28aeT8EKZ8JxdURa7jBTp5C6bB2poELWiOg36gp3MTmv9H3QfXobGyElQCwkVh_3w6dqVWk4Cde2Tv1TBTyQU'
+PUSH_NOTIFICATIONS_SETTINGS = {
+        "FCM_API_KEY": "[your api key]",
+        "GCM_API_KEY": "[your api key]",
+        "APNS_CERTIFICATE": "/path/to/your/certificate.pem",
+}
 
 LOCAL_APPS = [
     "namito.users",
