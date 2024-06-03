@@ -1,6 +1,7 @@
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.views import APIView
 
 from django.http import JsonResponse
 from django.contrib.auth.models import User
@@ -203,3 +204,19 @@ class UserDeleteAPIView(generics.DestroyAPIView):
 
         return Response({'message': 'User deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
 
+
+class NotificationSettingsAPIView(APIView):
+    def put(self, request):
+        user = request.user
+        receive_notifications = request.data.get('receive_notifications', None)
+        fcm_token = request.data.get('fcm_token', None)
+
+        if receive_notifications is not None:
+            user.receive_notifications = receive_notifications
+            user.save()
+
+        if fcm_token:
+            user.fcm_token = fcm_token
+            user.save()
+
+        return Response({'success': True}, status=status.HTTP_200_OK)
