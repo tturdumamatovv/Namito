@@ -27,7 +27,6 @@ class NotificationAdmin(admin.ModelAdmin):
                 try:
                     send_firebase_notification(user.fcm_token, notification.title, notification.description, notification.image.url if notification.image else None)
                 except InvalidArgumentError:
-                    # Обработка ошибки, если FCM токен недействителен
                     messages.error(request, f"Ошибка при отправке уведомления пользователю с токеном: {user.fcm_token}")
 
         self.message_user(request, "Notifications sent successfully")

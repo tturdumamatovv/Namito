@@ -34,7 +34,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(blank=True, verbose_name=_('Имейл'))
     first_visit = models.BooleanField(default=True, verbose_name=_('Дата первого визита'))
     fcm_token = models.CharField(max_length=255, blank=True, null=True, verbose_name=_('Токен'))
-    receive_notifications = models.BooleanField(verbose_name=_('Получать уведомления'), null=True, blank=True)
+    receive_notifications = models.BooleanField(default=False ,verbose_name=_('Получать уведомления'), null=True, blank=True)
 
     objects = CustomUserManager()
 
