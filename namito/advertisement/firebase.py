@@ -8,14 +8,14 @@ cred = credentials.Certificate('firebase_key.json')
 firebase_admin.initialize_app(cred)
 
 
-def send_firebase_notification(title, description, fcm_token, image_url=None):
+def send_firebase_notification(fcm_token, title, description, image_url=None):
     message = messaging.Message(
+        token=fcm_token,
         notification=messaging.Notification(
             title=title,
             body=description,
             image=image_url,
         ),
-        token=fcm_token,  # Отправка уведомления на конкретное устройство по его fcm_token
     )
     try:
         response = messaging.send(message)
