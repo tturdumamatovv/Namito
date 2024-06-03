@@ -434,7 +434,7 @@ class ProductSearchByNameAndBrandAPIView(generics.ListAPIView):
                 translated_field = f"brand__{field}_{language_code}"
                 filters |= Q(**{f"{translated_field}__icontains": brand_query})
 
-        queryset = queryset.filter(filters).filter(variants__stock__gt=0).distinct()
+        queryset = queryset.filter(filters).filter(images__isnull=False).distinct()
         return queryset
 
 
