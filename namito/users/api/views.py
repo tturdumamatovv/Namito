@@ -205,18 +205,24 @@ class UserDeleteAPIView(generics.DestroyAPIView):
         return Response({'message': 'User deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
 
 
-class NotificationSettingsAPIView(APIView):
-    def put(self, request):
-        user = request.user
-        receive_notifications = request.data.get('receive_notifications', None)
-        fcm_token = request.data.get('fcm_token', None)
+class NotificationSettingsAPIView(generics.RetrieveUpdateAPIView):
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        user = self.get_object()
+        fcm_token = request.data.get('fcm_token')
+        receive_notifications = request.data.get('receive_notifications')
+
+        if fcm_token is not None:
+            user.fcm_token = fcm_token
+            user.save()
 
         if receive_notifications is not None:
             user.receive_notifications = receive_notifications
             user.save()
 
-        if fcm_token:
-            user.fcm_token = fcm_token
-            user.save()
-
-        return Response({'success': True}, status=status.HTTP_200_OK)
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)
