@@ -34,7 +34,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(blank=True, verbose_name=_('Имейл'))
     first_visit = models.BooleanField(default=True, verbose_name=_('Дата первого визита'))
     fcm_token = models.CharField(max_length=255, blank=True, null=True, verbose_name=_('Токен'))
-    receive_notifications = models.BooleanField(default=False ,verbose_name=_('Получать уведомления'), null=True, blank=True)
+    receive_notifications = models.BooleanField(default=False, verbose_name=_('Получать уведомления'), null=True, blank=True)
 
     objects = CustomUserManager()
 
@@ -47,11 +47,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = _('Пользователь')
         verbose_name_plural = _("Пользователи")
-
-    def save(self, *args, **kwargs):
-        if self.receive_notifications and not self.fcm_token:
-            raise ValidationError(_('FCM token is required if receive notifications is set to true.'))
-        super().save(*args, **kwargs)
 
 
 class UserAddress(models.Model):
