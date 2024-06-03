@@ -5,7 +5,7 @@ from namito.catalog.models import Product, Category
 from namito.pages.models import (
     MainPageSlider,
     MainPage,
-    StaticPage, Phone, Email, SocialLink, Contacts, PaymentMethod, FAQ
+    StaticPage, Phone, Email, SocialLink, Contacts, PaymentMethod, FAQ, MainPageLayoutMeta
 )
 from namito.advertisement.api.serializers import AdvertisementSerializer
 from namito.advertisement.models import Advertisement
@@ -152,5 +152,5 @@ class ContactsSerializer(serializers.ModelSerializer):
 
 class LayoutSeoSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Contacts
+        model = MainPageLayoutMeta
         fields = ('meta_title', 'meta_description', 'meta_image')

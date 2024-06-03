@@ -59,6 +59,17 @@ class MainPage(SingletonModel):
         verbose_name_plural = _("Главная страница")
 
 
+class MainPageLayoutMeta(models.Model):
+    meta_title = models.CharField(max_length=255, verbose_name=_('Мета Заголовок'), blank=True, null=True)
+    meta_description = models.TextField(verbose_name=_('Мета Описание'), blank=True, null=True)
+    meta_image = models.ImageField(upload_to='layout/meta_image', verbose_name=_('Мета Картинки'), blank=True, null=True)
+    page = models.OneToOneField(MainPage, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = _('Мета главная страница')
+        verbose_name_plural = _("Мета главная страница")
+
+
 class MainPageSlider(models.Model):
     image = models.ImageField(upload_to='slider/', blank=True, null=True)
     small_image = models.ImageField(upload_to='slider-mobile/', blank=True, null=True,
@@ -140,10 +151,7 @@ class FAQ(models.Model):
 
 
 class Contacts(SingletonModel):
-    meta_title = models.CharField(max_length=255, verbose_name=_('Мета Заголовок'), blank=True, null=True)
-    meta_description = models.TextField(verbose_name=_('Мета Описание'), blank=True, null=True)
-    meta_image = models.ImageField(upload_to='layout/meta_image', verbose_name=_('Мета Картинки'), blank=True, null=True)
-
+    pass
     def __str__(self):
         return 'Контактная информация'
 

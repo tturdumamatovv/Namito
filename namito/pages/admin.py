@@ -3,7 +3,7 @@ from django.contrib import admin
 # Register your models here.
 from namito.advertisement.admin import AdvertisementInline
 from namito.pages.models import (StaticPage, MainPageSlider, MainPage, Phone, Email, SocialLink,
-                                 Contacts, Address, PaymentMethod, FAQ)
+                                 Contacts, Address, PaymentMethod, FAQ, MainPageLayoutMeta)
 
 
 class MainPageSliderInline(admin.TabularInline):
@@ -12,10 +12,15 @@ class MainPageSliderInline(admin.TabularInline):
     readonly_fields = ('small_image',)
 
 
+class MainPageLayoutInline(admin.StackedInline):
+    model = MainPageLayoutMeta
+    extra = 0
+
+
 @admin.register(MainPage)
 class MainPageAdmin(admin.ModelAdmin):
     list_display = ('title', 'description', 'button', 'button_link',)
-    inlines = [AdvertisementInline, MainPageSliderInline]
+    inlines = [AdvertisementInline, MainPageSliderInline, MainPageLayoutInline]
     fieldsets = (
         (None, {
             'fields': (
