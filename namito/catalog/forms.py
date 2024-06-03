@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.admin.widgets import FilteredSelectMultiple
 
+from mptt.forms import TreeNodeChoiceField
+
 from namito.catalog.models import (
     Category,
     Color,
@@ -19,6 +21,8 @@ class CategoryAdminForm(forms.ModelForm):
 
 
 class ProductForm(forms.ModelForm):
+    category = TreeNodeChoiceField(queryset=Category.objects.all())
+
     class Meta:
         model = Product
         fields = '__all__'

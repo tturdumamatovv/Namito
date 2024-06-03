@@ -33,27 +33,29 @@ from .models import (
 @admin.register(Category)
 class CategoryAdmin(DraggableMPTTAdmin):
     form = CategoryAdminForm
-
     list_display = [
         "tree_actions",
         "indented_name",
-        "id",
-        "name",
-        "order",
+        "type",
         "parent",
     ]
-
     list_display_links = ("indented_name",)
     list_filter = [
         "parent",
+        'type'
     ]
-    search_fields = ["id", "name"]
+    search_fields = ["id", 'name']
     list_select_related = ["parent"]
     mptt_level_indent = 20
 
     @admin.display(description="Name")
     def indented_name(self, instance):
-        return f'{instance.name}'
+        return mark_safe(
+            '<div style="text-indent: {}px">{}</div>'.format(
+                instance._mpttfield('level') * self.mptt_level_indent,
+                instance.name
+            )
+        )
 
 
 class ImageInline(nested_admin.NestedTabularInline):
