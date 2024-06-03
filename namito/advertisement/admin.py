@@ -18,16 +18,17 @@ class NotificationAdmin(admin.ModelAdmin):
     actions = ['send_notification']
 
     def send_notification(self, request, queryset):
-        users_with_tokens = User.objects.exclude(fcm_token__isnull=True).exclude(fcm_token__exact='')
+        users_with_tokens = User.objects.filter(
+            receive_notifications=True
+        ).exclude(fcm_token__isnull=True).exclude(fcm_token__exact='')
 
         for notification in queryset:
             for user in users_with_tokens:
-                if user.fcm_token:
-                    try:
-                        send_firebase_notification(user.fcm_token, notification.title, notification.description, notification.image.url if notification.image else None)
-                    except InvalidArgumentError:
-                        # Обработка ошибки, если FCM токен недействителен
-                        messages.error(request, f"Ошибка при отправке уведомления пользователю с токеном: {user.fcm_token}")
+                try:
+                    send_firebase_notification(user.fcm_token, notification.title, notification.description, notification.image.url if notification.image else None)
+                except InvalidArgumentError:
+                    # Обработка ошибки, если FCM токен недействителен
+                    messages.error(request, f"Ошибка при отправке уведомления пользователю с токеном: {user.fcm_token}")
 
         self.message_user(request, "Notifications sent successfully")
 
