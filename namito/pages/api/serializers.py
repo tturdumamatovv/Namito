@@ -13,10 +13,11 @@ from namito.advertisement.models import Advertisement
 
 class MainPageSliderSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
+    small_image = serializers.SerializerMethodField()
 
     class Meta:
         model = MainPageSlider
-        fields = ['image', 'link']
+        fields = ['image', 'small_image', 'link']
 
     def get_image(self, slider):
         if slider.image and slider.image.file:
@@ -25,6 +26,15 @@ class MainPageSliderSerializer(serializers.ModelSerializer):
                 return request.build_absolute_uri(slider.image.url)
             else:
                 return slider.image.url
+        return None
+
+    def get_small_image(self, slider):
+        if slider.small_image and slider.small_image.file:
+            request = self.context.get('request')
+            if request is not None:
+                return request.build_absolute_uri(slider.small_image.url)
+            else:
+                return slider.small_image.url
         return None
 
 

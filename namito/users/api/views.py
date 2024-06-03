@@ -30,10 +30,6 @@ from namito.users.utils import (
 )
 
 
-cred = credentials.Certificate("firebase_key.json")
-firebase_admin.initialize_app(cred)
-
-
 class UserLoginView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer

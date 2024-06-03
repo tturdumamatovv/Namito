@@ -116,6 +116,20 @@ PUSH_NOTIFICATIONS_SETTINGS = {
         # "APNS_CERTIFICATE": "/path/to/your/certificate.pem",
 }
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
+
 
 LOCAL_APPS = [
     "namito.users",
@@ -473,6 +487,11 @@ SIMPLEUI_CONFIG = {
             'icon': 'fa fa-phone',
             'url': '/admin/pages/contacts/'
         },
+        {
+            'name': "Уведомление",
+            'icon': 'fa fa-bell',
+            'url': '/admin/advertisement/notification/'
+        }
     ]
 }
 

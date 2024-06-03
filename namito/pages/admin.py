@@ -9,6 +9,7 @@ from namito.pages.models import (StaticPage, MainPageSlider, MainPage, Phone, Em
 class MainPageSliderInline(admin.TabularInline):
     model = MainPageSlider
     extra = 0
+    readonly_fields = ('small_image',)
 
 
 @admin.register(MainPage)

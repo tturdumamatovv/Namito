@@ -1,9 +1,14 @@
+import io
+
 from django.db import models
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 
 from namito.catalog.models import ProcessedImageModel
+
+from PIL import Image as PILImage
 
 
 class SingletonModel(models.Model):
@@ -56,12 +61,33 @@ class MainPage(SingletonModel):
 
 class MainPageSlider(models.Model):
     image = models.ImageField(upload_to='slider/', blank=True, null=True)
+    small_image = models.ImageField(upload_to='slider-mobile/', blank=True, null=True,
+                                    verbose_name=_("Мини изображение"))
     link = models.URLField(blank=True, null=True)
     page = models.ForeignKey(MainPage, on_delete=models.PROTECT, blank=True, null=True)
 
     class Meta:
         verbose_name = _('Слайдер')
         verbose_name_plural = _("Слайдер")
+
+    def save(self, *args, **kwargs):
+        self.process_image()
+        super().save(*args, **kwargs)
+
+    def process_image(self):
+        if self.image:
+            pil_image = PILImage.open(self.image)
+            output_io_stream = io.BytesIO()
+            pil_image.save(output_io_stream, format='WEBP', quality=90)
+            output_io_stream.seek(0)
+            self.image.save(f"{self.image.name.split('.')[0]}.webp", ContentFile(output_io_stream.read()), save=False)
+
+            small_image = pil_image.copy()
+            small_image.thumbnail((150, 150))
+            small_output_io_stream = io.BytesIO()
+            small_image.save(small_output_io_stream, format='WEBP', quality=90)
+            small_output_io_stream.seek(0)
+            self.small_image.save(f"{self.image.name.split('.')[0]}_small.webp", ContentFile(small_output_io_stream.read()), save=False)
 
 
 class StaticPage(ProcessedImageModel):
