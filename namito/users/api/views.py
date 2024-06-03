@@ -23,7 +23,6 @@ from .serializers import (
     UserProfileSerializer,
     UserAddressSerializer,
     UserAddressUpdateSerializer,
-    NotificationSerializer
 )
 from namito.users.utils import (
     send_sms,
