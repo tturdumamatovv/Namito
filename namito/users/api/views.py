@@ -22,7 +22,8 @@ from .serializers import (
     VerifyCodeSerializer,
     UserProfileSerializer,
     UserAddressSerializer,
-    UserAddressUpdateSerializer
+    UserAddressUpdateSerializer,
+    NotificationSerializer
 )
 from namito.users.utils import (
     send_sms,
@@ -206,7 +207,7 @@ class UserDeleteAPIView(generics.DestroyAPIView):
 
 
 class NotificationSettingsAPIView(generics.RetrieveUpdateAPIView):
-    serializer_class = UserSerializer
+    serializer_class = NotificationSerializer
 
     def get_object(self):
         return self.request.user
