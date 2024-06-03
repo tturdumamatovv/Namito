@@ -17,4 +17,3 @@ class AdvertisementConfig(AppConfig):
             if created:
                 image_url = instance.image.url if instance.image else None
                 send_firebase_notification(instance.title, instance.description, image_url)
-
