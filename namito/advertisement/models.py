@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from namito.pages.models import MainPage
+from namito.users.models import User
 
 
 class Advertisement(models.Model):
@@ -25,6 +26,7 @@ class Notification(models.Model):
     description = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(upload_to='notifications/')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications', blank=True, null=True)
 
     def __str__(self):
         return self.title
