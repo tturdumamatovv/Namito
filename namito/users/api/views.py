@@ -23,6 +23,7 @@ from .serializers import (
     UserProfileSerializer,
     UserAddressSerializer,
     UserAddressUpdateSerializer,
+    NotificationSerializer
 )
 from namito.users.utils import (
     send_sms,
@@ -210,3 +211,26 @@ class UserDeleteAPIView(generics.DestroyAPIView):
         user.delete()  # Удаляем пользователя
 
         return Response({'message': 'User deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+
+
+class NotificationSettingsAPIView(generics.RetrieveUpdateAPIView):
+    serializer_class = NotificationSerializer
+
+    def get_object(self):
+        return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        user = self.get_object()
+        fcm_token = request.data.get('fcm_token')
+        receive_notifications = request.data.get('receive_notifications')
+
+        if fcm_token is not None:
+            user.fcm_token = fcm_token
+            user.save()
+
+        if receive_notifications is not None:
+            user.receive_notifications = receive_notifications
+            user.save()
+
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)
