@@ -69,10 +69,11 @@ class VerifyCodeView(generics.CreateAPIView):
     serializer_class = VerifyCodeSerializer
 
     def create(self, request, *args, **kwargs):
-        code = request.data.get('code')
-
-        if not code:
-            return Response({'error': 'Code is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        code = serializer.validated_data.get('code')
+        fcm_token = serializer.validated_data.get('fcm_token')
+        receive_notifications = serializer.validated_data.get('receive_notifications')
 
         user = User.objects.filter(code=code).first()
         if not user:
@@ -80,6 +81,12 @@ class VerifyCodeView(generics.CreateAPIView):
 
         user.is_verified = True
         user.code = None
+
+        if fcm_token is not None:
+            user.fcm_token = fcm_token
+        if receive_notifications is not None:
+            user.receive_notifications = receive_notifications
+
         user.save()
 
         refresh = RefreshToken.for_user(user)
@@ -88,8 +95,8 @@ class VerifyCodeView(generics.CreateAPIView):
         return Response({
             'access_token': access_token,
             'refresh_token': str(refresh),
-            'first_visit': user.first_visit},
-            status=status.HTTP_200_OK)
+            'first_visit': user.first_visit
+        }, status=status.HTTP_200_OK)
 
 
 class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
@@ -204,26 +211,3 @@ class UserDeleteAPIView(generics.DestroyAPIView):
         user.delete()  # Удаляем пользователя
 
         return Response({'message': 'User deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
-
-
-class NotificationSettingsAPIView(generics.RetrieveUpdateAPIView):
-    serializer_class = NotificationSerializer
-
-    def get_object(self):
-        return self.request.user
-
-    def update(self, request, *args, **kwargs):
-        user = self.get_object()
-        fcm_token = request.data.get('fcm_token')
-        receive_notifications = request.data.get('receive_notifications')
-
-        if fcm_token is not None:
-            user.fcm_token = fcm_token
-            user.save()
-
-        if receive_notifications is not None:
-            user.receive_notifications = receive_notifications
-            user.save()
-
-        serializer = self.get_serializer(user)
-        return Response(serializer.data)

@@ -14,6 +14,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 class VerifyCodeSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=4)
+    fcm_token = serializers.CharField(max_length=255, required=False, allow_blank=True, allow_null=True)
+    receive_notifications = serializers.BooleanField(required=False, allow_null=True)
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -63,12 +65,3 @@ class UserAddressUpdateSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'city', 'street', 'apartment_number', 'entrance',
                   'floor', 'intercom', 'created_at', 'is_primary']  # Include 'is_primary'
         read_only_fields = ['user', 'created_at']
-
-
-class NotificationSerializer(serializers.ModelSerializer):
-    fcm_token = serializers.CharField(max_length=255, required=False)
-    receive_notifications = serializers.BooleanField(default=True, required=False)
-
-    class Meta:
-        model = User
-        fields = ('fcm_token', 'receive_notifications')
