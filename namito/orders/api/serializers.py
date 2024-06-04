@@ -197,3 +197,20 @@ class OrderListSerializer(serializers.ModelSerializer):
         model = Order
         fields = ['id', 'order_number', 'created_at', 'status', 'total_amount']
         read_only_fields = ['id', 'order_number', 'created_at', 'status', 'total_amount']
+
+
+class MultiCartItemAddSerializer(serializers.Serializer):
+    product_variant = serializers.IntegerField()
+    quantity = serializers.IntegerField(min_value=1)
+
+    def validate_product_variant(self, value):
+        from namito.catalog.models import Variant
+        try:
+            variant = Variant.objects.get(pk=value)
+        except Variant.DoesNotExist:
+            raise serializers.ValidationError("Product variant does not exist.")
+
+        if variant.stock <= 0:
+            raise serializers.ValidationError("Product variant is out of stock.")
+
+        return value

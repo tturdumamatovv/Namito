@@ -1,5 +1,6 @@
 from rest_framework import status, permissions, generics
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from namito.orders.api.serializers import (
     CartSerializer,
@@ -7,7 +8,8 @@ from namito.orders.api.serializers import (
     OrderHistorySerializer,
     CartItemSerializer,
     CartItemCreateUpdateSerializer,
-    OrderListSerializer
+    OrderListSerializer,
+    MultiCartItemAddSerializer
     )
 from namito.orders.models import (
     Cart,
@@ -196,39 +198,30 @@ class OrderCancelAPIView(generics.RetrieveUpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-
-
-class CartBulkItemCreateAPIView(generics.CreateAPIView):
-    queryset = CartItem.objects.all()
-    serializer_class = CartItemCreateUpdateSerializer
+class MultiCartItemAddAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data, many=True)
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        cart, created = Cart.objects.get_or_create(user=user)
+
+        items_data = request.data.get('items', [])
+
+        # Validate the input data
+        serializer = MultiCartItemAddSerializer(data=items_data, many=True)
         serializer.is_valid(raise_exception=True)
 
-        user = self.request.user
-        cart, created = Cart.objects.get_or_create(user=user)
-        created_items = []
         for item_data in serializer.validated_data:
-            variant_id = item_data.get('product_variant')
+            variant_id = item_data['product_variant']
+            quantity = item_data['quantity']
 
-            # Check if the CartItem with the same product_variant already exists in the cart
-            cart_item = CartItem.objects.filter(cart=cart, product_variant_id=variant_id).first()
-
-            if cart_item:
-                # If it exists, increase the quantity
-                cart_item.quantity += item_data.get('quantity', 1)
+            cart_item, created = CartItem.objects.get_or_create(
+                cart=cart,
+                product_variant_id=variant_id,
+                defaults={'quantity': quantity}
+            )
+            if not created:
+                cart_item.quantity += quantity
                 cart_item.save()
-                created_items.append(cart_item)
-            else:
-                # If it does not exist, create a new CartItem
-                item_data['cart'] = cart
-                item_data['product_variant_id'] = variant_id
-                created_item_serializer = self.get_serializer(data=item_data)
-                created_item_serializer.is_valid(raise_exception=True)
-                created_item_serializer.save()
-                created_items.append(created_item_serializer.instance)
 
-        headers = self.get_success_headers(serializer.data)
-        return Response(self.get_serializer(created_items, many=True).data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response({"detail": "Items added to cart successfully."}, status=status.HTTP_201_CREATED)

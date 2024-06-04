@@ -10,12 +10,12 @@ from namito.orders.api.views import (
     UserOrderListAPIView,
     MultiCartItemUpdateAPIView,
     OrderCancelAPIView,
-    CartBulkItemCreateAPIView
+    MultiCartItemAddAPIView
     )
 
 urlpatterns = [
     path('add/', CartItemCreateAPIView.as_view(), name='cart-add'),
-    path('cart/items/', CartBulkItemCreateAPIView.as_view(), name='cart-item-bulk-create'),
+    path('cart/add-multiple/', MultiCartItemAddAPIView.as_view(), name='add-multiple-cart-items'),
     path('detail/', CartDetailAPIView.as_view(), name='cart-detail'),
     path('item/<int:pk>/', CartItemDeleteAPIView.as_view(), name='cart-item-update-delete'),
     path('multi-update/', MultiCartItemUpdateAPIView.as_view(), name='cart-multi-update'),
