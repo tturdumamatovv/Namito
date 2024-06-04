@@ -197,10 +197,3 @@ class OrderListSerializer(serializers.ModelSerializer):
         model = Order
         fields = ['id', 'order_number', 'created_at', 'status', 'total_amount']
         read_only_fields = ['id', 'order_number', 'created_at', 'status', 'total_amount']
-
-
-class MultipleCartItemCreateSerializer(serializers.Serializer):
-    product_variants = serializers.ListField(child=serializers.IntegerField())
-
-    def create(self, validated_data):
-        pass

@@ -7,8 +7,7 @@ from namito.orders.api.serializers import (
     OrderHistorySerializer,
     CartItemSerializer,
     CartItemCreateUpdateSerializer,
-    OrderListSerializer,
-    MultipleCartItemCreateSerializer
+    OrderListSerializer
     )
 from namito.orders.models import (
     Cart,
@@ -198,26 +197,38 @@ class OrderCancelAPIView(generics.RetrieveUpdateAPIView):
 
 
 
-class MultipleCartItemCreateAPIView(generics.CreateAPIView):
+
+class CartBulkItemCreateAPIView(generics.CreateAPIView):
     queryset = CartItem.objects.all()
-    serializer_class = MultipleCartItemCreateSerializer
+    serializer_class = CartItemCreateUpdateSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+
         user = self.request.user
         cart, created = Cart.objects.get_or_create(user=user)
+        created_items = []
+        for item_data in serializer.validated_data:
+            variant_id = item_data.get('product_variant')
 
-        # Get a list of product_variant IDs from the request data
-        variant_ids = self.request.data.get('product_variants', [])
-
-        for variant_id in variant_ids:
             # Check if the CartItem with the same product_variant already exists in the cart
             cart_item = CartItem.objects.filter(cart=cart, product_variant_id=variant_id).first()
 
             if cart_item:
                 # If it exists, increase the quantity
-                cart_item.quantity += 1
+                cart_item.quantity += item_data.get('quantity', 1)
                 cart_item.save()
+                created_items.append(cart_item)
             else:
                 # If it does not exist, create a new CartItem
-                serializer.save(cart=cart, product_variant_id=variant_id)
+                item_data['cart'] = cart
+                item_data['product_variant_id'] = variant_id
+                created_item_serializer = self.get_serializer(data=item_data)
+                created_item_serializer.is_valid(raise_exception=True)
+                created_item_serializer.save()
+                created_items.append(created_item_serializer.instance)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(self.get_serializer(created_items, many=True).data, status=status.HTTP_201_CREATED, headers=headers)
