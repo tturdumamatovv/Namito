@@ -12,6 +12,7 @@ class AdvertisementInline(admin.StackedInline):
     extra = 0
 
 
+
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ('title', 'description', 'date', 'image')
@@ -30,7 +31,7 @@ class NotificationAdmin(admin.ModelAdmin):
                         user.fcm_token,
                         notification.title,
                         notification.description,
-                        notification.date,
+                        notification.date,  # Pass the date directly
                         image_url
                     )
                 except InvalidArgumentError:
