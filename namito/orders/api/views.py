@@ -7,7 +7,8 @@ from namito.orders.api.serializers import (
     OrderHistorySerializer,
     CartItemSerializer,
     CartItemCreateUpdateSerializer,
-    OrderListSerializer
+    OrderListSerializer,
+    CartItemBulkCreateSerializer
     )
 from namito.orders.models import (
     Cart,
@@ -195,3 +196,28 @@ class OrderCancelAPIView(generics.RetrieveUpdateAPIView):
         serializer = self.get_serializer(instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class CartItemBulkCreateAPIView(generics.ListCreateAPIView):
+    queryset = CartItem.objects.all()
+    serializer_class = CartItemBulkCreateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        cart, created = Cart.objects.get_or_create(user=user)
+        items_data = self.request.data.get('items', [])
+
+        for item_data in items_data:
+            variant_id = item_data.get('product_variant')
+            quantity = item_data.get('quantity', 1)
+
+            # Check if the CartItem with the same product_variant already exists in the cart
+            cart_item = CartItem.objects.filter(cart=cart, product_variant_id=variant_id).first()
+
+            if cart_item:
+                # If it exists, increase the quantity
+                cart_item.quantity += quantity
+                cart_item.save()
+            else:
+                # If it does not exist, create a new CartItem
+                serializer.save(cart=cart, product_variant_id=variant_id, quantity=quantity)
