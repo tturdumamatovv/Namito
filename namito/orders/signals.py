@@ -27,10 +27,13 @@ def send_order_status_notification(sender, instance, created, **kwargs):
                     message_body = f'Ваш заказ #{instance.order_number} от {instance.created_at.strftime("%d.%m.%Y")} был отменен.'
                 elif instance.status == 0:
                     message_title = 'Заказ в процессе'
-                    message_body = f'Ваш заказ #{instance.order_number} от {instance.created_at.strftime("%d.%m.%Y")} в процессе.'
+                    message_body = f'Ваш заказ {instance.order_number} от {instance.created_at.strftime("%d.%m.%Y")} в процессе.'
+                elif instance.status == 3:
+                    message_title = 'Заказ отправлен'
+                    message_body = f'Ваш заказ {instance.order_number} от {instance.created_at.strftime("%d.%m.%Y")} отправлен.'
                 else:
                     message_title = 'Статус заказа изменен'
-                    message_body = f'Новый статус вашего заказа #{instance.order_number} от {instance.created_at.strftime("%d.%m.%Y")}: {instance.get_status_display()}.'
+                    message_body = f'Новый статус вашего заказа {instance.order_number} от {instance.created_at.strftime("%d.%m.%Y")}: {instance.get_status_display()}.'
 
                 message = messaging.Message(
                     notification=messaging.Notification(title=message_title, body=message_body),
@@ -48,8 +51,8 @@ def send_order_status_notification(sender, instance, created, **kwargs):
         user = instance.user
         try:
             if user and user.fcm_token:
-                message_title = 'Заказ в процессе'
-                message_body = f'Ваш заказ #{instance.order_number} от {instance.created_at.strftime("%d.%m.%Y")} в процессе.'
+                message_title = 'Заказ создан'
+                message_body = f'Ваш заказ {instance.order_number} от {instance.created_at.strftime("%d.%m.%Y")} создан.'
                 message = messaging.Message(
                     notification=messaging.Notification(title=message_title, body=message_body),
                     token=user.fcm_token
