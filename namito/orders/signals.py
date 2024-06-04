@@ -21,19 +21,24 @@ def send_order_status_notification(sender, instance, created, **kwargs):
             try:
                 if instance.status == 1:
                     message_title = 'Заказ доставлен'
-                    message_body = f'Ваш заказ #{instance.order_number} от {instance.created_at.strftime("%d.%m.%Y")} успешно доставлен.'
+                    message_body = (f'Ваш заказ: {instance.order_number} '
+                                    f'от {instance.created_at.strftime("%d.%m.%Y")} успешно доставлен.')
                 elif instance.status == 2:
                     message_title = 'Заказ отменен'
-                    message_body = f'Ваш заказ #{instance.order_number} от {instance.created_at.strftime("%d.%m.%Y")} был отменен.'
+                    message_body = (f'Ваш заказ {instance.order_number} '
+                                    f'от {instance.created_at.strftime("%d.%m.%Y")} был отменен.')
                 elif instance.status == 0:
                     message_title = 'Заказ в процессе'
-                    message_body = f'Ваш заказ {instance.order_number} от {instance.created_at.strftime("%d.%m.%Y")} в процессе.'
+                    message_body = (f'Ваш заказ {instance.order_number} '
+                                    f'от {instance.created_at.strftime("%d.%m.%Y")} в процессе.')
                 elif instance.status == 3:
                     message_title = 'Заказ отправлен'
-                    message_body = f'Ваш заказ {instance.order_number} от {instance.created_at.strftime("%d.%m.%Y")} отправлен.'
+                    message_body = (f'Ваш заказ {instance.order_number} '
+                                    f'от {instance.created_at.strftime("%d.%m.%Y")} отправлен.')
                 else:
                     message_title = 'Статус заказа изменен'
-                    message_body = f'Новый статус вашего заказа {instance.order_number} от {instance.created_at.strftime("%d.%m.%Y")}: {instance.get_status_display()}.'
+                    message_body = (f'Новый статус вашего заказа {instance.order_number} '
+                                    f'от {instance.created_at.strftime("%d.%m.%Y")}: {instance.get_status_display()}.')
 
                 message = messaging.Message(
                     notification=messaging.Notification(title=message_title, body=message_body),
@@ -52,7 +57,8 @@ def send_order_status_notification(sender, instance, created, **kwargs):
         try:
             if user and user.fcm_token:
                 message_title = 'Заказ создан'
-                message_body = f'Ваш заказ {instance.order_number} от {instance.created_at.strftime("%d.%m.%Y")} создан.'
+                message_body = (f'Ваш заказ: {instance.order_number} '
+                                f'от {instance.created_at.strftime("%d.%m.%Y")} создан.')
                 message = messaging.Message(
                     notification=messaging.Notification(title=message_title, body=message_body),
                     token=user.fcm_token
@@ -64,4 +70,3 @@ def send_order_status_notification(sender, instance, created, **kwargs):
                 print('FCM token is not available for the user.')
         except Exception as e:
             print('Error sending message:', str(e))
-
