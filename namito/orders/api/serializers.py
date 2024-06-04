@@ -199,10 +199,8 @@ class OrderListSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'order_number', 'created_at', 'status', 'total_amount']
 
 
-class CartItemBulkCreateSerializer(serializers.ListSerializer):
-    child = CartItemCreateUpdateSerializer()
+class MultipleCartItemCreateSerializer(serializers.Serializer):
+    product_variants = serializers.ListField(child=serializers.IntegerField())
 
     def create(self, validated_data):
-        items = [CartItem(**item) for item in validated_data]
-        return CartItem.objects.bulk_create(items)
-
+        pass
