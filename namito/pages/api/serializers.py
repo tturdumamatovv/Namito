@@ -17,7 +17,7 @@ class MainPageSliderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MainPageSlider
-        fields = ['image', 'small_image', 'link']
+        fields = ['image', 'link', 'small_image']
 
     def get_image(self, slider):
         if slider.image and slider.image.file:

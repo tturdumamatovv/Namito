@@ -1,5 +1,4 @@
 from django.urls import path
-from django.views.generic import TemplateView
 
 from namito.catalog.api.views import (
     CategoryListView,
@@ -32,6 +31,7 @@ from namito.catalog.api.views import (
     SimilarProductsView,
     DiscountAPIView, ProductSeoAPIView, CategorySeoAPIView
 )
+from namito.advertisement.api.views import NotificationList
 
 
 category_patterns = [
@@ -74,6 +74,7 @@ utility_patterns = [
     path('favorites/', FavoriteListView.as_view(), name='favorite-list'),
     path('size-charts/', SizeChartListView.as_view(), name='size-chart-list'),
     path('size-charts/<int:category_id>/', SizeChartListView.as_view(), name='size-chart-list-by-category'),
+    path('notifications/', NotificationList.as_view(), name='notification-list'),
 ]
 
 seo_patterns = [
