@@ -224,4 +224,7 @@ class MultiCartItemAddAPIView(APIView):
                 cart_item.quantity += quantity
                 cart_item.save()
 
-        return Response({"detail": "Items added to cart successfully."}, status=status.HTTP_201_CREATED)
+        # Serialize the updated cart
+        cart_serializer = CartSerializer(cart, context={'request': request})
+
+        return Response(cart_serializer.data, status=status.HTTP_201_CREATED)
