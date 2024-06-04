@@ -42,4 +42,23 @@ def send_order_status_notification(sender, instance, created, **kwargs):
             except Exception as e:
                 print('Error sending message:', str(e))
         else:
+
             print('FCM token is not available for the user.')
+    else:
+        user = instance.user
+        try:
+            if user and user.fcm_token:
+                message_title = 'Заказ в процессе'
+                message_body = f'Ваш заказ #{instance.order_number} от {instance.created_at.strftime("%d.%m.%Y")} в процессе.'
+                message = messaging.Message(
+                    notification=messaging.Notification(title=message_title, body=message_body),
+                    token=user.fcm_token
+                )
+
+                response = messaging.send(message)
+                print('Successfully sent message:', response)
+            else:
+                print('FCM token is not available for the user.')
+        except Exception as e:
+            print('Error sending message:', str(e))
+
