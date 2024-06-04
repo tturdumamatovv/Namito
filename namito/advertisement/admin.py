@@ -31,7 +31,7 @@ class NotificationAdmin(admin.ModelAdmin):
                         user.fcm_token,
                         notification.title,
                         notification.description,
-                        notification.date,  # Pass the date directly
+                        notification.date,
                         image_url
                     )
                 except InvalidArgumentError:
