@@ -99,6 +99,7 @@ class VerifyCodeView(generics.CreateAPIView):
         }, status=status.HTTP_200_OK)
 
 
+
 class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
