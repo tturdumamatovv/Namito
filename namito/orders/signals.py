@@ -21,11 +21,11 @@ def send_order_status_notification(sender, instance, created, **kwargs):
         if user and user.fcm_token:
             try:
                 message_title = 'Ваш заказ оформлен'
-                message_body = (f'{instance.created_at.strftime("%B %d, %Y")}, #{instance.order_number}, '
+                message_body = (f'{instance.created_at.strftime("%d.%m.%Y")}, {instance.order_number}, '
                                 f'{instance.get_status_display()}.')
                 data = {
-                    "order_id": f"#{instance.order_number}",
-                    "order_date": instance.created_at.strftime("%B %d, %Y"),
+                    "order_id": f"{instance.order_number}",
+                    "order_date": instance.created_at.strftime("%d.%m.%Y"),
                     "order_status": instance.get_status_display(),
                     "notification_type": "order"
                 }
@@ -55,11 +55,11 @@ def send_order_status_notification(sender, instance, created, **kwargs):
                         message_title = 'Заказ отправлен'
                     else:
                         message_title = 'Статус заказа изменен'
-                    message_body = (f'{instance.created_at.strftime("%B %d, %Y")}, #{instance.order_number}, '
+                    message_body = (f'{instance.created_at.strftime("%d.%m.%Y")}, {instance.order_number}, '
                                     f'{instance.get_status_display()}.')
                     data = {
-                        "order_id": f"#{instance.order_number}",
-                        "order_date": instance.created_at.strftime("%B %d, %Y"),
+                        "order_id": f"{instance.order_number}",
+                        "order_date": instance.created_at.strftime("%d.%m.%Y"),
                         "order_status": instance.get_status_display(),
                         "notification_type": "order"
                     }
