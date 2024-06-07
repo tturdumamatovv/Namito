@@ -31,7 +31,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True, max_length=255, verbose_name=_('Изображение профиля'))
     full_name = models.CharField(max_length=255, blank=True, verbose_name=_('Полное имя'))
     date_of_birth = models.DateField(blank=True, null=True, verbose_name=_('Дата рождения'))
-    email = models.EmailField(blank=True, null=True, verbose_name=_('Имейл'))
+    email = models.EmailField(blank=True, verbose_name=_('Имейл'))
     first_visit = models.BooleanField(default=True, verbose_name=_('Дата первого визита'))
     fcm_token = models.CharField(max_length=255, blank=True, null=True, verbose_name=_('Токен'))
     receive_notifications = models.BooleanField(default=False, verbose_name=_('Получать уведомления'), null=True, blank=True)
