@@ -20,11 +20,18 @@ def send_order_status_notification(sender, instance, created, **kwargs):
         user = instance.user
         if user and user.fcm_token:
             try:
-                message_title = 'Заказ создан'
-                message_body = (f'Ваш заказ: #{instance.order_number}, '
-                                f'{instance.created_at.strftime("%B %d %Y")}, {instance.get_status_display()}.')
+                message_title = 'Ваш заказ оформлен'
+                message_body = (f'{instance.created_at.strftime("%B %d, %Y")}, #{instance.order_number}, '
+                                f'{instance.get_status_display()}.')
+                data = {
+                    "order_id": f"#{instance.order_number}",
+                    "order_date": instance.created_at.strftime("%B %d, %Y"),
+                    "order_status": instance.get_status_display(),
+                    "notification_type": "order"
+                }
                 message = messaging.Message(
                     notification=messaging.Notification(title=message_title, body=message_body),
+                    data=data,
                     token=user.fcm_token
                 )
                 response = messaging.send(message)
@@ -48,10 +55,17 @@ def send_order_status_notification(sender, instance, created, **kwargs):
                         message_title = 'Заказ отправлен'
                     else:
                         message_title = 'Статус заказа изменен'
-                    message_body = (f'Ваш заказ: #{instance.order_number}, '
-                                    f'{instance.created_at.strftime("%B %d %Y")}, {instance.get_status_display()}.')
+                    message_body = (f'{instance.created_at.strftime("%B %d, %Y")}, #{instance.order_number}, '
+                                    f'{instance.get_status_display()}.')
+                    data = {
+                        "order_id": f"#{instance.order_number}",
+                        "order_date": instance.created_at.strftime("%B %d, %Y"),
+                        "order_status": instance.get_status_display(),
+                        "notification_type": "order"
+                    }
                     message = messaging.Message(
                         notification=messaging.Notification(title=message_title, body=message_body),
+                        data=data,
                         token=user.fcm_token
                     )
                     response = messaging.send(message)
