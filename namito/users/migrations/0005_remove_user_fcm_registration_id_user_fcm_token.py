@@ -14,9 +14,4 @@ class Migration(migrations.Migration):
             model_name='user',
             name='fcm_registration_id',
         ),
-        migrations.AddField(
-            model_name='user',
-            name='fcm_token',
-            field=models.CharField(blank=True, max_length=255, null=True, verbose_name='Токен'),
-        ),
     ]

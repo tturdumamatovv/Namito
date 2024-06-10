@@ -1,5 +1,6 @@
 from rest_framework import status, permissions, generics
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from namito.orders.api.serializers import (
     CartSerializer,
@@ -7,7 +8,8 @@ from namito.orders.api.serializers import (
     OrderHistorySerializer,
     CartItemSerializer,
     CartItemCreateUpdateSerializer,
-    OrderListSerializer
+    OrderListSerializer,
+    MultiCartItemAddSerializer
     )
 from namito.orders.models import (
     Cart,
@@ -195,3 +197,34 @@ class OrderCancelAPIView(generics.RetrieveUpdateAPIView):
         serializer = self.get_serializer(instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class MultiCartItemAddAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        cart, created = Cart.objects.get_or_create(user=user)
+
+        items_data = request.data.get('items', [])
+
+        # Validate the input data
+        serializer = MultiCartItemAddSerializer(data=items_data, many=True)
+        serializer.is_valid(raise_exception=True)
+
+        for item_data in serializer.validated_data:
+            variant_id = item_data['product_variant']
+            quantity = item_data['quantity']
+
+            cart_item, created = CartItem.objects.get_or_create(
+                cart=cart,
+                product_variant_id=variant_id,
+                defaults={'quantity': quantity}
+            )
+            if not created:
+                cart_item.quantity += quantity
+                cart_item.save()
+
+        # Serialize the updated cart
+        cart_serializer = CartSerializer(cart, context={'request': request})
+
+        return Response(cart_serializer.data, status=status.HTTP_201_CREATED)

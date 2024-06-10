@@ -12,6 +12,7 @@ class AdvertisementInline(admin.StackedInline):
     extra = 0
 
 
+
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ('title', 'description', 'date', 'image')
@@ -25,7 +26,14 @@ class NotificationAdmin(admin.ModelAdmin):
         for notification in queryset:
             for user in users_with_tokens:
                 try:
-                    send_firebase_notification(user.fcm_token, notification.title, notification.description, notification.image.url if notification.image else None)
+                    image_url = request.build_absolute_uri(notification.image.url) if notification.image else None
+                    send_firebase_notification(
+                        user.fcm_token,
+                        notification.title,
+                        notification.description,
+                        notification.date,
+                        image_url
+                    )
                 except InvalidArgumentError:
                     messages.error(request, f"Ошибка при отправке уведомления пользователю с токеном: {user.fcm_token}")
 

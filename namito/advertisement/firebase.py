@@ -1,5 +1,6 @@
 import firebase_admin
 from firebase_admin import credentials, messaging
+from datetime import datetime
 import logging
 
 logger = logging.getLogger(__name__)
@@ -8,7 +9,7 @@ cred = credentials.Certificate('firebase_key.json')
 firebase_admin.initialize_app(cred)
 
 
-def send_firebase_notification(fcm_token, title, description, image_url=None):
+def send_firebase_notification(fcm_token, title, description, date, image_url=None):
     message = messaging.Message(
         token=fcm_token,
         notification=messaging.Notification(
@@ -16,6 +17,9 @@ def send_firebase_notification(fcm_token, title, description, image_url=None):
             body=description,
             image=image_url,
         ),
+        data={
+            'date': date.isoformat() if isinstance(date, datetime) else str(date)
+        }
     )
     try:
         response = messaging.send(message)

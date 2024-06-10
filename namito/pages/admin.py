@@ -6,10 +6,9 @@ from namito.pages.models import (StaticPage, MainPageSlider, MainPage, Phone, Em
                                  Contacts, Address, PaymentMethod, FAQ, MainPageLayoutMeta)
 
 
-class MainPageSliderInline(admin.TabularInline):
+class MainPageSliderInline(admin.StackedInline):
     model = MainPageSlider
     extra = 0
-    readonly_fields = ('small_image',)
 
 
 class MainPageLayoutInline(admin.StackedInline):

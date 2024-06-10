@@ -1,6 +1,8 @@
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
+
 from .models import Order
+
 from firebase_admin import messaging
 
 
@@ -13,22 +15,63 @@ def track_status_change(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Order)
 def send_order_status_notification(sender, instance, created, **kwargs):
-    if not created and instance.status != getattr(instance, '_original_status', None):
-        if instance.status == 1:  # Если заказ доставлен
-            message_title = 'Заказ доставлен'
-            message_body = 'Ваш заказ успешно доставлен.'
-        elif instance.status == 2:  # Если заказ отменен
-            message_title = 'Заказ отменен'
-            message_body = 'Ваш заказ был отменен.'
+    if created:
+        instance._original_status = instance.status
+        user = instance.user
+        if user and user.fcm_token:
+            try:
+                message_title = 'Ваш заказ оформлен'
+                message_body = (f'{instance.created_at.strftime("%d.%m.%Y")}, {instance.order_number}, '
+                                f'{instance.get_status_display()}.')
+                data = {
+                    "order_id": f"{instance.order_number}",
+                    "order_date": instance.created_at.strftime("%d.%m.%Y"),
+                    "order_status": instance.get_status_display(),
+                    "notification_type": "order"
+                }
+                message = messaging.Message(
+                    notification=messaging.Notification(title=message_title, body=message_body),
+                    data=data,
+                    token=user.fcm_token
+                )
+                response = messaging.send(message)
+                print('Successfully sent message:', response)
+            except Exception as e:
+                print('Error sending message:', str(e))
         else:
-            message_title = 'Статус заказа изменен'
-            message_body = f'Новый статус вашего заказа: {instance.get_status_display()}.'
-
-        # Отправляем уведомление на устройство пользователя
-        message = messaging.Message(
-            notification=messaging.Notification(title=message_title, body=message_body),
-            token=instance.user.fcm_token  # Здесь предполагается, что у пользователя есть поле fcm_token
-        )
-
-        response = messaging.send(message)
-        print('Successfully sent message:', response)
+            print('FCM token is not available for the user.')
+    else:
+        if instance.status != getattr(instance, '_original_status', None):
+            user = instance.user
+            if user and user.fcm_token:
+                try:
+                    if instance.status == 1:
+                        message_title = 'Заказ доставлен'
+                    elif instance.status == 2:
+                        message_title = 'Заказ отменен'
+                    elif instance.status == 0:
+                        message_title = 'Заказ в процессе'
+                    elif instance.status == 3:
+                        message_title = 'Заказ отправлен'
+                    else:
+                        message_title = 'Статус заказа изменен'
+                    message_body = (f'{instance.created_at.strftime("%d.%m.%Y")}, {instance.order_number}, '
+                                    f'{instance.get_status_display()}.')
+                    data = {
+                        "order_id": f"{instance.order_number}",
+                        "order_date": instance.created_at.strftime("%d.%m.%Y"),
+                        "order_status": instance.get_status_display(),
+                        "notification_type": "order"
+                    }
+                    message = messaging.Message(
+                        notification=messaging.Notification(title=message_title, body=message_body),
+                        data=data,
+                        token=user.fcm_token
+                    )
+                    response = messaging.send(message)
+                    print('Successfully sent message:', response)
+                except Exception as e:
+                    print('Error sending message:', str(e))
+            else:
+                print('FCM token is not available for the user.')
+        instance._original_status = instance.status

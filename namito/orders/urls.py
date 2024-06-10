@@ -9,11 +9,13 @@ from namito.orders.api.views import (
     OrderHistoryListAPIView,
     UserOrderListAPIView,
     MultiCartItemUpdateAPIView,
-    OrderCancelAPIView
+    OrderCancelAPIView,
+    MultiCartItemAddAPIView
     )
 
 urlpatterns = [
     path('add/', CartItemCreateAPIView.as_view(), name='cart-add'),
+    path('cart/add-multiple/', MultiCartItemAddAPIView.as_view(), name='add-multiple-cart-items'),
     path('detail/', CartDetailAPIView.as_view(), name='cart-detail'),
     path('item/<int:pk>/', CartItemDeleteAPIView.as_view(), name='cart-item-update-delete'),
     path('multi-update/', MultiCartItemUpdateAPIView.as_view(), name='cart-multi-update'),
