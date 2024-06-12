@@ -77,13 +77,16 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class CategoryBySlugSerializer(CategorySerializer):
     products = serializers.SerializerMethodField()
-    colors = serializers.SerializerMethodField()
+    colors_in_products = serializers.SerializerMethodField()
+    brands_in_products = serializers.SerializerMethodField()
+    sizes_in_products = serializers.SerializerMethodField()
     ratings = serializers.SerializerMethodField()
     min_price = serializers.SerializerMethodField()
     max_price = serializers.SerializerMethodField()
 
     class Meta(CategorySerializer.Meta):
-        fields = CategorySerializer.Meta.fields + ['products', 'colors', 'ratings', 'min_price', 'max_price']
+        fields = CategorySerializer.Meta.fields + ['products', 'ratings', 'min_price', 'max_price',
+                                                   'brands_in_products', 'colors_in_products', 'sizes_in_products']
 
     def get_products(self, obj):
         def get_all_products(category):
@@ -131,7 +134,7 @@ class CategoryBySlugSerializer(CategorySerializer):
                         prices.append(price)
         return max(prices) if prices else None
 
-    def get_colors(self, obj):
+    def get_colors_in_products(self, obj):
         def get_all_products(category):
             products = list(category.products.filter(variants__isnull=False).distinct())
             for child in category.children.all():
@@ -143,6 +146,32 @@ class CategoryBySlugSerializer(CategorySerializer):
         colors = {variant.color for variant in variants if variant.color}
 
         data = [{'id': color.id, 'name': color.name, 'color': color.color} for color in colors]
+        return data
+
+    def get_brands_in_products(self, obj):
+        def get_all_products(category):
+            products = list(category.products.filter(variants__isnull=False).distinct())
+            for child in category.children.all():
+                products.extend(get_all_products(child))
+            return products
+
+        products = get_all_products(obj)
+        brands = Brand.objects.filter(products__in=products).distinct()
+        data = [{'name': brand.name} for brand in brands]
+        return data
+
+    def get_sizes_in_products(self, obj):
+        def get_all_products(category):
+            products = list(category.products.filter(variants__isnull=False).distinct())
+            for child in category.children.all():
+                products.extend(get_all_products(child))
+            return products
+
+        products = get_all_products(obj)
+        variants = Variant.objects.filter(product__in=products).select_related('size')
+        sizes = {variant.size for variant in variants if variant.size}
+
+        data = [{'id': size.id, 'name': size.name} for size in sizes]
         return data
 
     def get_ratings(self, obj):
