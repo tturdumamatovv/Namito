@@ -152,11 +152,12 @@ class Product(models.Model):
                 if variant.discount_type == 'percent':
                     discount_amount = (variant.discount_value / 100) * variant.price
                     discounted_price = variant.price - discount_amount
-                elif variant.discount_type == 'unit':
+                else:
                     discounted_price = variant.price - variant.discount_value
                 prices_with_discount.append(discounted_price)
             else:
                 prices_with_discount.append(variant.price)
+        print(prices_with_discount)
 
         if prices_with_discount:
             return min(prices_with_discount)
@@ -176,9 +177,10 @@ class Product(models.Model):
                 prices_with_discount.append(discounted_price)
             else:
                 prices_with_discount.append(variant.price)
-
+        print(prices_with_discount)
         if prices_with_discount:
             return max(prices_with_discount)
+
         return None
 
 
