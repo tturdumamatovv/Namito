@@ -152,8 +152,8 @@ class CategoryBySlugSerializer(CategorySerializer):
             return products
 
         products = get_all_products(obj)
-        ratings = set(product.get_average_rating() for product in products)
-        return ratings
+        ratings = [round(product.get_average_rating()) for product in products if product.get_average_rating() > 0]
+        return set(ratings)
 
 
 class BrandSerializer(serializers.ModelSerializer):
