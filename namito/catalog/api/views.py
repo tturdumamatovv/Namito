@@ -2,6 +2,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Max, Count, Min
 from django.db import models
+from django.http import Http404
+
 
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
@@ -177,7 +179,10 @@ class ProductDetailView(generics.RetrieveAPIView):
         return context
 
     def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
+        try:
+            instance = self.get_object()
+        except Http404:
+            return Response({"detail": "Продукт не существует."}, status=404)
         user = request.user
 
         if user.is_authenticated:
@@ -261,13 +266,17 @@ class ProductReviewListView(generics.ListAPIView):
         return context
 
     def list(self, request, *args, **kwargs):
+        try:
+            product_id = self.kwargs.get('pk')
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response({"detail": "Продукт с указанным идентификатором не найден."}, status=404)
+
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         response_data = serializer.data
 
         # Add review_allowed field to the response
-        product_id = self.kwargs.get('pk')
-        product = Product.objects.get(id=product_id)
         review_allowed = self.get_review_allowed(product)
 
         return Response({
@@ -371,6 +380,11 @@ class SizeChartListView(generics.ListAPIView):
         category_id = self.kwargs.get('category_id', None)
         if category_id:
             queryset = queryset.filter(categories__id=category_id)
+
+        # Check if category with specified category_id exists
+        if category_id and not queryset.exists():
+            raise Http404("Категория не существует")
+
         return queryset
 
 
@@ -382,6 +396,8 @@ class CategoryBySlugAPIView(generics.ListAPIView):
     def get_queryset(self):
         slug = self.kwargs.get('slug')
         queryset = Category.objects.filter(slug=slug)
+        if not queryset.exists():
+            raise Http404("Категория не существует")
         return queryset
 
     def get_serializer_context(self):
@@ -462,8 +478,10 @@ class ProductSeoAPIView(generics.RetrieveAPIView):
 
     def get_object(self):
         pk = self.kwargs.get('pk')
-        return self.get_queryset().get(pk=pk)
-
+        try:
+            return self.get_queryset().get(pk=pk)
+        except Product.DoesNotExist:
+            raise Http404("Продукт не существует")
 
 
 class CategorySeoAPIView(generics.RetrieveAPIView):
@@ -473,4 +491,7 @@ class CategorySeoAPIView(generics.RetrieveAPIView):
 
     def get_object(self):
         slug = self.kwargs.get('slug')
-        return self.get_queryset().get(slug=slug)
+        try:
+            return self.get_queryset().get(slug=slug)
+        except Category.DoesNotExist:
+            raise Http404("Категория не существует")
