@@ -8,6 +8,7 @@ from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django.core.files.base import ContentFile
 from django.conf import settings
+from django.db.models import Avg
 
 from mptt.models import MPTTModel, TreeForeignKey
 from colorfield.fields import ColorField
@@ -191,6 +192,13 @@ class Product(models.Model):
     def get_popularity_score(self):
         return self.views.count()
 
+    def get_average_rating(self):
+        # Рассчитываем средний рейтинг для продукта
+        average_rating = self.reviews.aggregate(Avg('rating'))['rating__avg']
+        if average_rating is None:
+            return 0
+        return round(average_rating, 2)
+
 
 class ProductView(models.Model):
     product = models.ForeignKey(Product, related_name='views', on_delete=models.CASCADE)
@@ -314,7 +322,7 @@ class Review(models.Model):
     text = models.TextField(verbose_name=_("Текст"), blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Время создания"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("Время обновления"))
-    rating = models.IntegerField(default=1, choices=[(i, str(i)) for i in range(1, 6)], verbose_name=_("Рейтинг"))
+    rating = models.IntegerField(default=5, choices=[(i, str(i)) for i in range(1, 6)], verbose_name=_("Рейтинг"))
 
     def __str__(self):
         return f"{self.created_at} by {self.user}"

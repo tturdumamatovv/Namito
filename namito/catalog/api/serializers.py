@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models import Avg
-from django.conf import settings
+from django.db.models import Min, Max
 
 from rest_framework import serializers
 
@@ -76,9 +76,13 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class CategoryBySlugSerializer(CategorySerializer):
     products = serializers.SerializerMethodField()
+    min_price = serializers.SerializerMethodField()
+    max_price = serializers.SerializerMethodField()
+    colors = serializers.SerializerMethodField()
+    ratings = serializers.SerializerMethodField()
 
     class Meta(CategorySerializer.Meta):
-        fields = CategorySerializer.Meta.fields + ['products']
+        fields = CategorySerializer.Meta.fields + ['products', 'min_price', 'max_price', 'colors', 'ratings']
 
     def get_products(self, obj):
         def get_all_products(category):
@@ -89,8 +93,65 @@ class CategoryBySlugSerializer(CategorySerializer):
 
         products = get_all_products(obj)
         products_with_images = [product for product in products if Image.objects.filter(product=product).exists()]
-        serializer = ProductListSerializer(products_with_images, many=True, context=self.context)
-        return serializer.data
+        product_data = []
+
+        for product in products_with_images:
+            rating = product.get_popularity_score()  # Получаем рейтинг продукта
+            product_serializer = ProductListSerializer(product, context=self.context)
+            product_data.append({**product_serializer.data, 'popularity_score': rating})
+
+        return product_data
+
+    def get_min_price(self, obj):
+        return self._get_price_with_discount(obj, price_type='min')
+
+    def get_max_price(self, obj):
+        return self._get_price_with_discount(obj, price_type='max')
+
+    def _get_price_with_discount(self, obj, price_type='min'):
+        products = obj.products.all()
+        variants = Variant.objects.filter(product__in=products)
+        prices_with_discount = []
+
+        for variant in variants:
+            if variant.discount_value and variant.discount_type:
+                if variant.discount_type == 'percent':
+                    discount_amount = (variant.discount_value / 100) * variant.price
+                    discounted_price = variant.price - discount_amount
+                elif variant.discount_type == 'unit':
+                    discounted_price = variant.price - variant.discount_value
+                prices_with_discount.append(discounted_price)
+            else:
+                prices_with_discount.append(variant.price)
+
+        if prices_with_discount:
+            return min(prices_with_discount) if price_type == 'min' else max(prices_with_discount)
+        return None
+
+    def get_colors(self, obj):
+        def get_all_products(category):
+            products = list(category.products.filter(variants__isnull=False).distinct())
+            for child in category.children.all():
+                products.extend(get_all_products(child))
+            return products
+
+        products = get_all_products(obj)
+        variants = Variant.objects.filter(product__in=products).select_related('color')
+        colors = {variant.color for variant in variants if variant.color}
+
+        data = [{'id': color.id, 'name': color.name, 'color': color.color} for color in colors]
+        return data
+
+    def get_ratings(self, obj):
+        def get_all_products(category):
+            products = list(category.products.filter(variants__isnull=False).distinct())
+            for child in category.children.all():
+                products.extend(get_all_products(child))
+            return products
+
+        products = get_all_products(obj)
+        ratings = set(product.get_average_rating() for product in products)
+        return ratings
 
 
 class BrandSerializer(serializers.ModelSerializer):
@@ -256,13 +317,14 @@ class ProductSerializer(serializers.ModelSerializer):
     brand = BrandSerializer(read_only=True, many=False)
     reviews = serializers.SerializerMethodField()
     review_count = serializers.SerializerMethodField()
+    rating_count = serializers.SerializerMethodField()
     review_allowed = serializers.SerializerMethodField()
     images = ImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags', 'brand', 'is_favorite',
-                  'cart_quantity', 'sku', 'review_count', 'characteristics', 'reviews', 'review_allowed', 'images']
+                  'cart_quantity', 'sku', 'review_count', 'rating_count', 'characteristics', 'reviews', 'review_allowed', 'images']
 
     def get_variants(self, product):
         variants_qs = Variant.objects.filter(product=product, product__active=True).order_by('-main', 'price')
@@ -304,8 +366,12 @@ class ProductSerializer(serializers.ModelSerializer):
         return ReviewSerializer(reviews_qs, many=True, context=self.context).data
 
     def get_review_count(self, product):
-        review_count = Review.objects.filter(product=product).count()
+        review_count = Review.objects.filter(product=product, text__isnull=False, text__gt='').count()
         return review_count
+
+    def get_rating_count(self, product):
+        rating_count = Review.objects.filter(product=product).count()
+        return rating_count
 
     def get_review_allowed(self, product):
         user = self.context.get('request').user
@@ -387,6 +453,12 @@ class ReviewSerializer(serializers.ModelSerializer):
         for i in self.context.get('request').FILES.getlist('images'):
             ReviewImage.objects.create(review=review, image=i)
         return review
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if not instance.text:  # Если текст отзыва пустой
+            representation.pop('text', None)  # Удаляем поле text из представления
+        return representation
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
