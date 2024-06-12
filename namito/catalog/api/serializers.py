@@ -103,30 +103,14 @@ class CategoryBySlugSerializer(CategorySerializer):
         return product_data
 
     def get_min_price(self, obj):
-        return self._get_price_with_discount(obj, price_type='min')
+        products = obj.products.all()
+        prices = [product.calculate_min_price() for product in products if product.calculate_min_price() is not None]
+        return min(prices) if prices else None
 
     def get_max_price(self, obj):
-        return self._get_price_with_discount(obj, price_type='max')
-
-    def _get_price_with_discount(self, obj, price_type='min'):
         products = obj.products.all()
-        variants = Variant.objects.filter(product__in=products)
-        prices_with_discount = []
-
-        for variant in variants:
-            if variant.discount_value and variant.discount_type:
-                if variant.discount_type == 'percent':
-                    discount_amount = (variant.discount_value / 100) * variant.price
-                    discounted_price = variant.price - discount_amount
-                elif variant.discount_type == 'unit':
-                    discounted_price = variant.price - variant.discount_value
-                prices_with_discount.append(discounted_price)
-            else:
-                prices_with_discount.append(variant.price)
-
-        if prices_with_discount:
-            return min(prices_with_discount) if price_type == 'min' else max(prices_with_discount)
-        return None
+        prices = [product.calculate_max_price() for product in products if product.calculate_max_price() is not None]
+        return max(prices) if prices else None
 
     def get_colors(self, obj):
         def get_all_products(category):
