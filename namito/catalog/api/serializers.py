@@ -76,13 +76,13 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class CategoryBySlugSerializer(CategorySerializer):
     products = serializers.SerializerMethodField()
-    min_price = serializers.SerializerMethodField()
-    max_price = serializers.SerializerMethodField()
     colors = serializers.SerializerMethodField()
     ratings = serializers.SerializerMethodField()
+    min_price = serializers.SerializerMethodField()
+    max_price = serializers.SerializerMethodField()
 
     class Meta(CategorySerializer.Meta):
-        fields = CategorySerializer.Meta.fields + ['products', 'min_price', 'max_price', 'colors', 'ratings']
+        fields = CategorySerializer.Meta.fields + ['products', 'colors', 'ratings', 'min_price', 'max_price']
 
     def get_products(self, obj):
         def get_all_products(category):
@@ -102,25 +102,32 @@ class CategoryBySlugSerializer(CategorySerializer):
 
         return product_data
 
-    def get_min_price(self):
-        # Get the instance of the category
-        obj = self.instance
-        # Collecting products from this category and all its descendant categories
-        products = Product.objects.filter(category__in=obj.get_descendants(include_self=True))
-        # Calculating minimum prices for all products
-        prices = [product.calculate_min_price() for product in products if product.calculate_min_price() is not None]
+    def get_min_price(self, obj):
+        products = self.get_products(obj)
+        prices = []
+        for product in products:
+            for variant_data in product.get('variants', []):
+                price = variant_data.get('price')
+                discounted_price = variant_data.get('discounted_price')
+                if price:
+                    if discounted_price:
+                        prices.append(discounted_price)
+                    else:
+                        prices.append(price)
         return min(prices) if prices else None
 
-    def get_max_price(self):
-        # Get the instance of the category
-        obj = self.instance
-
-        # Collecting products from this category and all its descendant categories
-        products = Product.objects.filter(category__in=obj.get_descendants(include_self=True))
-
-        # Calculating maximum prices for all products
-        prices = [product.calculate_max_price() for product in products if product.calculate_max_price() is not None]
-
+    def get_max_price(self, obj):
+        products = self.get_products(obj)
+        prices = []
+        for product in products:
+            for variant_data in product.get('variants', []):
+                price = variant_data.get('price')
+                discounted_price = variant_data.get('discounted_price')
+                if price:
+                    if discounted_price:
+                        prices.append(discounted_price)
+                    else:
+                        prices.append(price)
         return max(prices) if prices else None
 
     def get_colors(self, obj):
@@ -315,10 +322,11 @@ class ProductSerializer(serializers.ModelSerializer):
     rating_count = serializers.SerializerMethodField()
     review_allowed = serializers.SerializerMethodField()
     images = ImageSerializer(many=True, read_only=True)
+    category_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'variants', 'average_rating', 'tags', 'brand', 'is_favorite',
+        fields = ['id', 'name', 'description', 'category', 'category_name', 'variants', 'average_rating', 'tags', 'brand', 'is_favorite',
                   'cart_quantity', 'sku', 'review_count', 'rating_count', 'characteristics', 'reviews', 'review_allowed', 'images']
 
     def get_variants(self, product):
@@ -386,6 +394,9 @@ class ProductSerializer(serializers.ModelSerializer):
         if request is not None:
             return [request.build_absolute_uri(image.image.url) for image in images if image.image]
         return [image.image.url for image in images if image.image]
+
+    def get_category_name(self, product):
+        return product.category.name
 
     def to_representation(self, instance):
         if not instance.active:

@@ -143,46 +143,6 @@ class Product(models.Model):
         verbose_name = "Продукт"
         verbose_name_plural = "Продукты"
 
-    def calculate_min_price(self):
-        variants = self.variants.all()
-        prices_with_discount = []
-
-        for variant in variants:
-            if variant.discount_value and variant.discount_type:
-                if variant.discount_type == 'percent':
-                    discount_amount = (variant.discount_value / 100) * variant.price
-                    discounted_price = variant.price - discount_amount
-                else:
-                    discounted_price = variant.price - variant.discount_value
-                prices_with_discount.append(discounted_price)
-            else:
-                prices_with_discount.append(variant.price)
-        print(prices_with_discount)
-
-        if prices_with_discount:
-            return min(prices_with_discount)
-        return None
-
-    def calculate_max_price(self):
-        variants = self.variants.all()
-        prices_with_discount = []
-
-        for variant in variants:
-            if variant.discount_value and variant.discount_type:
-                if variant.discount_type == 'percent':
-                    discount_amount = (variant.discount_value / 100) * variant.price
-                    discounted_price = variant.price - discount_amount
-                elif variant.discount_type == 'unit':
-                    discounted_price = variant.price - variant.discount_value
-                prices_with_discount.append(discounted_price)
-            else:
-                prices_with_discount.append(variant.price)
-        print(prices_with_discount)
-        if prices_with_discount:
-            return max(prices_with_discount)
-
-        return None
-
 
     def get_images(self):
         base_url = settings.DEFAULT_PRODUCT_URL
@@ -209,7 +169,6 @@ class Product(models.Model):
                 first_image = self.images.first()
                 self.meta_image = first_image.image.url
 
-        self.min_price = self.calculate_min_price() or 0
         super().save(*args, **kwargs)
 
     def generate_sku(self):
