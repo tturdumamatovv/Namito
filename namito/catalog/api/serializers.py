@@ -1,6 +1,7 @@
+import math
+
 from django.db import models
 from django.db.models import Avg
-from django.db.models import Min, Max
 
 from rest_framework import serializers
 
@@ -152,7 +153,7 @@ class CategoryBySlugSerializer(CategorySerializer):
             return products
 
         products = get_all_products(obj)
-        ratings = [round(product.get_average_rating()) for product in products if product.get_average_rating() > 0]
+        ratings = [math.floor(product.get_average_rating()) for product in products if product.get_average_rating() > 0]
         return set(ratings)
 
 
@@ -323,10 +324,11 @@ class ProductSerializer(serializers.ModelSerializer):
     review_allowed = serializers.SerializerMethodField()
     images = ImageSerializer(many=True, read_only=True)
     category_name = serializers.SerializerMethodField()
+    category_slug = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'category_name', 'variants', 'average_rating', 'tags', 'brand', 'is_favorite',
+        fields = ['id', 'name', 'description', 'category', 'category_name', 'category_slug', 'variants', 'average_rating', 'tags', 'brand', 'is_favorite',
                   'cart_quantity', 'sku', 'review_count', 'rating_count', 'characteristics', 'reviews', 'review_allowed', 'images']
 
     def get_variants(self, product):
@@ -397,6 +399,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_category_name(self, product):
         return product.category.name
+
+    def get_category_slug(self, product):
+        return product.category.slug
 
     def to_representation(self, instance):
         if not instance.active:
