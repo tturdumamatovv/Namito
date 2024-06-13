@@ -5,8 +5,8 @@ from namito.catalog.models import Product, Category
 
 class ProductFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(field_name="name", lookup_expr='icontains')
-    min_price = django_filters.NumberFilter(field_name="variants__price", lookup_expr='gte')
-    max_price = django_filters.NumberFilter(field_name="variants__price", lookup_expr='lte')
+    min_price = django_filters.NumberFilter(method='filter_by_min_price')
+    max_price = django_filters.NumberFilter(method='filter_by_max_price')
     brand = django_filters.CharFilter(method='filter_by_brands')
     category_slug = django_filters.CharFilter(method='filter_by_category_slug')
     min_rating = django_filters.NumberFilter(method='filter_by_min_rating')
@@ -66,6 +66,16 @@ class ProductFilter(django_filters.FilterSet):
         else:
             return queryset
 
+    def filter_by_min_price(self, queryset, name, value):
+        return queryset.filter(
+            Q(variants__price__gte=value) | Q(variants__discounted_price__gte=value)
+        ).distinct()
+
+    def filter_by_max_price(self, queryset, name, value):
+        return queryset.filter(
+            Q(variants__price__lte=value) | Q(variants__discounted_price__lte=value)
+        ).distinct()
+
     @property
     def qs(self):
         queryset = super().qs
@@ -83,9 +93,9 @@ class ProductFilter(django_filters.FilterSet):
     def apply_filters(self, queryset):
         if self.request:
             if 'min_price' in self.request.GET:
-                queryset = queryset.filter(variants__price__gte=self.request.GET['min_price'])
+                queryset = self.filter_by_min_price(queryset, 'min_price', self.request.GET['min_price'])
             if 'max_price' in self.request.GET:
-                queryset = queryset.filter(variants__price__lte=self.request.GET['max_price'])
+                queryset = self.filter_by_max_price(queryset, 'max_price', self.request.GET['max_price'])
             if 'color_id' in self.request.GET:
                 queryset = self.filter_by_colors(queryset, 'color_id', self.request.GET.getlist('color_id'))
             if 'size' in self.request.GET:
