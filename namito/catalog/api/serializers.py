@@ -27,15 +27,13 @@ from namito.users.api.serializers import UserProfileSerializer
 
 class CategorySerializer(serializers.ModelSerializer):
     children = serializers.SerializerMethodField()
-    brands = serializers.SerializerMethodField()
-    sizes = serializers.SerializerMethodField()
     parent = serializers.SerializerMethodField()
-    colors = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Category
         fields = ['id', 'name', 'type', 'slug', 'image', 'parent', 'order', 'meta_title', 'meta_image',
-                  'promotion', 'children', 'background_color', 'brands', 'sizes', 'colors', 'icon']
+                  'promotion', 'children', 'background_color', 'icon']
 
     def get_fields(self):
         fields = super().get_fields()
@@ -50,21 +48,6 @@ class CategorySerializer(serializers.ModelSerializer):
         serializer = CategorySerializer(obj.children.all(), many=True, context=self.context)
         return serializer.data
 
-    def get_brands(self, obj):
-        brands = Brand.objects.filter(categories=obj)
-        data = [{'name': brand.name, 'logo': brand.logo.url if brand.logo else None} for brand in brands]
-        return data
-
-    def get_sizes(self, obj):
-        sizes = Size.objects.filter(categories=obj)
-        size_data = [{'id': size.id, 'name': size.name} for size in sizes]
-        return size_data
-
-    def get_colors(self, obj):
-        colors = Color.objects.all()
-        data = [{'id': color.id, 'name': color.name, 'color': color.color} for color in colors]
-        return data
-
     def get_parent(self, obj):
         if obj.parent:
             return {
@@ -77,16 +60,16 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class CategoryBySlugSerializer(CategorySerializer):
     products = serializers.SerializerMethodField()
-    colors_in_products = serializers.SerializerMethodField()
-    brands_in_products = serializers.SerializerMethodField()
-    sizes_in_products = serializers.SerializerMethodField()
+    colors = serializers.SerializerMethodField()
+    brands = serializers.SerializerMethodField()
+    sizes = serializers.SerializerMethodField()
     ratings = serializers.SerializerMethodField()
     min_price = serializers.SerializerMethodField()
     max_price = serializers.SerializerMethodField()
 
     class Meta(CategorySerializer.Meta):
         fields = CategorySerializer.Meta.fields + ['products', 'ratings', 'min_price', 'max_price',
-                                                   'brands_in_products', 'colors_in_products', 'sizes_in_products']
+                                                   'brands', 'colors', 'sizes']
 
     def get_products(self, obj):
         def get_all_products(category):
@@ -134,7 +117,7 @@ class CategoryBySlugSerializer(CategorySerializer):
                         prices.append(price)
         return max(prices) if prices else None
 
-    def get_colors_in_products(self, obj):
+    def get_colors(self, obj):
         def get_all_products(category):
             products = list(category.products.filter(variants__isnull=False).distinct())
             for child in category.children.all():
@@ -148,7 +131,7 @@ class CategoryBySlugSerializer(CategorySerializer):
         data = [{'id': color.id, 'name': color.name, 'color': color.color} for color in colors]
         return data
 
-    def get_brands_in_products(self, obj):
+    def get_brands(self, obj):
         def get_all_products(category):
             products = list(category.products.filter(variants__isnull=False).distinct())
             for child in category.children.all():
@@ -160,7 +143,7 @@ class CategoryBySlugSerializer(CategorySerializer):
         data = [{'name': brand.name} for brand in brands]
         return data
 
-    def get_sizes_in_products(self, obj):
+    def get_sizes(self, obj):
         def get_all_products(category):
             products = list(category.products.filter(variants__isnull=False).distinct())
             for child in category.children.all():
