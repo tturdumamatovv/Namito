@@ -5,8 +5,8 @@ from namito.catalog.models import Product, Category
 
 class ProductFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(field_name="name", lookup_expr='icontains')
-    min_price = django_filters.NumberFilter(field_name="variants__price", lookup_expr='gte')
-    max_price = django_filters.NumberFilter(field_name="variants__price", lookup_expr='lte')
+    min_price = django_filters.NumberFilter(field_name="variants__discounted_price", lookup_expr='gte')
+    max_price = django_filters.NumberFilter(field_name="variants__discounted_price", lookup_expr='lte')
     brand = django_filters.CharFilter(method='filter_by_brands')
     category_slug = django_filters.CharFilter(method='filter_by_category_slug')
     min_rating = django_filters.NumberFilter(method='filter_by_min_rating')
@@ -39,12 +39,11 @@ class ProductFilter(django_filters.FilterSet):
         return queryset.filter(variants__size__name__in=sizes)
 
     def filter_by_min_rating(self, queryset, name, value):
-        queryset = queryset.annotate(
-            avg_rating=Avg('reviews__rating')  # Обратите внимание на путь к рейтингу
+        return queryset.annotate(
+            avg_rating=Avg('reviews__rating')
         ).filter(
-            Q(avg_rating__gte=value) | Q(avg_rating__isnull=False)
+            Q(avg_rating__gte=value)
         )
-        return queryset.distinct()
 
     def filter_by_discount_presence(self, queryset, name, value):
         if value:
@@ -83,9 +82,9 @@ class ProductFilter(django_filters.FilterSet):
     def apply_filters(self, queryset):
         if self.request:
             if 'min_price' in self.request.GET:
-                queryset = queryset.filter(variants__price__gte=self.request.GET['min_price'])
+                queryset = queryset.filter(variants__discounted_price__gte=self.request.GET['min_price'])
             if 'max_price' in self.request.GET:
-                queryset = queryset.filter(variants__price__lte=self.request.GET['max_price'])
+                queryset = queryset.filter(variants__discounted_price__lte=self.request.GET['max_price'])
             if 'color_id' in self.request.GET:
                 queryset = self.filter_by_colors(queryset, 'color_id', self.request.GET.getlist('color_id'))
             if 'size' in self.request.GET:

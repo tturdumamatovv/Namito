@@ -169,6 +169,11 @@ class Product(models.Model):
                 first_image = self.images.first()
                 self.meta_image = first_image.image.url
 
+        if self.variants:
+            for variant in self.variants.all():
+                variant.discounted_price = variant.get_price()
+                variant.save()
+
         super().save(*args, **kwargs)
 
     def generate_sku(self):
@@ -268,6 +273,7 @@ class Variant(models.Model):
         "Discount amount, either in percentage or fixed unit based on the discount type."), verbose_name=_('Значение скидки'))
     discount_type = models.CharField(default=0, max_length=7, choices=DISCOUNT_TYPE_CHOICES, blank=True, null=True,
                                      help_text=_("Type of the discount - either a percent or a fixed unit."), verbose_name=_('Тмп скидки'))
+    discounted_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_("Цена со скидкой"), blank=True, null=True)
 
     class Meta:
         verbose_name = 'Вариант'
