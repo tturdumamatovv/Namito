@@ -470,6 +470,16 @@ class DiscountAPIView(generics.ListAPIView):
                                       variants__discount_type__isnull=False).distinct()
     serializer_class = ProductListSerializer
 
+    def list(self, request, *args, **kwargs):
+        # Получаем исходный список сериализованных объектов
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+
+        # Исключаем объекты, в которых все поля null
+        cleaned_data = [item for item in serializer.data if item is not None]
+
+        return Response(cleaned_data)
+
 
 class ProductSeoAPIView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
