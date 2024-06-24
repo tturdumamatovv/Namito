@@ -1,7 +1,9 @@
 from rest_framework import generics
 from rest_framework.response import Response
 
+
 from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
 
 from namito.pages.api.serializers import MainPageSerializer, StaticPageSerializer, ContactsSerializer, LayoutSeoSerializer
 from namito.pages.models import MainPage, StaticPage, Contacts, MainPageLayoutMeta
@@ -115,3 +117,7 @@ class LayoutView(generics.RetrieveAPIView):
 class LayoutSeoAPIView(generics.ListAPIView):
     queryset = MainPageLayoutMeta.objects.all()
     serializer_class = LayoutSeoSerializer
+
+
+def handle_not_found(request, exception):
+    return JsonResponse({'error': 'Not found'}, status=404)

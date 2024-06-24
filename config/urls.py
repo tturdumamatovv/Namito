@@ -3,10 +3,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include
-from django.urls import path, re_path
+from django.urls import path
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
-from django.shortcuts import render
 
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
@@ -52,6 +51,8 @@ urlpatterns += [
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+handler404 = 'pages.api.views.handle_not_found'
 
 if settings.DEBUG:
     # This allows the error pages to be debugged during development, just visit
