@@ -59,10 +59,18 @@ class MainPageSerializer(serializers.ModelSerializer):
 
     def get_top_products(self, page):
         products = Product.objects.filter(is_top=True, variants__stock__gt=0).distinct().order_by('?')[:15]
-        serializer = ProductListSerializer(products, many=True, read_only=True,
-                                           context={'request': self.context['request']})
-        # Фильтруем продукты, которые были преобразованы в None
-        return [product for product in serializer.data if product is not None]
+
+        # Собираем уникальные id продуктов
+        product_ids = set(product.id for product in products)
+
+        # Сериализуем каждый уникальный продукт один раз
+        serialized_data = []
+        for product_id in product_ids:
+            product = Product.objects.get(id=product_id)
+            serializer = ProductListSerializer(product, context={'request': self.context['request']})
+            serialized_data.append(serializer.data)
+
+        return serialized_data
 
 
 class FAQSerializer(serializers.ModelSerializer):
