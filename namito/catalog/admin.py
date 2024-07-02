@@ -130,6 +130,7 @@ class ProductAdmin(nested_admin.NestedModelAdmin):
     list_display = ['name_ru', 'name_en', 'category', 'active']
     search_fields = ['name', 'category__name']
     list_filter = ['category', 'brand']
+    exclude = ['name', 'description']
     inlines = [CharacteristicsInline, VariantInline, ImageInlineWithColor, ReviewInline, ]
 
     class Media:
