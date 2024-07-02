@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.db.models import OuterRef, Subquery
 
 from namito.catalog.api.serializers import ProductListSerializer
 from namito.catalog.models import Product, Category
@@ -58,10 +59,14 @@ class MainPageSerializer(serializers.ModelSerializer):
         return MainPageSliderSerializer(slider_qs, many=True, context=self.context).data
 
     def get_top_products(self, page):
-        products = Product.objects.filter(is_top=True, variants__stock__gt=0).distinct().order_by('?')[:15]
+        # Используем подзапрос для выбора только уникальных продуктов
+        subquery = Product.objects.filter(
+            id=OuterRef('id'),
+            is_top=True,
+            variants__stock__gt=0
+        ).distinct().order_by('?')[:15]
 
-        if not products.exists():
-            return []
+        products = Product.objects.filter(id__in=Subquery(subquery.values('id')))
 
         # Сериализуем продукты
         serializer = ProductListSerializer(products, many=True, context={'request': self.context['request']})
