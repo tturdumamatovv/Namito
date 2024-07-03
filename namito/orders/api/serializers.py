@@ -206,14 +206,20 @@ class MultiCartItemAddSerializer(serializers.Serializer):
     product_variant = serializers.IntegerField()
     quantity = serializers.IntegerField(min_value=1)
 
-    def validate_product_variant(self, value):
+    def validate(self, data):
         from namito.catalog.models import Variant
+        variant_id = data['product_variant']
+        quantity = data['quantity']
+
         try:
-            variant = Variant.objects.get(pk=value)
+            variant = Variant.objects.get(pk=variant_id)
         except Variant.DoesNotExist:
-            raise serializers.ValidationError("Product variant does not exist.")
+            raise serializers.ValidationError("Такого варианта товара не существует.")
 
         if variant.stock <= 0:
-            raise serializers.ValidationError("Product variant is out of stock.")
+            raise serializers.ValidationError("Вариант товара отсутствует на складе.")
 
-        return value
+        if quantity > variant.stock:
+            raise serializers.ValidationError(f"Запрашиваемое количество ({quantity}) превышает доступное количество на складе ({variant.stock}).")
+
+        return data
