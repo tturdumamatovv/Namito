@@ -85,7 +85,7 @@ class MultiCartItemUpdateAPIView(generics.GenericAPIView):
 
         # Проверьте, является ли request.data словарем
         if not isinstance(request.data, dict):
-            return Response({"error": "Request data should be a JSON object with 'items' key."},
+            return Response({"error": "Данные запроса должны быть JSON-объектом с ключом 'items'."},
                             status=status.HTTP_400_BAD_REQUEST)
 
         # Получаем данные элементов
@@ -93,7 +93,7 @@ class MultiCartItemUpdateAPIView(generics.GenericAPIView):
 
         # Если items_data не список, возвращаем ошибку
         if not isinstance(items_data, list):
-            return Response({"error": "The 'items' key should contain a list of items."},
+            return Response({"error": "Ключ 'items' должен содержать список элементов."},
                             status=status.HTTP_400_BAD_REQUEST)
 
         # Словарь для хранения результата обновления
@@ -111,6 +111,17 @@ class MultiCartItemUpdateAPIView(generics.GenericAPIView):
                 serializer = self.serializer_class(cart_item, data=item_data, partial=True)
 
                 if serializer.is_valid():
+                    # Проверяем наличие достаточного количества товара на складе
+                    product_variant = serializer.validated_data.get('product_variant', cart_item.product_variant)
+                    new_quantity = serializer.validated_data.get('quantity', cart_item.quantity)
+
+                    if new_quantity > product_variant.stock:
+                        results["errors"].append({
+                            "id": item_id,
+                            "errors": "Недостаточно товара на складе для обновления элемента."
+                        })
+                        continue
+
                     serializer.save()
                     results["updated_items"].append(serializer.data)
                 else:
@@ -122,7 +133,7 @@ class MultiCartItemUpdateAPIView(generics.GenericAPIView):
             except CartItem.DoesNotExist:
                 results["errors"].append({
                     "id": item_id,
-                    "errors": "CartItem with id {} does not exist.".format(item_id)
+                    "errors": "Элемент корзины с id {} не существует.".format(item_id)
                 })
 
         return Response(results, status=status.HTTP_200_OK)

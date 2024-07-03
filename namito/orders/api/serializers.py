@@ -26,6 +26,12 @@ class CartItemCreateUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Товар не доступен для добавления в корзину.")
         return value
 
+    def validate_quantity(self, value):
+        product_variant = self.instance.product_variant if self.instance else self.initial_data['product_variant']
+        if value > product_variant.stock:
+            raise serializers.ValidationError("Недостаточно товара на складе.")
+        return value
+
 
 class CartItemSerializer(serializers.ModelSerializer):
     product_variant = VariantSerializer(required=False)
