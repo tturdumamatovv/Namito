@@ -118,7 +118,7 @@ class MultiCartItemUpdateAPIView(generics.GenericAPIView):
                     if new_quantity > product_variant.stock:
                         results["errors"].append({
                             "id": item_id,
-                            "errors": "Недостаточно товара на складе для обновления элемента."
+                            "errors": {"quantity": ["Недостаточно товара на складе."]}
                         })
                         continue
 
@@ -133,9 +133,14 @@ class MultiCartItemUpdateAPIView(generics.GenericAPIView):
             except CartItem.DoesNotExist:
                 results["errors"].append({
                     "id": item_id,
-                    "errors": "Элемент корзины с id {} не существует.".format(item_id)
+                    "errors": {"id": "Элемент корзины с id {} не существует.".format(item_id)}
                 })
 
+        # Если есть ошибки, возвращаем статус 400
+        if results["errors"]:
+            return Response(results, status=status.HTTP_400_BAD_REQUEST)
+
+        # Если все элементы обновлены успешно, возвращаем статус 200
         return Response(results, status=status.HTTP_200_OK)
 
 
