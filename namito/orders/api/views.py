@@ -97,7 +97,7 @@ class MultiCartItemUpdateAPIView(generics.GenericAPIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
         # Словарь для хранения результата обновления
-        results = {"updated_items": [], "errors": []}
+        results = {"updated_items": [], "update_errors": []}
 
         for item_data in items_data:
             # Получаем id элемента
@@ -116,8 +116,9 @@ class MultiCartItemUpdateAPIView(generics.GenericAPIView):
                     new_quantity = serializer.validated_data.get('quantity', cart_item.quantity)
 
                     if new_quantity > product_variant.stock:
-                        results["errors"].append({
+                        results["update_errors"].append({
                             "id": item_id,
+                            "product_name": product_variant.product.name,
                             "errors": {"quantity": ["Недостаточно товара на складе."]}
                         })
                         continue
@@ -125,19 +126,20 @@ class MultiCartItemUpdateAPIView(generics.GenericAPIView):
                     serializer.save()
                     results["updated_items"].append(serializer.data)
                 else:
-                    results["errors"].append({
+                    results["update_errors"].append({
                         "id": item_id,
+                        "product_name": cart_item.product_variant.product.name,
                         "errors": serializer.errors
                     })
 
             except CartItem.DoesNotExist:
-                results["errors"].append({
+                results["update_errors"].append({
                     "id": item_id,
                     "errors": {"id": "Элемент корзины с id {} не существует.".format(item_id)}
                 })
 
         # Если есть ошибки, возвращаем статус 400
-        if results["errors"]:
+        if results["update_errors"]:
             return Response(results, status=status.HTTP_400_BAD_REQUEST)
 
         # Если все элементы обновлены успешно, возвращаем статус 200
