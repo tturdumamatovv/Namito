@@ -71,7 +71,10 @@ class CartSerializer(ModelSerializer):
         return cart
 
     def get_total_amount(self, obj):
-        return obj.total_amount()
+        total_amount = sum(item.quantity * (item.product_variant.discounted_price or item.product_variant.price)
+                           for item in obj.items.all())
+        return total_amount
+
 
 
 class OrderedItemSerializer(ModelSerializer):
