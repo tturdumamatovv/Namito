@@ -1,5 +1,5 @@
 from namito.catalog.api.serializers import VariantSerializer
-from namito.catalog.models import Image
+from namito.catalog.models import Image, Variant
 from namito.orders.models import (
     Cart,
     CartItem,
@@ -27,7 +27,9 @@ class CartItemCreateUpdateSerializer(serializers.ModelSerializer):
         return value
 
     def validate_quantity(self, value):
-        product_variant = self.instance.product_variant if self.instance else self.initial_data['product_variant']
+        product_variant = self.initial_data.get('product_variant') or self.instance.product_variant
+        if isinstance(product_variant, int):
+            product_variant = Variant.objects.get(pk=product_variant)
         if value > product_variant.stock:
             raise serializers.ValidationError("Недостаточно товара на складе.")
         return value
