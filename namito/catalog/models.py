@@ -262,7 +262,7 @@ class Variant(models.Model):
     product = models.ForeignKey(Product, related_name='variants', on_delete=models.CASCADE, verbose_name=_('Продукт'))
     color = models.ForeignKey(Color, on_delete=models.PROTECT, related_name='variants', verbose_name=_('Цвет'))
     size = models.ForeignKey(Size, on_delete=models.PROTECT, related_name='variants', verbose_name=_('Размер'))
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_('Цена'))
+    price = models.PositiveIntegerField(default=0, verbose_name=_('Цена'))
     stock = models.PositiveIntegerField(default=0, blank=True, null=True, verbose_name=_('Количество'))
     main = models.BooleanField(default=False, verbose_name=_('Главный'))
     DISCOUNT_TYPE_CHOICES = [
