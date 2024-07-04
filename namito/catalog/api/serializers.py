@@ -1,7 +1,7 @@
 import math
 
 from django.db import models
-from django.db.models import Avg
+from django.db.models import Avg, Min
 
 from rest_framework import serializers
 
@@ -28,6 +28,7 @@ from namito.users.api.serializers import UserProfileSerializer
 class CategorySerializer(serializers.ModelSerializer):
     children = serializers.SerializerMethodField()
     parent = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Category
@@ -93,23 +94,13 @@ class CategoryBySlugSerializer(CategorySerializer):
         prices = []
         for product in products:
             for variant_data in product.get('variants', []):
-                if variant_data['main']:
-                    price = variant_data.get('price')
-                    discounted_price = variant_data.get('discounted_price')
-                    if price:
-                        if discounted_price:
-                            prices.append(discounted_price)
-                        else:
-                            prices.append(price)
-                else:
-                    price = variant_data.get('price')
-                    discounted_price = variant_data.get('discounted_price')
-                    if price:
-                        if discounted_price:
-                            prices.append(discounted_price)
-                        else:
-                            prices.append(price)
-
+                price = variant_data.get('price')
+                discounted_price = variant_data.get('discounted_price')
+                if price:
+                    if discounted_price:
+                        prices.append(discounted_price)
+                    else:
+                        prices.append(price)
         return min(prices) if prices else None
 
     def get_max_price(self, obj):
@@ -117,23 +108,13 @@ class CategoryBySlugSerializer(CategorySerializer):
         prices = []
         for product in products:
             for variant_data in product.get('variants', []):
-                if variant_data['main']:
-
-                    price = variant_data.get('price')
-                    discounted_price = variant_data.get('discounted_price')
-                    if price:
-                        if discounted_price:
-                            prices.append(discounted_price)
-                        else:
-                            prices.append(price)
-                else:
-                    price = variant_data.get('price')
-                    discounted_price = variant_data.get('discounted_price')
-                    if price:
-                        if discounted_price:
-                            prices.append(discounted_price)
-                        else:
-                            prices.append(price)
+                price = variant_data.get('price')
+                discounted_price = variant_data.get('discounted_price')
+                if price:
+                    if discounted_price:
+                        prices.append(discounted_price)
+                    else:
+                        prices.append(price)
         return max(prices) if prices else None
 
     def get_colors(self, obj):
@@ -276,17 +257,20 @@ class ProductListSerializer(serializers.ModelSerializer):
                   'cart_quantity', 'images', 'characteristics']
 
     def get_price(self, product):
-        main_variant = Variant.objects.filter(product=product, main=True).first()
-        if not main_variant:
-            main_variant = Variant.objects.filter(product=product).first()
-        if main_variant:
-            price = main_variant.price
-            discount = main_variant.get_price()
-            return {
-                'price': price,
-                'reduced_price': discount if discount != price else None
-            }
-        return {'price': 0, 'discount': 0}
+        # Получаем самую минимальную цену среди всех вариантов продукта
+        min_price = Variant.objects.filter(product=product).aggregate(min_price=Min('price'))['min_price']
+
+        if min_price is not None:
+            main_variant = Variant.objects.filter(product=product, price=min_price).first()
+            if main_variant:
+                price = main_variant.price
+                discount = main_variant.get_price()  # Предполагая, что это возвращает скидку
+                return {
+                    'price': price,
+                    'reduced_price': discount if discount != price else None
+                }
+
+        return {'price': 0, 'reduced_price': 0}
 
     def get_average_rating(self, product):
         average = Review.objects.filter(product=product).aggregate(Avg('rating'))['rating__avg']
@@ -359,10 +343,8 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'category_name', 'category_slug', 'variants',
-                  'average_rating', 'tags', 'brand', 'is_favorite',
-                  'cart_quantity', 'sku', 'review_count', 'rating_count', 'characteristics', 'reviews',
-                  'review_allowed', 'images']
+        fields = ['id', 'name', 'description', 'category', 'category_name', 'category_slug', 'variants', 'average_rating', 'tags', 'brand', 'is_favorite',
+                  'cart_quantity', 'sku', 'review_count', 'rating_count', 'characteristics', 'reviews', 'review_allowed', 'images']
 
     def get_variants(self, product):
         variants_qs = Variant.objects.filter(product=product, product__active=True).order_by('-main', 'price')
@@ -459,8 +441,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ['id', 'product', 'product_name', 'product_image', 'user', 'text', 'created_at', 'updated_at',
-                  'rating', 'images', 'review_allowed']
+        fields = ['id', 'product', 'product_name', 'product_image', 'user', 'text', 'created_at', 'updated_at', 'rating', 'images', 'review_allowed']
 
     def get_product_image(self, obj):
         product = obj.product
