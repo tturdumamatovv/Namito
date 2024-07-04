@@ -283,7 +283,7 @@ db.sqlite3
 .idea/
 
 /postgres
-/static
+/assets/static
 
 
 # Backup files #
@@ -350,7 +350,7 @@ Control.system-ca-bundle
 
 # Visual Studio Code #
 
-static/
+assets/static/
 postgres/
 
 firebase_key.json
