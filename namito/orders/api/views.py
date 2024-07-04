@@ -239,14 +239,7 @@ class MultiCartItemAddAPIView(APIView):
                 defaults={'quantity': quantity}
             )
             if not created:
-                new_quantity = cart_item.quantity + quantity
-                if new_quantity > cart_item.product_variant.stock:
-                    return Response(
-                        {
-                            "error": f"Запрашиваемое количество ({new_quantity}) превышает доступное количество на складе ({cart_item.product_variant.stock})."},
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-                cart_item.quantity = new_quantity
+                cart_item.quantity = quantity
                 cart_item.save()
 
         # Serialize the updated cart

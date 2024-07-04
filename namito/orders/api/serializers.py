@@ -224,10 +224,4 @@ class MultiCartItemAddSerializer(serializers.Serializer):
         except Variant.DoesNotExist:
             raise serializers.ValidationError("Такого варианта товара не существует.")
 
-        if variant.stock <= 0:
-            raise serializers.ValidationError("Вариант товара отсутствует на складе.")
-
-        if quantity > variant.stock:
-            raise serializers.ValidationError(f"Запрашиваемое количество ({quantity}) превышает доступное количество на складе ({variant.stock}).")
-
         return data
