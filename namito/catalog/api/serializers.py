@@ -105,17 +105,17 @@ class CategoryBySlugSerializer(CategorySerializer):
 
     def get_max_price(self, obj):
         products = self.get_products(obj)
-        prices = []
+        min_prices = []
+
         for product in products:
-            for variant_data in product.get('variants', []):
-                price = variant_data.get('price')
-                discounted_price = variant_data.get('discounted_price')
-                if price:
-                    if discounted_price:
-                        prices.append(discounted_price)
-                    else:
-                        prices.append(price)
-        return max(min(prices)) if prices else None
+            variants = product.get('variants', [])
+            if variants:
+                # Находим минимальную цену среди всех вариантов продукта
+                min_price = min(variant.get('price', float('inf')) for variant in variants)
+                min_prices.append(min_price)
+
+        # Находим максимальное значение среди всех минимальных цен
+        return max(min_prices) if min_prices else None
 
     def get_colors(self, obj):
         def get_all_products(category):
