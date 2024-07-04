@@ -115,7 +115,7 @@ class CategoryBySlugSerializer(CategorySerializer):
                         prices.append(discounted_price)
                     else:
                         prices.append(price)
-        return max(prices) if prices else None
+        return max(min(prices)) if prices else None
 
     def get_colors(self, obj):
         def get_all_products(category):
