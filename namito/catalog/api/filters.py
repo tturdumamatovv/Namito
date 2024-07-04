@@ -1,6 +1,6 @@
 import django_filters
-from django.db.models import Avg
-from namito.catalog.models import Product, Category
+from django.db.models import Avg, Min, Max
+from namito.catalog.models import Product, Category, Variant
 
 
 class ProductFilter(django_filters.FilterSet):
@@ -56,14 +56,20 @@ class ProductFilter(django_filters.FilterSet):
             ).distinct()
 
     def filter_by_min_price(self, queryset, name, value):
-        value = float(value)  # Преобразуем value в число
-        filtered_products = [product.pk for product in queryset if product.get_price() >= value]
-        return queryset.filter(pk__in=filtered_products)
+        return queryset.annotate(
+            min_variant_price=Min(
+                'variants__discounted_price',
+                filter=Q(variants__discounted_price__isnull=False)
+            )
+        ).filter(min_variant_price__gte=value)
 
     def filter_by_max_price(self, queryset, name, value):
-        value = float(value)  # Преобразуем value в число
-        filtered_products = [product.pk for product in queryset if product.get_price() <= value]
-        return queryset.filter(pk__in=filtered_products)
+        return queryset.annotate(
+            max_variant_price=Max(
+                'variants__discounted_price',
+                filter=Q(variants__discounted_price__isnull=False)
+            )
+        ).filter(max_variant_price__lte=value)
 
     def sort_by_discount(self, queryset, order):
         if order == 'asc':
