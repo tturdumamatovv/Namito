@@ -1,5 +1,5 @@
 import django_filters
-from django.db.models import Avg, Min, Max
+from django.db.models import Avg, Min, Max, Q
 from namito.catalog.models import Product, Category, Variant
 
 
