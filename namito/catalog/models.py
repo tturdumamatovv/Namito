@@ -290,9 +290,9 @@ class Variant(models.Model):
         if self.discount_value and self.discount_type:
             if self.discount_type == 'percent':
                 discount_amount = (self.discount_value / 100) * self.price
-                return self.price - discount_amount
+                return round(self.price - discount_amount)
             elif self.discount_type == 'unit':
-                return self.price - self.discount_value
+                return round(self.price - self.discount_value)
         return self.price
 
 
