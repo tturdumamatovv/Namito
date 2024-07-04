@@ -1,7 +1,7 @@
 import math
 
 from django.db import models
-from django.db.models import Avg, Min
+from django.db.models import Avg, Min, Q, Case, When, IntegerField
 
 from rest_framework import serializers
 
@@ -258,13 +258,22 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     def get_price(self, product):
         # Получаем самую минимальную цену среди всех вариантов продукта
-        min_price = Variant.objects.filter(product=product).aggregate(min_price=Min('price'))['min_price']
+        min_price = Variant.objects.filter(product=product).aggregate(min_price=Min(
+            Case(
+                When(discounted_price__isnull=False, then='discounted_price'),
+                default='price',
+                output_field=IntegerField(),
+            )
+        ))['min_price']
 
         if min_price is not None:
-            main_variant = Variant.objects.filter(product=product, price=min_price).first()
+            main_variant = Variant.objects.filter(product=product).filter(
+                Q(price=min_price) | Q(discounted_price=min_price)
+            ).first()
+
             if main_variant:
                 price = main_variant.price
-                discount = main_variant.get_price()  # Предполагая, что это возвращает скидку
+                discount = main_variant.discounted_price
                 return {
                     'price': price,
                     'reduced_price': discount if discount != price else None

@@ -2,6 +2,7 @@ import django_filters
 from django.db.models import Avg
 from namito.catalog.models import Product, Category
 
+
 class ProductFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(field_name="name", lookup_expr='icontains')
     min_price = django_filters.NumberFilter(method='filter_by_min_price')
