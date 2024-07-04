@@ -1,12 +1,12 @@
 import django_filters
-from django.db.models import Avg, Q
+from django.db.models import Avg
 from namito.catalog.models import Product, Category
 
 
 class ProductFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(field_name="name", lookup_expr='icontains')
-    min_price = django_filters.NumberFilter(field_name="variants__discounted_price", lookup_expr='gte')
-    max_price = django_filters.NumberFilter(field_name="variants__discounted_price", lookup_expr='lte')
+    min_price = django_filters.NumberFilter(method='filter_by_min_price')
+    max_price = django_filters.NumberFilter(method='filter_by_max_price')
     brand = django_filters.CharFilter(method='filter_by_brands')
     category_slug = django_filters.CharFilter(method='filter_by_category_slug')
     min_rating = django_filters.NumberFilter(method='filter_by_min_rating')
@@ -16,8 +16,7 @@ class ProductFilter(django_filters.FilterSet):
 
     class Meta:
         model = Product
-        fields = ['name', 'min_price', 'max_price', 'brand', 'category_slug',
-                  'min_rating', 'has_discount', 'color', 'size']
+        fields = ['name', 'brand', 'category_slug', 'min_rating', 'has_discount', 'color', 'size']
 
     def filter_by_category_slug(self, queryset, name, value):
         category = Category.objects.filter(slug=value).first()
@@ -55,6 +54,12 @@ class ProductFilter(django_filters.FilterSet):
                 variants__discount_type__isnull=False
             ).distinct()
 
+    def filter_by_min_price(self, queryset, name, value):
+        return queryset.filter(variants__discounted_price__gte=value)
+
+    def filter_by_max_price(self, queryset, name, value):
+        return queryset.filter(variants__discounted_price__lte=value)
+
     def sort_by_discount(self, queryset, order):
         if order == 'asc':
             return queryset.order_by('variants__discount_value').distinct()
@@ -77,9 +82,9 @@ class ProductFilter(django_filters.FilterSet):
         params = self.request.GET
 
         if 'min_price' in params:
-            queryset = queryset.filter(variants__discounted_price__gte=params['min_price'])
+            queryset = self.filter_by_min_price(queryset, 'min_price', params['min_price'])
         if 'max_price' in params:
-            queryset = queryset.filter(variants__discounted_price__lte=params['max_price'])
+            queryset = self.filter_by_max_price(queryset, 'max_price', params['max_price'])
         if 'color_id' in params:
             queryset = self.filter_by_colors(queryset, 'color_id', params.getlist('color_id'))
         if 'size' in params:

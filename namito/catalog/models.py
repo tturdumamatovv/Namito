@@ -278,6 +278,10 @@ class Variant(models.Model):
     class Meta:
         verbose_name = 'Вариант'
         verbose_name_plural = 'Варианты'
+        indexes = [
+            models.Index(fields=['price']),
+            models.Index(fields=['discounted_price']),
+        ]
 
     def __str__(self):
         return f"{self.product.name} - {self.color} - {self.size}"
