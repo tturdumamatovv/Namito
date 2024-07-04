@@ -205,6 +205,23 @@ class Product(models.Model):
             return 0
         return round(average_rating, 2)
 
+    def get_price(self):
+        main_variant = Variant.objects.filter(product=self, main=True).first()
+        if not main_variant:
+            main_variant = Variant.objects.filter(product=self).first()
+        if main_variant:
+            price = main_variant.price
+            reduced_price = main_variant.get_price()
+            return reduced_price if reduced_price else price
+        return 0
+
+    def get_price_range(self):
+        price_data = self.get_price()
+        return {
+            'min_price': price_data,
+            'max_price': price_data
+        }
+
 
 class ProductView(models.Model):
     product = models.ForeignKey(Product, related_name='views', on_delete=models.CASCADE)
