@@ -29,7 +29,6 @@ class CategorySerializer(serializers.ModelSerializer):
     children = serializers.SerializerMethodField()
     parent = serializers.SerializerMethodField()
 
-
     class Meta:
         model = Category
         fields = ['id', 'name', 'type', 'slug', 'image', 'parent', 'order', 'meta_title', 'meta_image',
@@ -94,13 +93,23 @@ class CategoryBySlugSerializer(CategorySerializer):
         prices = []
         for product in products:
             for variant_data in product.get('variants', []):
-                price = variant_data.get('price')
-                discounted_price = variant_data.get('discounted_price')
-                if price:
-                    if discounted_price:
-                        prices.append(discounted_price)
-                    else:
-                        prices.append(price)
+                if variant_data['main']:
+                    price = variant_data.get('price')
+                    discounted_price = variant_data.get('discounted_price')
+                    if price:
+                        if discounted_price:
+                            prices.append(discounted_price)
+                        else:
+                            prices.append(price)
+                else:
+                    price = variant_data.get('price')
+                    discounted_price = variant_data.get('discounted_price')
+                    if price:
+                        if discounted_price:
+                            prices.append(discounted_price)
+                        else:
+                            prices.append(price)
+
         return min(prices) if prices else None
 
     def get_max_price(self, obj):
@@ -108,13 +117,23 @@ class CategoryBySlugSerializer(CategorySerializer):
         prices = []
         for product in products:
             for variant_data in product.get('variants', []):
-                price = variant_data.get('price')
-                discounted_price = variant_data.get('discounted_price')
-                if price:
-                    if discounted_price:
-                        prices.append(discounted_price)
-                    else:
-                        prices.append(price)
+                if variant_data['main']:
+
+                    price = variant_data.get('price')
+                    discounted_price = variant_data.get('discounted_price')
+                    if price:
+                        if discounted_price:
+                            prices.append(discounted_price)
+                        else:
+                            prices.append(price)
+                else:
+                    price = variant_data.get('price')
+                    discounted_price = variant_data.get('discounted_price')
+                    if price:
+                        if discounted_price:
+                            prices.append(discounted_price)
+                        else:
+                            prices.append(price)
         return max(prices) if prices else None
 
     def get_colors(self, obj):
@@ -340,8 +359,10 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'category_name', 'category_slug', 'variants', 'average_rating', 'tags', 'brand', 'is_favorite',
-                  'cart_quantity', 'sku', 'review_count', 'rating_count', 'characteristics', 'reviews', 'review_allowed', 'images']
+        fields = ['id', 'name', 'description', 'category', 'category_name', 'category_slug', 'variants',
+                  'average_rating', 'tags', 'brand', 'is_favorite',
+                  'cart_quantity', 'sku', 'review_count', 'rating_count', 'characteristics', 'reviews',
+                  'review_allowed', 'images']
 
     def get_variants(self, product):
         variants_qs = Variant.objects.filter(product=product, product__active=True).order_by('-main', 'price')
@@ -438,7 +459,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ['id', 'product', 'product_name', 'product_image', 'user', 'text', 'created_at', 'updated_at', 'rating', 'images', 'review_allowed']
+        fields = ['id', 'product', 'product_name', 'product_image', 'user', 'text', 'created_at', 'updated_at',
+                  'rating', 'images', 'review_allowed']
 
     def get_product_image(self, obj):
         product = obj.product
