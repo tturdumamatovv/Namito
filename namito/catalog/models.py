@@ -224,12 +224,18 @@ class Product(models.Model):
         }
 
     def update_price_range(self):
-        variants = self.variants.all()
-        min_price = variants.aggregate(models.Min('discounted_price'))['discounted_price__min']
-        max_price = variants.aggregate(models.Max('discounted_price'))['discounted_price__max']
+        # Проверка флага для предотвращения рекурсии
+        if hasattr(self, '_updating_price_range') and self._updating_price_range:
+            return
+
+        self._updating_price_range = True
+        min_price = self.variants.aggregate(models.Min('discounted_price'))['discounted_price__min']
+        max_price = self.variants.aggregate(models.Max('discounted_price'))['discounted_price__max']
+
         self.min_price = min_price if min_price is not None else 0
         self.max_price = max_price if max_price is not None else 0
-        self.save()
+        self.save(update_fields=['min_price', 'max_price'])
+        self._updating_price_range = False
 
 
 class ProductView(models.Model):
@@ -322,9 +328,10 @@ class Variant(models.Model):
         return self.price
 
     def save(self, *args, **kwargs):
-        self.discounted_price = self.get_price()
         super().save(*args, **kwargs)
-        self.product.update_price_range()
+        # Проверка флага для предотвращения рекурсии
+        if not hasattr(self.product, '_updating_price_range') or not self.product._updating_price_range:
+            self.product.update_price_range()
 
 
 class Image(ProcessedImageModel):
