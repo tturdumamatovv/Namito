@@ -94,7 +94,8 @@ class CategoryBySlugSerializer(CategorySerializer):
         min_prices = []
         for product in products:
             min_price = product.min_price
-            min_prices.append(min_price)
+            if min_price > 0:  # Учитываем только ненулевые минимальные цены
+                min_prices.append(min_price)
         return min(min_prices) if min_prices else None
 
     def get_max_price(self, obj):
