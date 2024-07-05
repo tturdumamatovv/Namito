@@ -271,27 +271,31 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     def get_price(self, product):
         # Получаем самую минимальную цену среди всех вариантов продукта
-        min_price = Variant.objects.filter(product=product).aggregate(min_price=Min(
-            Case(
-                When(discounted_price__isnull=False, then='discounted_price'),
-                default='price',
-                output_field=IntegerField(),
+        min_price = Variant.objects.filter(product=product).aggregate(
+            min_price=Min(
+                Case(
+                    When(discounted_price__isnull=False, then='discounted_price'),
+                    default='price',
+                    output_field=IntegerField(),
+                )
             )
-        ))['min_price']
+        )['min_price']
 
         if min_price is not None:
-            main_variant = Variant.objects.filter(product=product).filter(
+            # Находим первый вариант с минимальной ценой или скидкой
+            min_variant = Variant.objects.filter(product=product).filter(
                 Q(price=min_price) | Q(discounted_price=min_price)
             ).first()
 
-            if main_variant:
-                price = main_variant.price
-                discount = main_variant.discounted_price
+            if min_variant:
+                price = min_variant.price
+                discount = min_variant.discounted_price
                 return {
                     'price': price,
                     'reduced_price': discount if discount != price else None
                 }
 
+        # Возвращаем нулевые значения, если не найдено
         return {'price': 0, 'reduced_price': 0}
 
     def get_average_rating(self, product):
