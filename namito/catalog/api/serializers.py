@@ -64,8 +64,8 @@ class CategoryBySlugSerializer(CategorySerializer):
     brands = serializers.SerializerMethodField()
     sizes = serializers.SerializerMethodField()
     ratings = serializers.SerializerMethodField()
-    min_price = serializers.IntegerField(source='min_price')
-    max_price = serializers.IntegerField(source='max_price')
+    min_price = serializers.IntegerField()
+    max_price = serializers.IntegerField()
 
     class Meta(CategorySerializer.Meta):
         fields = CategorySerializer.Meta.fields + ['products', 'ratings', 'min_price', 'max_price',
