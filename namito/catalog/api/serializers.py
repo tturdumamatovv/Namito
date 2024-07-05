@@ -64,8 +64,8 @@ class CategoryBySlugSerializer(CategorySerializer):
     brands = serializers.SerializerMethodField()
     sizes = serializers.SerializerMethodField()
     ratings = serializers.SerializerMethodField()
-    min_price = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
-    max_price = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
+    min_price = serializers.SerializerMethodField()
+    max_price = serializers.SerializerMethodField()
 
     class Meta(CategorySerializer.Meta):
         fields = CategorySerializer.Meta.fields + ['products', 'ratings', 'min_price', 'max_price',
@@ -83,19 +83,52 @@ class CategoryBySlugSerializer(CategorySerializer):
         product_data = []
 
         for product in products_with_images:
-            rating = product.get_popularity_score()  # Assuming this method exists
+            rating = product.get_popularity_score()  # Получаем рейтинг продукта
             product_serializer = ProductListSerializer(product, context=self.context)
             product_data.append({**product_serializer.data, 'popularity_score': rating})
 
         return product_data
 
     def get_min_price(self, obj):
-        # Assuming min_price is a field in the Product model
-        return obj.min_price
+        products = self.get_products(obj)
+        prices = []
+        for product in products:
+            for variant_data in product.get('variants', []):
+                price = variant_data.get('price')
+                discounted_price = variant_data.get('discounted_price')
+                if price:
+                    if discounted_price:
+                        prices.append(discounted_price)
+                    else:
+                        prices.append(price)
+        return min(prices) if prices else None
 
     def get_max_price(self, obj):
-        # Assuming max_price is a field in the Product model
-        return obj.max_price
+        products = self.get_products(obj)
+        min_prices = []
+
+        for product in products:
+            variants = product.get('variants', [])
+
+            # Находим минимальную цену среди всех вариантов продукта
+            min_price = None
+            for variant_data in variants:
+                price = variant_data.get('price')
+                discounted_price = variant_data.get('discounted_price')
+
+                if price:
+                    if discounted_price:
+                        current_min = min(price, discounted_price)
+                    else:
+                        current_min = price
+
+                    if min_price is None or current_min < min_price:
+                        min_price = current_min
+
+            if min_price is not None:
+                min_prices.append(min_price)
+
+        return max(min_prices) if min_prices else None
 
     def get_colors(self, obj):
         def get_all_products(category):
