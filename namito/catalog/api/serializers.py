@@ -90,10 +90,14 @@ class CategoryBySlugSerializer(CategorySerializer):
         return product_data
 
     def get_min_price(self, obj):
-        return obj.min_price
+        products = obj.products.all()  # получаем все продукты этой категории
+        min_price = min(products.values_list('min_price', flat=True)) if products else None
+        return min_price
 
     def get_max_price(self, obj):
-        return obj.max_price
+        products = obj.products.all()  # получаем все продукты этой категории
+        max_price = max(products.values_list('max_price', flat=True)) if products else None
+        return max_price
 
     def get_colors(self, obj):
         def get_all_products(category):
