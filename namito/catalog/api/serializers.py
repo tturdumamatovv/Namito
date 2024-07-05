@@ -91,12 +91,18 @@ class CategoryBySlugSerializer(CategorySerializer):
 
     def get_min_price(self, obj):
         products = self.get_products(obj)
-        prices = [product.get('min_price') for product in products if product.get('min_price') is not None]
+        prices = []
+        for product in products:
+            if 'min_price' in product and product['min_price'] is not None:
+                prices.append(product['min_price'])
         return min(prices) if prices else None
 
     def get_max_price(self, obj):
         products = self.get_products(obj)
-        prices = [product.get('max_price') for product in products if product.get('max_price') is not None]
+        prices = []
+        for product in products:
+            if 'max_price' in product and product['max_price'] is not None:
+                prices.append(product['max_price'])
         return max(prices) if prices else None
 
     def get_colors(self, obj):
