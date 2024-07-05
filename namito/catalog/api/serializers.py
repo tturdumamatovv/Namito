@@ -29,10 +29,15 @@ class CategorySerializer(serializers.ModelSerializer):
     children = serializers.SerializerMethodField()
     parent = serializers.SerializerMethodField()
 
+
     class Meta:
         model = Category
         fields = ['id', 'name', 'type', 'slug', 'image', 'parent', 'order', 'meta_title', 'meta_image',
                   'promotion', 'children', 'background_color', 'icon']
+
+    def get_fields(self):
+        fields = super().get_fields()
+        return fields
 
     def get_children(self, obj):
         if 'serialized_categories' not in self.context:
@@ -66,14 +71,14 @@ class CategoryBySlugSerializer(CategorySerializer):
         fields = CategorySerializer.Meta.fields + ['products', 'ratings', 'min_price', 'max_price',
                                                    'brands', 'colors', 'sizes']
 
-    def get_all_products(self, category):
-        products = list(category.products.filter(variants__isnull=False).distinct())
-        for child in category.children.all():
-            products.extend(self.get_all_products(child))
-        return Product.objects.filter(category=category)
-
     def get_products(self, obj):
-        products = self.get_all_products(obj)
+        def get_all_products(category):
+            products = list(category.products.filter(variants__isnull=False).distinct())
+            for child in category.children.all():
+                products.extend(get_all_products(child))
+            return products
+
+        products = get_all_products(obj)
         products_with_images = [product for product in products if Image.objects.filter(product=product).exists()]
         product_data = []
 
@@ -85,13 +90,54 @@ class CategoryBySlugSerializer(CategorySerializer):
         return product_data
 
     def get_min_price(self, obj):
-        return obj.get_min_price(obj)
+        products = self.get_products(obj)
+        prices = []
+        for product in products:
+            for variant_data in product.get('variants', []):
+                price = variant_data.get('price')
+                discounted_price = variant_data.get('discounted_price')
+                if price:
+                    if discounted_price:
+                        prices.append(discounted_price)
+                    else:
+                        prices.append(price)
+        return min(prices) if prices else None
 
     def get_max_price(self, obj):
-        return obj.get_max_price(obj)
+        products = self.get_products(obj)
+        min_prices = []
+
+        for product in products:
+            variants = product.get('variants', [])
+
+            # Находим минимальную цену среди всех вариантов продукта
+            min_price = None
+            for variant_data in variants:
+                price = variant_data.get('price')
+                discounted_price = variant_data.get('discounted_price')
+
+                if price:
+                    if discounted_price:
+                        current_min = min(price, discounted_price)
+                    else:
+                        current_min = price
+
+                    if min_price is None or current_min < min_price:
+                        min_price = current_min
+
+            if min_price is not None:
+                min_prices.append(min_price)
+
+        return max(min_prices) if min_prices else None
 
     def get_colors(self, obj):
-        products = self.get_all_products(obj)
+        def get_all_products(category):
+            products = list(category.products.filter(variants__isnull=False).distinct())
+            for child in category.children.all():
+                products.extend(get_all_products(child))
+            return products
+
+        products = get_all_products(obj)
         variants = Variant.objects.filter(product__in=products).select_related('color')
         colors = {variant.color for variant in variants if variant.color}
 
@@ -99,13 +145,25 @@ class CategoryBySlugSerializer(CategorySerializer):
         return data
 
     def get_brands(self, obj):
-        products = self.get_all_products(obj)
+        def get_all_products(category):
+            products = list(category.products.filter(variants__isnull=False).distinct())
+            for child in category.children.all():
+                products.extend(get_all_products(child))
+            return products
+
+        products = get_all_products(obj)
         brands = Brand.objects.filter(products__in=products).distinct()
         data = [{'name': brand.name} for brand in brands]
         return data
 
     def get_sizes(self, obj):
-        products = self.get_all_products(obj)
+        def get_all_products(category):
+            products = list(category.products.filter(variants__isnull=False).distinct())
+            for child in category.children.all():
+                products.extend(get_all_products(child))
+            return products
+
+        products = get_all_products(obj)
         variants = Variant.objects.filter(product__in=products).select_related('size')
         sizes = {variant.size for variant in variants if variant.size}
 
@@ -113,7 +171,13 @@ class CategoryBySlugSerializer(CategorySerializer):
         return data
 
     def get_ratings(self, obj):
-        products = self.get_all_products(obj)
+        def get_all_products(category):
+            products = list(category.products.filter(variants__isnull=False).distinct())
+            for child in category.children.all():
+                products.extend(get_all_products(child))
+            return products
+
+        products = get_all_products(obj)
         ratings = [math.floor(product.get_average_rating()) for product in products if product.get_average_rating() > 0]
         return set(ratings)
 
@@ -206,29 +270,19 @@ class ProductListSerializer(serializers.ModelSerializer):
                   'cart_quantity', 'images', 'characteristics']
 
     def get_price(self, product):
-        # Получаем самую минимальную цену среди всех вариантов продукта
-        min_price = Variant.objects.filter(product=product).aggregate(min_price=Min(
-            Case(
-                When(discounted_price__isnull=False, then='discounted_price'),
-                default='price',
-                output_field=IntegerField(),
-            )
-        ))['min_price']
+        # Получаем все варианты продукта с их ценами
+        variants = Variant.objects.filter(product=product)
 
-        if min_price is not None:
-            main_variant = Variant.objects.filter(product=product).filter(
-                Q(price=min_price) | Q(discounted_price=min_price)
-            ).first()
+        prices = []
+        for variant in variants:
+            price = variant.price
+            discount = variant.discounted_price if variant.discounted_price != variant.price else None
+            prices.append({
+                'price': price,
+                'reduced_price': discount
+            })
 
-            if main_variant:
-                price = main_variant.price
-                discount = main_variant.discounted_price
-                return {
-                    'price': price,
-                    'reduced_price': discount if discount != price else None
-                }
-
-        return {'price': 0, 'reduced_price': 0}
+        return prices
 
     def get_average_rating(self, product):
         average = Review.objects.filter(product=product).aggregate(Avg('rating'))['rating__avg']
