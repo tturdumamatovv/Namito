@@ -90,21 +90,45 @@ class CategoryBySlugSerializer(CategorySerializer):
         return product_data
 
     def get_min_price(self, obj):
-        products = Product.objects.filter(category=obj)
-        min_prices = []
+        products = self.get_products(obj)
+        prices = []
         for product in products:
-            min_price = product.min_price
-            if min_price > 0:  # Учитываем только ненулевые минимальные цены
-                min_prices.append(min_price)
-        return min(min_prices) if min_prices else None
+            for variant_data in product.get('variants', []):
+                price = variant_data.get('price')
+                discounted_price = variant_data.get('discounted_price')
+                if price:
+                    if discounted_price:
+                        prices.append(discounted_price)
+                    else:
+                        prices.append(price)
+        return min(prices) if prices else None
 
     def get_max_price(self, obj):
-        products = Product.objects.filter(category=obj)
-        max_prices = []
+        products = self.get_products(obj)
+        min_prices = []
+
         for product in products:
-            max_price = product.max_price
-            max_prices.append(max_price)
-        return max(max_prices) if max_prices else None
+            variants = product.get('variants', [])
+
+            # Находим минимальную цену среди всех вариантов продукта
+            min_price = None
+            for variant_data in variants:
+                price = variant_data.get('price')
+                discounted_price = variant_data.get('discounted_price')
+
+                if price:
+                    if discounted_price:
+                        current_min = min(price, discounted_price)
+                    else:
+                        current_min = price
+
+                    if min_price is None or current_min < min_price:
+                        min_price = current_min
+
+            if min_price is not None:
+                min_prices.append(min_price)
+
+        return max(min_prices) if min_prices else None
 
     def get_colors(self, obj):
         def get_all_products(category):
