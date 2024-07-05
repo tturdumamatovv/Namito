@@ -70,7 +70,7 @@ class CategoryBySlugSerializer(CategorySerializer):
         products = list(category.products.filter(variants__isnull=False).distinct())
         for child in category.children.all():
             products.extend(self.get_all_products(child))
-        return products
+        return Product.objects.filter(category=category)
 
     def get_products(self, obj):
         products = self.get_all_products(obj)
@@ -85,14 +85,10 @@ class CategoryBySlugSerializer(CategorySerializer):
         return product_data
 
     def get_min_price(self, obj):
-        products = self.get_all_products(obj)
-        prices = [product.min_price for product in products if product.min_price is not None]
-        return min(prices) if prices else None
+        return obj.get_min_price(obj)
 
     def get_max_price(self, obj):
-        products = self.get_all_products(obj)
-        prices = [product.max_price for product in products if product.max_price is not None]
-        return max(prices) if prices else None
+        return obj.get_max_price(obj)
 
     def get_colors(self, obj):
         products = self.get_all_products(obj)
