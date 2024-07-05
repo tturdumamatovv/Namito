@@ -270,19 +270,29 @@ class ProductListSerializer(serializers.ModelSerializer):
                   'cart_quantity', 'images', 'characteristics']
 
     def get_price(self, product):
-        # Получаем все варианты продукта с их ценами
-        variants = Variant.objects.filter(product=product)
+        # Получаем самую минимальную цену среди всех вариантов продукта
+        min_price = Variant.objects.filter(product=product).aggregate(min_price=Min(
+            Case(
+                When(discounted_price__isnull=False, then='discounted_price'),
+                default='price',
+                output_field=IntegerField(),
+            )
+        ))['min_price']
 
-        prices = []
-        for variant in variants:
-            price = variant.price
-            discount = variant.discounted_price if variant.discounted_price != variant.price else None
-            prices.append({
-                'price': price,
-                'reduced_price': discount
-            })
+        if min_price is not None:
+            main_variant = Variant.objects.filter(product=product).filter(
+                Q(price=min_price) | Q(discounted_price=min_price)
+            ).first()
 
-        return prices
+            if main_variant:
+                price = main_variant.price
+                discount = main_variant.discounted_price
+                return {
+                    'price': price,
+                    'reduced_price': discount if discount != price else None
+                }
+
+        return {'price': 0, 'reduced_price': 0}
 
     def get_average_rating(self, product):
         average = Review.objects.filter(product=product).aggregate(Avg('rating'))['rating__avg']
