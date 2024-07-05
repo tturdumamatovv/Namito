@@ -132,6 +132,7 @@ class Product(models.Model):
                                    verbose_name=_('Мета картинка'))
     keywords = models.TextField(null=True, blank=True, help_text=_('Запишите ключевые слова через запятую'), verbose_name=_('Ключевые слова'))
     min_price = models.PositiveIntegerField(default=0, verbose_name=_('Минимальная цена'))
+    max_price = models.PositiveIntegerField(default=0, verbose_name=_('Максимальная цена'))
     tags = models.ManyToManyField(Tag, blank=True, verbose_name=_('Теги'))
     is_top = models.BooleanField(default=False, verbose_name=_('Топ продукт'))
     is_new = models.BooleanField(default=False, verbose_name=_('Новый продукт'))
@@ -222,6 +223,14 @@ class Product(models.Model):
             'max_price': price_data
         }
 
+    def update_price_range(self):
+        variants = self.variants.all()
+        min_price = variants.aggregate(models.Min('discounted_price'))['discounted_price__min']
+        max_price = variants.aggregate(models.Max('discounted_price'))['discounted_price__max']
+        self.min_price = min_price if min_price is not None else 0
+        self.max_price = max_price if max_price is not None else 0
+        self.save()
+
 
 class ProductView(models.Model):
     product = models.ForeignKey(Product, related_name='views', on_delete=models.CASCADE)
@@ -311,6 +320,11 @@ class Variant(models.Model):
             elif self.discount_type == 'unit':
                 return round(self.price - self.discount_value)
         return self.price
+
+    def save(self, *args, **kwargs):
+        self.discounted_price = self.get_price()
+        super().save(*args, **kwargs)
+        self.product.update_price_range()
 
 
 class Image(ProcessedImageModel):
