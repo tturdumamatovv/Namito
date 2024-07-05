@@ -317,6 +317,8 @@ class ProductListSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         variants = Variant.objects.filter(product=instance)
         representation['variants'] = VariantSerializer(variants, many=True).data
+        representation['min_price'] = instance.get_min_price()
+        representation['max_price'] = instance.get_max_price()
         return representation
 
 
