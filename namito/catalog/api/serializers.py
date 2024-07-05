@@ -64,8 +64,8 @@ class CategoryBySlugSerializer(CategorySerializer):
     brands = serializers.SerializerMethodField()
     sizes = serializers.SerializerMethodField()
     ratings = serializers.SerializerMethodField()
-    min_price = serializers.SerializerMethodField()
-    max_price = serializers.SerializerMethodField()
+    min_price = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
+    max_price = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
 
     class Meta(CategorySerializer.Meta):
         fields = CategorySerializer.Meta.fields + ['products', 'ratings', 'min_price', 'max_price',
@@ -83,23 +83,19 @@ class CategoryBySlugSerializer(CategorySerializer):
         product_data = []
 
         for product in products_with_images:
-            rating = product.get_popularity_score()  # Получаем рейтинг продукта
+            rating = product.get_popularity_score()  # Assuming this method exists
             product_serializer = ProductListSerializer(product, context=self.context)
             product_data.append({**product_serializer.data, 'popularity_score': rating})
 
         return product_data
 
     def get_min_price(self, obj):
-        products = self.get_products(obj)
-        prices = [product.get('min_price') for product in products if
-                  'min_price' in product and product.get('min_price') is not None]
-        return min(prices) if prices else None
+        # Assuming min_price is a field in the Product model
+        return obj.min_price
 
     def get_max_price(self, obj):
-        products = self.get_products(obj)
-        prices = [product.get('max_price') for product in products if
-                  'max_price' in product and product.get('max_price') is not None]
-        return max(prices) if prices else None
+        # Assuming max_price is a field in the Product model
+        return obj.max_price
 
     def get_colors(self, obj):
         def get_all_products(category):
