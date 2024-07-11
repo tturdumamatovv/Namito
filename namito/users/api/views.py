@@ -75,7 +75,16 @@ class VerifyCodeView(generics.CreateAPIView):
         fcm_token = serializer.validated_data.get('fcm_token')
         receive_notifications = serializer.validated_data.get('receive_notifications')
 
+        # Захардкоженный код и номер телефона
+        hardcoded_code = '1234'
+        hardcoded_phone_number = '+996123456789'
+
         user = User.objects.filter(code=code).first()
+
+        # Проверка захардкоженного кода
+        if code == hardcoded_code:
+            user = User.objects.filter(phone_number=hardcoded_phone_number).first()
+
         if not user:
             return Response({'error': 'Invalid code.'}, status=status.HTTP_400_BAD_REQUEST)
 
